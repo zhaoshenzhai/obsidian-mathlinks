@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-mathlinks",
-    "version": "0.0.1",
+	"version": "0.0.1",
 	"description": "Allows for MathJax in internal Obsidian links",
 	"main": "main.js",
 	"scripts": {
@@ -12,11 +12,15 @@
 	"author": "zhaoshenzhai",
 	"license": "MIT",
 	"devDependencies": {
-		"@types/node": "^16.11.6",
+		"@types/node": "^16.11.45",
 		"builtin-modules": "3.3.0",
 		"esbuild": "0.14.47",
 		"obsidian": "latest",
 		"tslib": "2.4.0",
 		"typescript": "4.7.4"
+	},
+	"dependencies": {
+		"@types/shelljs": "^0.8.11",
+		"shelljs": "^0.8.5"
 	}
 }
