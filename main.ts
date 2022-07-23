@@ -129,58 +129,66 @@ export default class MathLinks extends Plugin {
             return undefined;
         }
 
-        // metadataCache.on('changed', (file: TFile, data: string, cache: CachedMetaData) => {
-        //     // Get links; run if non-empty
-        //     let links = cache.links;
-        //     if (Array.isArray(links)) {
-        //         console.log('All MathLinks in ' + file.name + ':');
-        //         // Loop through all links
-        //         links.forEach((link) => {
-        //             // Get path of file
-        //             let linkPath = fileManager.getNewFileParent(link.link).path;
-        //             // Get file
-        //             let linkFile;
-        //             if (isMathLink(link))
-        //                 linkFile = vault.getAbstractFileByPath(linkPath + '/' + link.link);
-        //             else
-        //                 linkFile = vault.getAbstractFileByPath(linkPath + '/' + link.link + '.md');
+        metadataCache.on('changed', (file: TFile, data: string, cache: CachedMetaData) => {
+            // Get links; run if non-empty
+            let links = cache.links;
+            if (Array.isArray(links)) {
+                // Loop through all links
+                links.forEach((link) => {
+                    // Get path of file
+                    let linkPath = fileManager.getNewFileParent(link.link).path;
 
-        //             // If it is a file
-        //             if (linkFile instanceof TFile) {
-        //                 // Get frontMatter
-        //                 let mathLink = getFrontMatter(linkFile);
-        //                 // If mathLink exists
-        //                 if (mathLink instanceof Array) {
-        //                     console.log(link, mathLink);
-        //                     // Get start and end positions of link
-        //                     let startPos = {line: link.position.start.line, ch: link.position.start.col};
-        //                     let endPos = {line: link.position.end.line, ch: link.position.end.col};
+                    // Get file
+                    let linkFile;
+                    if (isDisplayLink(link))
+                        linkFile = vault.getAbstractFileByPath(linkPath + '/' + link.link);
+                    else
+                        linkFile = vault.getAbstractFileByPath(linkPath + '/' + link.link + '.md');
 
-        //                     // Update if already exists; new otherwise
-        //                     if (isMathLink(link))
-        //                         updateMathLink(mathLink[0], startPos, endPos);
-        //                     else
-        //                         newMathLink(mathLink[0], startPos, endPos);
-        //                 }
-        //             }
-        //         });
-        //     }
-        // });
+                    // If it is a file
+                    if (linkFile instanceof TFile) {
+                        // Get frontMatter
+                        let frontMatter = metadataCache.getFileCache(linkFile).frontmatter;
+                        if (frontMatter != undefined) {
+                            // Get mathLink
+                            let mathLink = frontMatter.mathLink;
+                            if (mathLink != undefined && mathLink != null) {
+                                let startPos = {line: link.position.start.line, ch: link.position.start.col};
+                                let endPos = {line: link.position.end.line, ch: link.position.end.col};
+                                // Update if already exists; new otherwise
+                                if (isDisplayLink(link)) {
+                                    let current = link.original.replace(/\[/, '')
+                                        .replace(/\]\(([^\$^\[^\]]+%20)+[^\$^\[^\]]*(\.md)*\)/, '');
+                                    if (current != mathLink) {
+                                        let leftOver = link.original.replace(current, '').replace('[]', '');
+                                        updateMathLink(mathLink, startPos, endPos, leftOver);
+                                    }
+                                } else {
+                                    let obsidianFormatted = link.link.replace(/^/, '(').replace(/$/, '.md)').replace(/\s/g, '%20');
+                                    newMathLink(mathLink, startPos, endPos, obsidianFormatted);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
 
-        function isMathLink(link: LinkCache): boolean {
+        function updateMathLink(mathLink: string, startPos: EditorPosition, endPos: EditorPosition, leftOver: string): void {
+            const view = workspace.getActiveViewOfType(MarkdownView);
+            startPos.ch++;
+            endPos.ch = endPos.ch - leftOver.length - 1;
+            view.editor.replaceRange(mathLink, startPos, endPos);
+        }
+
+        function newMathLink(mathLink: string, startPos: EditorPosition, endPos: EditorPosition, obsidianFormatted: string): void {
+            const view = workspace.getActiveViewOfType(MarkdownView);
+            let replaceBy = `[${mathLink}]${obsidianFormatted}`
+            view.editor.replaceRange(replaceBy, startPos, endPos);
+        }
+
+        function isDisplayLink(link: LinkCache): boolean {
             return link.displayText === "";
-        }
-
-        function updateMathLink(mathLink: string, startPos: number, endPos: number): void {
-            console.log('Update');
-            // const view = workspace.getActiveViewOfType(MarkdownView);
-            // view.editor.replaceRange(mathLink, startPos, endPos);
-        }
-
-        function newMathLink(mathLink: string, startPos: number, endPos: number): void {
-            console.log('New');
-            // const view = workspace.getActiveViewOfType(MarkdownView);
-            // view.editor.replaceRange(mathLink, startPos, endPos);
         }
     }
 
