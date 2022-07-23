@@ -1,37 +1,39 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-
-interface MathLinksSettings {
-	mySetting: string;
-}
-
-const DEFAULT_SETTINGS: MathLinksSettings = {
-	mySetting: 'default'
-}
+import { App, Plugin, Editor, MarkdownView, TFile } from 'obsidian';
 
 export default class MathLinks extends Plugin {
-	settings: MathLinksSettings;
-
 	async onload() {
-		await this.loadSettings();
-
         const { vault } = this.app;
         const { workspace } = this.app;
+        const { metadataCache } = this.app;
+        const { fileManager } = this.app;
 
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
-
+        // Command to add mathLink
+        // Only available if there is no mathLink
 		this.addCommand({
 			id: 'add-mathlink',
 			name: 'Add a MathLink to the current file',
 			checkCallback: (checking: boolean) => {
                 const view = workspace.getActiveViewOfType(MarkdownView);
 				if (view) {
-                    if (getMathLink() == null) {
+                    let yaml = getYaml(workspace.getActiveFile());
+                    if (!(yaml instanceof Array)) {
+                        console.log('Add ' + yaml);
                         if (!checking) {
-                            new AddMathLink(this.app, (mathLink: string) => {
-                                new Notice('MathLink added');
-                            }).open();
+                            let editor = view.editor;
+                            if (yaml === null) { // Add mathLink if yaml: null
+                                // Continue here
+                            } else { // Add mathLink if yaml: EditorRange
+                                // Change to edit mode
+                                let currentState = workspace.getLeaf().getViewState();
+                                currentState.state.mode = 'source';
+                                workspace.getLeaf(false).setViewState(currentState);
+
+                                // Add 'mathLink: ' and focus cursor
+                                let lineToAppendTo = yaml.to.line - 1;
+                                editor.setLine(lineToAppendTo, editor.getLine(lineToAppendTo) + '\nmathLink: ');
+                                editor.setCursor(yaml.to.line);
+                                editor.focus();
+                            }
                         }
                         return true;
                     }
@@ -40,17 +42,22 @@ export default class MathLinks extends Plugin {
 			}
 		});
 
+        // Command to edit mathLink
+        // Only available if mathLink exists
 		this.addCommand({
 			id: 'edit-mathlink',
 			name: 'Edit the MathLink of the current file',
 			checkCallback: (checking: boolean) => {
                 const view = workspace.getActiveViewOfType(MarkdownView);
 				if (view) {
-                    if (getMathLink() != null) {
+                    let yaml = getYaml(workspace.getActiveFile());
+                    if (yaml instanceof Array) {
+                        console.log('Edit ' + yaml);
                         if (!checking) {
-                            new EditMathLink(this.app, (mathLink: string) => {
-                                new Notice('MathLink edited');
-                            }).open();
+                            // Edit mathLink (yaml: [string, EditorRange])
+                            // new EditMathLink(this.app, (mathLink: string) => {
+                            //     new Notice('MathLink edited');
+                            // }).open();
                         }
                         return true;
                     }
@@ -59,143 +66,81 @@ export default class MathLinks extends Plugin {
 			}
 		});
 
-        function getMathLink(): string | null {
-            const view = workspace.getActiveViewOfType(MarkdownView);
-            if (view.editor.getLine(0) === '---') {
-                let lineNumber = 1;
-                while (true) {
-                    let line = view.editor.getLine(lineNumber);
-                    if (line.substring(0, 5) === 'alias') {
-                    //if (line.substring(0, 8) === 'mathLink') {
-                        return line;
-                    } else if (line === '---') {
-                        return null;
-                    } else {
-                        lineNumber = ++lineNumber;
-                    }
-                }
+        function getYaml(file: TFile): [string, EditorRange] | EditorRange | null {
+            // Get YAML frontmatter
+            let yaml = metadataCache.getFileCache(file).frontmatter;
+
+            // If no frontmatter, return null
+            if (yaml === undefined)
+                return null;
+            else {
+                // Get frontmatter range
+                let yamlRange: EditorRange = {from: yaml.position.start, to: yaml.position.end};
+                // Return range if no mathlink
+                if (yaml.mathLink === undefined) {
+                    return yamlRange;
+                // Return mathLink if it exists
+                } else
+                    return [yaml.mathLink, yamlRange];
             }
-            return null;
         }
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+        metadataCache.on('changed', (file: TFile, data: string, cache: CachedMetaData) => {
+            // Get links; run if non-empty
+            let links = cache.links;
+            if (Array.isArray(links)) {
+                console.log('All MathLinks of ' + file.name + ':');
+                // Loop through all links
+                links.forEach((link) => {
+                    // Get path of file
+                    let linkPath = fileManager.getNewFileParent(link.link).path;
+                    // Get file
+                    let linkFile;
+                    if (isMathLink(link))
+                        linkFile = vault.getAbstractFileByPath(linkPath + '/' + link.link);
+                    else
+                        linkFile = vault.getAbstractFileByPath(linkPath + '/' + link.link + '.md');
+
+                    // If it is a file
+                    if (linkFile instanceof TFile) {
+                        // Get YAML
+                        let mathLink = getYaml(linkFile);
+                        // If mathLink exists
+                        if (mathLink instanceof Array) {
+                            console.log(link, mathLink);
+                            // Get start and end positions of link
+                            let startPos = {line: link.position.start.line, ch: link.position.start.col};
+                            let endPos = {line: link.position.end.line, ch: link.position.end.col};
+
+                            // Update if already exists; new otherwise
+                            if (isMathLink(link))
+                                updateMathLink(mathLink[0], startPos, endPos);
+                            else
+                                newMathLink(mathLink[0], startPos, endPos);
+                        }
+                    }
+                });
+            }
+        });
+
+        function isMathLink(link: LinkCache): boolean {
+            return link.displayText === "";
+        }
+
+        function updateMathLink(mathLink: string, startPos: number, endPos: number): void {
+            console.log('Update');
+            // const view = workspace.getActiveViewOfType(MarkdownView);
+            // view.editor.replaceRange(mathLink, startPos, endPos);
+        }
+
+        function newMathLink(mathLink: string, startPos: number, endPos: number): void {
+            console.log('New');
+            // const view = workspace.getActiveViewOfType(MarkdownView);
+            // view.editor.replaceRange(mathLink, startPos, endPos);
+        }
     }
 
 	async onunload() {
         console.log('Unloaded');
-	}
-
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
-}
-
-class AddMathLink extends Modal {
-    mathLink: string;
-    onSubmit: (mathLink: string) => void;
-
-    constructor(app: App, onSubmit: (mathLink: string) => void) {
-        super(app);
-        this.onSubmit = onSubmit;
-    }
-
-    onOpen() {
-        const { contentEl } = this;
-
-        contentEl.createEl("h1", { text: 'Add a MathLink to the current file' });
-
-        new Setting(contentEl)
-            .setName("MathLink")
-            .addText((text) =>
-                text.onChange((value) => {
-                    this.mathLink = value
-                }));
-
-        new Setting(contentEl)
-            .addButton((btn) =>
-                btn
-                .setButtonText("Add")
-                .setCta()
-                .onClick(() => {
-                    this.close();
-                    this.onSubmit(this.mathLink);
-                }));
-    }
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-class EditMathLink extends Modal {
-    mathLink: string;
-    onSubmit: (mathLink: string) => void;
-
-    constructor(app: App, onSubmit: (mathLink: string) => void) {
-        super(app);
-        this.onSubmit = onSubmit;
-    }
-
-    onOpen() {
-        const { contentEl } = this;
-
-        contentEl.createEl("h1", { text: 'Edit the MathLink of the current file' });
-
-        new Setting(contentEl)
-            .setName("MathLink")
-            .addText((text) =>
-                text.onChange((value) => {
-                    this.mathLink = value
-                }));
-
-        new Setting(contentEl)
-            .addButton((btn) =>
-                btn
-                .setButtonText("Edit")
-                .setCta()
-                .onClick(() => {
-                    this.close();
-                    this.onSubmit(this.mathLink);
-                }));
-    }
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MathLinks;
-
-	constructor(app: App, plugin: MathLinks) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const {containerEl} = this;
-
-		containerEl.empty();
-
-		containerEl.createEl('h2', {text: 'Settings for my awesome plugin.'});
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					console.log('Secret: ' + value);
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
 	}
 }
