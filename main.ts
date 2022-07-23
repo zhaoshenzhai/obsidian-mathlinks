@@ -1,19 +1,19 @@
 import { App, Plugin, Editor, MarkdownView, TFile } from 'obsidian';
 
 export default class MathLinks extends Plugin {
-	async onload() {
+    async onload() {
         const { vault } = this.app;
         const { workspace } = this.app;
         const { metadataCache } = this.app;
         const { fileManager } = this.app;
 
         // Command to add mathLink. Only available if there is no mathLink
-		this.addCommand({
-			id: 'add-mathlink',
-			name: 'Add a MathLink to the current file',
-			checkCallback: (checking: boolean) => {
+        this.addCommand({
+            id: 'add-mathlink',
+            name: 'Add a MathLink to the current file',
+            checkCallback: (checking: boolean) => {
                 const view = workspace.getActiveViewOfType(MarkdownView);
-			    if (view) {
+                if (view) {
                     let currentFile = workspace.getActiveFile();
                     let mathLink = getMathLink();
                     if (mathLink === undefined || mathLink[0] === null) {
@@ -56,12 +56,12 @@ export default class MathLinks extends Plugin {
         });
 
         // Command to edit mathLink. Only available if mathLink exists
-		this.addCommand({
-			id: 'edit-mathlink',
-			name: 'Edit the MathLink of the current file',
-			checkCallback: (checking: boolean) => {
+        this.addCommand({
+            id: 'edit-mathlink',
+            name: 'Edit the MathLink of the current file',
+            checkCallback: (checking: boolean) => {
                 const view = workspace.getActiveViewOfType(MarkdownView);
-				if (view) {
+                if (view) {
                     let mathLink = getMathLink();
                     if (mathLink != undefined) {
                         if (typeof mathLink[0] === 'string') {
@@ -78,10 +78,10 @@ export default class MathLinks extends Plugin {
                             return true;
                         }                       
                     }
-				}
+                }
                 return false;
-			}
-		});
+            }
+        });
 
         // Get frontMatter as string[] and EditorRange. Undefined otherwise.
         function getFrontMatter(): [string[], EditorRange] | undefined {
@@ -184,7 +184,7 @@ export default class MathLinks extends Plugin {
         }
     }
 
-	async onunload() {
+    async onunload() {
         console.log('Unloaded');
-	}
+    }
 }
