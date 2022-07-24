@@ -129,8 +129,11 @@ export default class MathLinks extends Plugin {
             return undefined;
         }
 
+        // Runs when file is change
+        // Ideally, I want to run it when a link is added/new mathLink is created
+        // Will need to look into it...
         metadataCache.on('changed', (file: TFile, data: string, cache: CachedMetaData) => {
-            // Get links; run if non-empty
+            // Get (out)links; run if non-empty
             let links = cache.links;
             if (Array.isArray(links)) {
                 // Loop through all links
@@ -172,6 +175,19 @@ export default class MathLinks extends Plugin {
                     }
                 });
             }
+
+            console.log('Backlinks');
+            let resolvedLinks = metadataCache.resolvedLinks;
+            let keys = Object.keys(resolvedLinks);
+            keys.forEach((key) => {
+                let links = resolvedLinks[key];
+                Object.keys(links).forEach((link) => {
+                    if (link === file.path) {
+                        console.log(key);
+                        console.log(metadataCache.getFirstLinkpathDest(key, key));
+                    }
+                });
+            });
         });
 
         function updateMathLink(mathLink: string, startPos: EditorPosition, endPos: EditorPosition, leftOver: string): void {
