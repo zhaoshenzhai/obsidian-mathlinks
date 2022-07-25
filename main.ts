@@ -12,7 +12,6 @@ export default class MathLinks extends Plugin {
         // Generate mathLinks of outLinks in file if file  is change.
         //     Want to midify it so it runs only if a link is created.
         metadataCache.on('changed', async (file: TFile, data: string, cache: CachedMetaData) => {
-            console.log(file.name);
             let mathLink = await getMathLink(file);
             if (mathLink != null && mathLink != undefined) {
                 let backLinkFilePaths: string[] = [];
@@ -42,24 +41,26 @@ export default class MathLinks extends Plugin {
 
             let fileContent = await vault.read(file);
             let modified = fileContent;
-            cache.links.forEach(async (outLink) => {
-                let outLinkFileName = outLink.link;
-                if (outLink.displayText != "")
-                    outLinkFileName = outLinkFileName.replace(/$/, '.md');
-                let outLinkFilePath = fileManager.getNewFileParent(outLinkFileName).path + '/' + outLinkFileName;
-                let outLinkFile = vault.getAbstractFileByPath(outLinkFilePath);
+            if (cache.links != undefined) {
+                cache.links.forEach(async (outLink) => {
+                    let outLinkFileName = outLink.link;
+                    if (outLink.displayText != "")
+                        outLinkFileName = outLinkFileName.replace(/$/, '.md');
+                    let outLinkFilePath = fileManager.getNewFileParent(outLinkFileName).path + '/' + outLinkFileName;
+                    let outLinkFile = vault.getAbstractFileByPath(outLinkFilePath);
 
-                if (outLinkFile instanceof TFile) {
-                    let outLinkMathLink = await getMathLink(outLinkFile);
-                    if (outLinkMathLink != null && outLinkMathLink != undefined) {
-                        modified = generateMathLinks(outLinkFileName, modified, outLinkMathLink[0]);
+                    if (outLinkFile instanceof TFile) {
+                        let outLinkMathLink = await getMathLink(outLinkFile);
+                        if (outLinkMathLink != null && outLinkMathLink != undefined) {
+                            modified = generateMathLinks(outLinkFileName, modified, outLinkMathLink[0]);
 
-                        if (fileContent != modified) {
-                            await vault.modify(file, modified);
+                            if (fileContent != modified) {
+                                await vault.modify(file, modified);
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         });
 
         // Get mathLink as string (with lineNumber). If key exists but not value, return null (with lineNumber). Undefined otherwise.
