@@ -12,6 +12,7 @@ export default class MathLinks extends Plugin {
         // Generate mathLinks of outLinks in file if file  is change.
         //     Want to midify it so it runs only if a link is created.
         metadataCache.on('changed', async (file: TFile, data: string, cache: CachedMetaData) => {
+            console.log(file.name);
             let mathLink = await getMathLink(file);
             if (mathLink != null && mathLink != undefined) {
                 let backLinkFilePaths: string[] = [];
@@ -29,16 +30,8 @@ export default class MathLinks extends Plugin {
                         let backLinkFile = vault.getAbstractFileByPath(backLinkFilePath);
                         if (backLinkFile instanceof TFile) {
                             let backLinkFileContent = await vault.read(backLinkFile);
+                            let modified = generateMathLinks(file.name, backLinkFileContent, mathLink[0]);
 
-                            let left = mathLink[0].replace(/^/, '[').replace(/$/, ']');
-                            let right = file.name.replace(/^/, '(').replace(/$/, ')').replace(/\s/g, '%20');
-                            let newLink = `${left}${right}`
-
-                            let rightFormatted = right.replace(/\./, '\\.').replace(/\(/, '\\(').replace(/\)/, '\\)').replace(/\%/, '\\%');
-                            let mixedLink = new RegExp('\\[((?!\\]\\(|\\]\\]).)*\\]' + rightFormatted, 'g');
-                            let doubleLink = new RegExp(file.name.replace(/^/, '\\[\\[').replace(/\.md$/, '\\]\\]').replace(/\s/g, '\\s'), 'g');
-
-                            let modified = backLinkFileContent.replace(mixedLink, newLink).replace(doubleLink, newLink);
                             if (backLinkFileContent != modified) {
                                 vault.modify(backLinkFile, modified);
                             }
@@ -59,13 +52,8 @@ export default class MathLinks extends Plugin {
                 if (outLinkFile instanceof TFile) {
                     let outLinkMathLink = await getMathLink(outLinkFile);
                     if (outLinkMathLink != null && outLinkMathLink != undefined) {
-                        let doubleLink = new RegExp(outLinkFileName.replace(/^/, '\\[\\[').replace(/\.md$/, '\\]\\]').replace(/\s/g, '\\s'), 'g');
+                        modified = generateMathLinks(outLinkFileName, modified, outLinkMathLink[0]);
 
-                        let left = outLinkMathLink[0].replace(/^/, '[').replace(/$/, ']');
-                        let right = outLinkFileName.replace(/^/, '(').replace(/$/, ')').replace(/\s/g, '%20');
-                        let newLink = `${left}${right}`;
-
-                        modified = modified.replace(doubleLink, newLink);
                         if (fileContent != modified) {
                             await vault.modify(file, modified);
                         }
@@ -75,17 +63,9 @@ export default class MathLinks extends Plugin {
         });
 
         // Get mathLink as string (with lineNumber). If key exists but not value, return null (with lineNumber). Undefined otherwise.
-        async function getMathLink(file?: TFile): [string, number] | [null, number] | undefined {
-            let contents = [];
-            if (file != null) {
-                contents = await vault.read(file);
-                contents = contents.split(/\r?\n/);
-            } else {
-                const editor = workspace.getActiveViewOfType(MarkdownView).editor;
-                for (let i = 0; i < editor.lineCount(); i++) {
-                    contents.push(editor.getLine(i));
-                }
-            }
+        async function getMathLink(file: TFile): [string, number] | [null, number] | undefined {
+            let contents = await vault.read(file);
+            contents = contents.split(/\r?\n/);
 
             if (contents[0] === '---') {
                 for (let lineNumber = 1; lineNumber < contents.length; lineNumber++) {
@@ -96,10 +76,15 @@ export default class MathLinks extends Plugin {
                         let key = line.substring(0, 10);
                         if (key === 'mathLink: ') {
                             let value = line.replace(key, '');
-                            if (value != '')
+                            if (value != '') {
+                                if (value === 'auto') {
+                                    let mathLink = await generateMathLinkFromAuto(file);
+                                    return [mathLink, lineNumber];
+                                }
                                 return [value, lineNumber];
-                            else
+                            } else {
                                 return [null, lineNumber];
+                            }
                         } else if (line === '---') {
                             return undefined;
                         } else {
@@ -109,6 +94,48 @@ export default class MathLinks extends Plugin {
                 }
             }
             return undefined;
+        }
+
+        // Generate mathLink from 'mathLink: auto' and file.name
+        async function generateMathLinkFromAuto(file: Tfile): string {
+            return file.name.replace('\.md', '')
+                .replace(/\bn-\b/g, '$n$-'                                      ) // n prefix
+                .replace(/\bR\b/g, '$\\R$'                                      ) // Real numbers
+                .replace(/\bN\b/g, '$\\N$'                                      ) // Natural numbers
+                .replace(/\bR2\b/g, '$\\R\\^2$'                                 ) // Real numbers squared
+                .replace(/\bN2\b/g, '$\\N\\^2$'                                 ) // Natural numbers squared
+                .replace(/\bequals\b/g, '$=$'                                   ) // Equals
+                .replace(/\bimplies\b/g, '$\\Rightarrow$'                       ) // Implies
+                .replace(/\biff\b/g, '$\\Leftrightarrow$'                       ) // Equivalence
+                .replace(/\bON\b/g, '$\textrm{ON}$'                             ) // Class of ordinals
+                .replace(/\bK\b/g, '$K$'                                        ) // K topology
+                .replace(/\sslash\s/g, '$\\slash$'                              ) // Slash
+                .replace(/\bCategory\sof\sSets\b/gi, '$\\catset$'               ) // Category of Sets
+                .replace(/\bCategory\sof\sRelations\b/gi, '$\\catrel$'          ) // Category of Relations
+                .replace(/\bCategory\sof\sVector\sSpaces\b/gi, '$\\catvect[K]$' ) // Category of Vector Spaces ov
+                .replace(/\brepr\sunder\sbasis\b/g, '$\\Leftrightarrow^\\textrm{repr.}_\\textrm{bases}$');
+                                                                         // represented by/represents under a choice of basis
+        }
+
+        // Convert mixed and double links to math links
+        function generateMathLinks(fileName: string, fileContent: string, mathLink: string): string {
+            let left = mathLink.replace(/^/, '[').replace(/$/, ']');
+            let right = fileName.replace(/^/, '(').replace(/$/, ')').replace(/\s/g, '%20');
+            let newLink = `${left}${right}`;
+
+            let mixedLink = new RegExp('\\[((?!\\]\\(|\\]\\]).)*\\]' + format(right), 'g');
+            let doubleLink = new RegExp(format(fileName.replace(/^/, '\\[\\[').replace(/\.md$/, '\\]\\]')), 'g');
+
+            return fileContent.replace(mixedLink, newLink).replace(doubleLink, newLink);
+        }
+
+        // Format str for regex
+        function format(str: string): string {
+            return str
+                .replace(/\s/g, '\\s')
+                .replace(/\./g, '\\.')
+                .replace(/\(/g, '\\(')
+                .replace(/\)/g, '\\)');
         }
     }
 
