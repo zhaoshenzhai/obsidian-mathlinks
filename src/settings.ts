@@ -1,4 +1,4 @@
-import { Setting, PluginSettingTab, Modal, TextComponent } from 'obsidian';
+import { Setting, PluginSettingTab, Modal, TextComponent, Notice } from 'obsidian';
 
 export class MathLinksSettingTab extends PluginSettingTab {
     plugin: MathLinks;
@@ -15,7 +15,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
         containerEl.createEl('h2', {text: 'MathLinks Settings'});
 
         new Setting(containerEl)
-            .setName('Add a new MathLink template')
+            .setName('Add a new template')
             .setDesc(
                 createFragment((e) => {
                     e.createSpan({
@@ -46,6 +46,29 @@ export class MathLinksSettingTab extends PluginSettingTab {
 
                                 this.plugin.settings.templates.push(template);
                                 await this.plugin.saveSettings();
+                                new Notice('MathLink template added');
+                            }
+                        };
+
+                        modal.open();
+                    });
+                return b;
+            });
+
+        new Setting(containerEl)
+            .setName('Edit templates')
+            .setDesc('Opens a modal lto edit existing templates.')
+            .addButton((button: ButtonComponent): ButtonComponent => {
+                let b = button
+                    .setTooltip("Edit")
+                    .setIcon("edit")
+                    .onClick(async () => {
+                        let modal = new EditTemplatesModal(this.app, this.plugin.settings.templates);
+
+                        modal.onClose = async () => {
+                            if (modal.saved) {
+                                await this.plugin.saveSettings();
+                                new Notice('MathLink templates saved');
                             }
                         };
 
@@ -92,11 +115,73 @@ class AddTemplatesModal extends Modal {
             });
 
         new Setting(contentEl)
-            .setName('Case insensitive')
-            .setDesc('Matches will be case insensitive.')
+            .setName('Case sensitive')
+            .setDesc('Matches will be case sensitive.')
             .addToggle((toggle) => {
-                toggle.setValue(this.sensitive).onChange((current) => (this.sensitive = !current));
+                toggle.setValue(true).onChange((current) => (this.sensitive = current));
             });
+
+        let footerEl = contentEl.createDiv();
+        let footerButtons = new Setting(footerEl);
+        footerButtons.addButton((b) => {
+            b.setTooltip("Save")
+                .setIcon("checkmark")
+                .onClick(async () => {
+                    this.saved = true;
+                    this.close();
+                });
+            return b;
+        });
+        footerButtons.addExtraButton((b) => {
+            b.setTooltip("Cancel")
+                .setIcon("cross")
+                .onClick(() => {
+                    this.saved = false;
+                    this.close();
+                });
+            return b;
+        });
+    }
+}
+
+class EditTemplatesModal extends Modal {
+    saved: boolean = false;
+    templates: string[];
+
+    constructor(app: App, templates: string[]) {
+        super(app);
+        this.templates = templates;
+    }
+
+    onOpen() {
+        const { contentEl } = this;
+        let templates = this.templates;
+
+        contentEl.createEl('h2', {text: 'Edit templates'});
+
+        for (let i = 0; i < templates.length; i++) {
+            let replacedText: TextComponent;
+            let replacementText: TextComponent;
+            new Setting(contentEl)
+                .setDesc('Replace all... with ... Case sensitive?')
+                .addText((text) => {
+                    replacedText = text;
+                    replacedText.setPlaceholder(templates[i].replaced);
+                    replacedText.setValue(templates[i].replaced).onChange((current) => {
+                        templates[i].replaced = current;
+                    });
+                })
+                .addText((text) => {
+                    replacementText = text;
+                    replacementText.setPlaceholder(templates[i].replacement);
+                    replacementText.setValue(templates[i].replacement).onChange((current) => {
+                        templates[i].replacement = current;
+                    });
+                })
+                .addToggle((toggle) => {
+                    toggle.setValue(templates[i].sensitive).onChange((current) => (templates[i].sensitive = current));
+                });
+        }
 
         let footerEl = contentEl.createDiv();
         let footerButtons = new Setting(footerEl);
