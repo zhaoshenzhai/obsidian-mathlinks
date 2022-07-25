@@ -1,7 +1,7 @@
 {
     "name": "obsidian-mathlinks",
     "version": "0.0.1",
-    "description": "Allows for MathJax in internal Obsidian links",
+    "description": "Manage and display MathJax in your links",
     "main": "main.js",
     "scripts": {
         "dev": "node esbuild.config.mjs",
