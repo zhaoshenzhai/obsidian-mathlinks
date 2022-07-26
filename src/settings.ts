@@ -33,7 +33,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
             .addButton((button: ButtonComponent): ButtonComponent => {
                 let b = button
                     .setTooltip("Add")
-                    .setButtonText("+")
+                    .setIcon("plus")
                     .onClick(async () => {
                         let modal = new AddTemplatesModal(this.app);
 
