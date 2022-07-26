@@ -1,4 +1,4 @@
-import { Setting, PluginSettingTab, Modal, TextComponent, Notice } from 'obsidian';
+import { Setting, PluginSettingTab, Modal, TextComponent, DropdownComponent, Notice } from 'obsidian';
 import { formatToRegex } from './utils';
 
 export class MathLinksSettingTab extends PluginSettingTab {
@@ -9,8 +9,10 @@ export class MathLinksSettingTab extends PluginSettingTab {
         this.plugin = plugin;
     }
 
-    display(): void {
+    async display(): void {
         const { containerEl } = this;
+
+        await this.plugin.loadSettings();
 
         containerEl.empty();
         containerEl.createEl('h2', {text: 'MathLinks Settings'});
@@ -40,6 +42,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                         modal.onClose = async () => {
                             if (modal.saved) {
                                 const template = {
+                                    title: modal.title,
                                     replaced: modal.replaced,
                                     replacement: modal.replacement,
                                     globalMatch: modal.globalMatch,
@@ -49,34 +52,98 @@ export class MathLinksSettingTab extends PluginSettingTab {
 
                                 this.plugin.settings.templates.push(template);
                                 await this.plugin.saveSettings();
-                                new Notice('MathLink template added');
+                                new Notice('MathLinks: Template added.');
                             }
                         };
 
                         modal.open();
+                        this.display();
                     });
                 return b;
             });
 
+        let templateTitleToEdit: string | null;
         new Setting(containerEl)
-            .setName('Edit templates')
-            .setDesc('Opens a modal to edit existing templates.')
-            .addButton((button: ButtonComponent): ButtonComponent => {
+            .setName('Edit template')
+            .setDesc('Select a template to edit it.')
+            .addDropdown((dropdown: DropdownComponent) => {
+                dropdown.addOption("__select", "Select");
+                for (let i = 0; i < this.plugin.settings.templates.length; i++) {
+                    dropdown.addOption(this.plugin.settings.templates[i].title, this.plugin.settings.templates[i].title);
+                }
+                dropdown.onChange(async (current) => {
+                    if (current != '__select')
+                        templateTitleToEdit = current;
+                    else
+                        templateTitleToEdit = null;
+                });
+            })
+            .addExtraButton((button: ButtonComponent): ButtonComponent => {
                 let b = button
                     .setTooltip("Edit")
                     .setIcon("edit")
                     .onClick(async () => {
-                        let currentTemplates = this.plugin.settings.templates.slice();
-                        let modal = new EditTemplatesModal(this.app, currentTemplates);
+                        if (templateTitleToEdit) {
+                            let modal = new EditTemplatesModal(this.app, templateTitleToEdit, this.plugin.settings.templates);
 
-                        modal.onClose = async () => {
-                            if (modal.saved) {
-                                await this.plugin.saveSettings();
-                                new Notice('MathLink templates saved');
-                            }
-                        };
+                            modal.onClose = async () => {
+                                if (modal.saved) {
+                                    await this.plugin.saveSettings();
+                                    new Notice('MathLinks: Template saved.');
+                                }
+                            };
 
-                        modal.open();
+                            modal.open();
+                            this.display();
+                        } else {
+                            new Notice('MathLinks: Please select a template.');
+                        }
+                    });
+                return b;
+            });
+
+        let templateTitleToDelete: string | null;
+        new Setting(containerEl)
+            .setName('Delete a template')
+            .setDesc('Select a template to delete it.')
+            .addDropdown((dropdown: DropdownComponent) => {
+                dropdown.addOption("__select", "Select");
+                for (let i = 0; i < this.plugin.settings.templates.length; i++) {
+                    dropdown.addOption(this.plugin.settings.templates[i].title, this.plugin.settings.templates[i].title);
+                }
+                dropdown.onChange(async (current) => {
+                    if (current != '__select')
+                        templateTitleToDelete = current;
+                    else
+                        templateTitleToDelete = null;
+                });
+            })
+            .addExtraButton((button: ButtonComponent): ButtonComponent => {
+                let b = button
+                    .setTooltip("Delete")
+                    .setIcon("trash")
+                    .onClick(async () => {
+                        if (templateTitleToDelete) {
+                            let modal = new DeleteTemplatesModal(this.app, templateTitleToDelete);
+
+                            modal.onClose = async () => {
+                                if (modal.proceed) {
+                                    for (let i = 0; i < this.plugin.settings.templates.length; i++) {
+                                        if (this.plugin.settings.templates[i].title === templateTitleToDelete) {
+                                            this.plugin.settings.templates.splice(i, 1);
+                                            await this.plugin.saveSettings();
+                                            new Notice(`MathLinks: Template '${templateTitleToDelete}' deleted.`);
+                                            break;
+                                        }
+                                    }
+                                }
+                            };
+
+                            modal.open();
+                            this.display();
+                        } else {
+                            new Notice('MathLinks: Please select a template.');
+                        }
                     });
                 return b;
             });
@@ -85,6 +152,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
 
 class AddTemplatesModal extends Modal {
     saved: boolean = false;
+    title: string = '';
 
     replaced: string = '';
     replacement: string = '';
@@ -99,6 +167,17 @@ class AddTemplatesModal extends Modal {
 
     onOpen() {
         const { contentEl } = this;
+
+        let titleText: TextComponent;
+        new Setting(contentEl)
+            .setName('Title')
+            .setDesc('Name of the template.')
+            .addText((text) => {
+                titleText = text;
+                titleText.setValue(this.title).onChange((current) => {
+                    this.title = current;
+                });
+            });
 
         let replacedText: TextComponent;
         new Setting(contentEl)
@@ -124,7 +203,7 @@ class AddTemplatesModal extends Modal {
 
         new Setting(contentEl)
             .setName('Global')
-            .setDesc('Match all instances (instead of just the first)')
+            .setDesc('Match all instances (instead of just the first).')
             .addToggle((toggle) => {
                 toggle.setValue(true).onChange((current) => (this.globalMatch = current));
             });
@@ -168,47 +247,78 @@ class AddTemplatesModal extends Modal {
 
 class EditTemplatesModal extends Modal {
     saved: boolean = false;
+    templateTitle: string;
     templates: string[];
 
-    constructor(app: App, templates: string[]) {
+    constructor(app: App, templateTitle: string, templates: string[]) {
         super(app);
-        this.templates = templates.slice();
+        this.templateTitle = templateTitle;
+        this.templates = templates;
     }
 
     onOpen() {
         const { contentEl } = this;
-        let templates = this.templates;
 
-        contentEl.createEl('h2', {text: 'Edit templates'});
+        contentEl.empty();
 
-        for (let i = 0; i < templates.length; i++) {
-            let replacedText: TextComponent;
-            let replacementText: TextComponent;
-            new Setting(contentEl)
-                .setDesc('Replace all... with ... Case sensitive?')
-                .addText((text) => {
-                    replacedText = text;
-                    replacedText.setPlaceholder(templates[i].replaced);
-                    replacedText.setValue(templates[i].replaced).onChange((current) => {
-                        templates[i].replaced = current;
+        for (let i = 0; i < this.templates.length; i++) {
+            if (this.templateTitle != undefined && this.templates[i].title === this.templateTitle) {
+                let titleText: TextComponent;
+                new Setting(contentEl)
+                    .setName('Title')
+                    .setDesc('Name of the template.')
+                    .addText((text) => {
+                        titleText = text;
+                        titleText.setValue(this.templates[i].title).onChange((current) => {
+                            this.templates[i].title = current;
+                        });
                     });
-                })
-                .addText((text) => {
-                    replacementText = text;
-                    replacementText.setPlaceholder(templates[i].replacement);
-                    replacementText.setValue(templates[i].replacement).onChange((current) => {
-                        templates[i].replacement = current;
+
+                let replacedText: TextComponent;
+                new Setting(contentEl)
+                    .setName('Replace all ...')
+                    .setDesc('Strings to be matched and replaced.')
+                    .addText((text) => {
+                        replacedText = text;
+                        replacedText.setValue(this.templates[i].replaced).onChange((current) => {
+                            this.templates[i].replaced = current;
+                        });
                     });
-                })
-                .addToggle((toggle) => {
-                    toggle.setValue(templates[i].sensitive).onChange((current) => (templates[i].sensitive = current));
-                })
-                .addToggle((toggle) => {
-                    toggle.setValue(templates[i].globalMatch).onChange((current) => (templates[i].globalMatch = current));
-                })
-                .addToggle((toggle) => {
-                    toggle.setValue(templates[i].word).onChange((current) => (templates[i].word = current));
-                });
+
+                let replacementText: TextComponent;
+                new Setting(contentEl)
+                    .setName('... with')
+                    .setDesc('String to replace all matches. Do not escape backslashes.')
+                    .addText((text) => {
+                        replacementText = text;
+                        replacementText.setValue(this.templates[i].replacement).onChange((current) => {
+                            this.templates[i].replacement = current;
+                        });
+                    });
+
+                new Setting(contentEl)
+                    .setName('Global')
+                    .setDesc('Match all instances (instead of just the first)')
+                    .addToggle((toggle) => {
+                        toggle.setValue(this.templates[i].globalMatch).onChange((current) => (this.templates[i].globalMatch = current));
+                    });
+
+                new Setting(contentEl)
+                    .setName('Case sensitive')
+                    .setDesc('Matches will be case sensitive.')
+                    .addToggle((toggle) => {
+                        toggle.setValue(this.templates[i].sensitive).onChange((current) => (this.templates[i].sensitive = current));
+                    });
+
+                new Setting(contentEl)
+                    .setName('Whole word')
+                    .setDesc('Only match whole words.')
+                    .addToggle((toggle) => {
+                        toggle.setValue(this.templates[i].sensitive).onChange((current) => (this.templates[i].word = current));
+                    });
+
+                break;
+            }
         }
 
         let footerEl = contentEl.createDiv();
@@ -227,6 +337,44 @@ class EditTemplatesModal extends Modal {
                 .setIcon("cross")
                 .onClick(() => {
                     this.saved = false;
+                    this.close();
+                });
+            return b;
+        });
+    }
+}
+
+class DeleteTemplatesModal extends Modal {
+    proceed: boolean = false;
+    templateTitle: string;
+
+    constructor(app: App, templateTitle: string) {
+        super(app);
+        this.templateTitle = templateTitle;
+    }
+
+    onOpen() {
+        const { contentEl } = this;
+
+        contentEl.empty();
+        contentEl.createEl('h3', {text: `Are you sure you want to delete '${this.templateTitle}'?`});
+
+        let footerEl = contentEl.createDiv();
+        let footerButtons = new Setting(footerEl);
+        footerButtons.addButton((b) => {
+            b.setTooltip("Yes")
+                .setIcon("checkmark")
+                .onClick(async () => {
+                    this.proceed = true;
+                    this.close();
+                });
+            return b;
+        });
+        footerButtons.addExtraButton((b) => {
+            b.setTooltip("Cancel")
+                .setIcon("cross")
+                .onClick(() => {
+                    this.proceed = false;
                     this.close();
                 });
             return b;
