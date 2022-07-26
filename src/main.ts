@@ -125,13 +125,13 @@ export default class MathLinks extends Plugin {
             let baseName =  file.name.replace('\.md', '');
             let mathLink = baseName;
             for (let i = 0; i < templates.length; i++) {
-                let replaced = new RegExp(templates[i].replaced);
+                let replaced = new RegExp(formatToRegex(templates[i].replaced));
                 let replacement = templates[i].replacement;
 
                 let flags = '';
                 if (templates[i].globalMatch)
                     flags += 'g';
-                if (templates[i].sensitive)
+                if (!templates[i].sensitive)
                     flags += 'i';
 
                 if (templates[i].word)
