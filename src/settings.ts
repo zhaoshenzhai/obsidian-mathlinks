@@ -1,5 +1,4 @@
 import { Setting, PluginSettingTab, Modal, TextComponent, DropdownComponent, Notice } from 'obsidian';
-import { formatToRegex } from './utils';
 
 export class MathLinksSettingTab extends PluginSettingTab {
     plugin: MathLinks;
@@ -187,7 +186,7 @@ class AddTemplatesModal extends Modal {
             .addText((text) => {
                 replacedText = text;
                 replacedText.setValue(this.replaced).onChange((current) => {
-                    this.replaced = formatToRegex(current);
+                    this.replaced = current;
                 });
             });
 
