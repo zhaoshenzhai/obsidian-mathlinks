@@ -12,8 +12,6 @@ export class MathLinksSettingTab extends PluginSettingTab {
     async display(): void {
         const { containerEl } = this;
 
-        await this.plugin.loadSettings();
-
         containerEl.empty();
         containerEl.createEl('h2', {text: 'MathLinks Settings'});
 
@@ -84,12 +82,15 @@ export class MathLinksSettingTab extends PluginSettingTab {
                     .setIcon("edit")
                     .onClick(async () => {
                         if (templateTitleToEdit) {
+                            let originalTemplates = JSON.parse(JSON.stringify(this.plugin.settings.templates));
                             let modal = new EditTemplatesModal(this.app, templateTitleToEdit, this.plugin.settings.templates);
 
                             modal.onClose = async () => {
                                 if (modal.saved) {
                                     await this.plugin.saveSettings();
                                     new Notice('MathLinks: Template saved.');
+                                } else {
+                                    this.plugin.settings.templates = originalTemplates;
                                 }
                             };
 
