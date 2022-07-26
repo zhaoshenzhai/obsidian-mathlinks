@@ -1,5 +1,6 @@
 import { App, Plugin, MarkdownView, TFile } from 'obsidian';
 import { MathLinksSettingTab } from './settings';
+import { formatToRegex } from './utils';
 
 interface MathLinksSettings {
     templates: string[];
@@ -26,6 +27,7 @@ export default class MathLinks extends Plugin {
         // Generate mathLinks of outLinks in file if file  is change.
         //     Want to midify it so it runs only if a link is created.
         metadataCache.on('changed', async (file: TFile, data: string, cache: CachedMetaData) => {
+            console.log(file.name);
             let mathLink = await getMathLink(file);
             if (mathLink != null && mathLink != undefined) {
                 let backLinkFilePaths = getBackLinkFilePaths(file);
@@ -123,12 +125,19 @@ export default class MathLinks extends Plugin {
             let baseName =  file.name.replace('\.md', '');
             let mathLink = baseName;
             for (let i = 0; i < templates.length; i++) {
-                let replaced;
-                if (templates[i].sensitive)
-                    replaced = new RegExp(templates[i].replaced, 'g');
-                else
-                    replaced = new RegExp(templates[i].replaced, 'gi');
+                let replaced = new RegExp(templates[i].replaced);
                 let replacement = templates[i].replacement;
+
+                let flags = '';
+                if (templates[i].globalMatch)
+                    flags += 'g';
+                if (templates[i].sensitive)
+                    flags += 'i';
+
+                if (templates[i].word)
+                    replaced = RegExp(replaced.source.replace(/^/, '\\b').replace(/$/, '\\b'), flags);
+                else
+                    replaced = RegExp(replaced.source, flags);
 
                 mathLink = mathLink.replace(replaced, replacement);
             }
@@ -141,23 +150,10 @@ export default class MathLinks extends Plugin {
             let right = fileName.replace(/^/, '(').replace(/$/, ')').replace(/\s/g, '%20');
             let newLink = `${left}${right}`;
 
-            let mixedLink = new RegExp('\\[((?!\\]\\(|\\]\\]).)*\\]' + format(right), 'g');
-            let doubleLink = new RegExp(format(fileName.replace(/^/, '\[\[').replace(/\.md$/, '\]\]')), 'g');
+            let mixedLink = new RegExp('\\[((?!\\]\\(|\\]\\]).)*\\]' + formatToRegex(right), 'g');
+            let doubleLink = new RegExp(formatToRegex(fileName.replace(/^/, '\[\[').replace(/\.md$/, '\]\]')), 'g');
 
             return fileContent.replace(mixedLink, newLink).replace(doubleLink, newLink);
-        }
-
-        // Format str for regex
-        function format(str: string): string {
-            return str
-                .replace(/\s/g, '\\s')
-                .replace(/\./g, '\\.')
-                .replace(/\(/g, '\\(')
-                .replace(/\)/g, '\\)')
-                .replace(/\{/g, '\\{')
-                .replace(/\}/g, '\\}')
-                .replace(/\[/g, '\\[')
-                .replace(/\]/g, '\\]');
         }
 
         // Add settings tab

@@ -1,4 +1,5 @@
 import { Setting, PluginSettingTab, Modal, TextComponent, Notice } from 'obsidian';
+import { formatToRegex } from './utils';
 
 export class MathLinksSettingTab extends PluginSettingTab {
     plugin: MathLinks;
@@ -41,7 +42,9 @@ export class MathLinksSettingTab extends PluginSettingTab {
                                 const template = {
                                     replaced: modal.replaced,
                                     replacement: modal.replacement,
-                                    sensitive: modal.sensitive
+                                    globalMatch: modal.globalMatch,
+                                    sensitive: modal.sensitive,
+                                    word: modal.word
                                 };
 
                                 this.plugin.settings.templates.push(template);
@@ -57,13 +60,14 @@ export class MathLinksSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('Edit templates')
-            .setDesc('Opens a modal lto edit existing templates.')
+            .setDesc('Opens a modal to edit existing templates.')
             .addButton((button: ButtonComponent): ButtonComponent => {
                 let b = button
                     .setTooltip("Edit")
                     .setIcon("edit")
                     .onClick(async () => {
-                        let modal = new EditTemplatesModal(this.app, this.plugin.settings.templates);
+                        let currentTemplates = this.plugin.settings.templates.slice();
+                        let modal = new EditTemplatesModal(this.app, currentTemplates);
 
                         modal.onClose = async () => {
                             if (modal.saved) {
@@ -81,9 +85,13 @@ export class MathLinksSettingTab extends PluginSettingTab {
 
 class AddTemplatesModal extends Modal {
     saved: boolean = false;
+
     replaced: string = '';
     replacement: string = '';
+
+    globalMatch: boolean = true;
     sensitive: boolean = true;
+    word: boolean = true
 
     constructor(app: App) {
         super(app);
@@ -95,11 +103,11 @@ class AddTemplatesModal extends Modal {
         let replacedText: TextComponent;
         new Setting(contentEl)
             .setName('Replace all ...')
-            .setDesc('Strings to be matched and replaced. Regex (without slashes or flags) recommended.')
+            .setDesc('Strings to be matched and replaced.')
             .addText((text) => {
                 replacedText = text;
                 replacedText.setValue(this.replaced).onChange((current) => {
-                    this.replaced = current;
+                    this.replaced = formatToRegex(current);
                 });
             });
 
@@ -115,10 +123,24 @@ class AddTemplatesModal extends Modal {
             });
 
         new Setting(contentEl)
+            .setName('Global')
+            .setDesc('Match all instances (instead of just the first)')
+            .addToggle((toggle) => {
+                toggle.setValue(true).onChange((current) => (this.globalMatch = current));
+            });
+
+        new Setting(contentEl)
             .setName('Case sensitive')
             .setDesc('Matches will be case sensitive.')
             .addToggle((toggle) => {
                 toggle.setValue(true).onChange((current) => (this.sensitive = current));
+            });
+
+        new Setting(contentEl)
+            .setName('Whole word')
+            .setDesc('Only match whole words.')
+            .addToggle((toggle) => {
+                toggle.setValue(true).onChange((current) => (this.word = current));
             });
 
         let footerEl = contentEl.createDiv();
@@ -150,7 +172,7 @@ class EditTemplatesModal extends Modal {
 
     constructor(app: App, templates: string[]) {
         super(app);
-        this.templates = templates;
+        this.templates = templates.slice();
     }
 
     onOpen() {
@@ -180,6 +202,12 @@ class EditTemplatesModal extends Modal {
                 })
                 .addToggle((toggle) => {
                     toggle.setValue(templates[i].sensitive).onChange((current) => (templates[i].sensitive = current));
+                })
+                .addToggle((toggle) => {
+                    toggle.setValue(templates[i].globalMatch).onChange((current) => (templates[i].globalMatch = current));
+                })
+                .addToggle((toggle) => {
+                    toggle.setValue(templates[i].word).onChange((current) => (templates[i].word = current));
                 });
         }
 
