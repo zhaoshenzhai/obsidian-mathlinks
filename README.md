@@ -4,7 +4,7 @@ An [Obsidian.md](https://obsidian.md) plugin to manage and display [MathJax](htt
 
 **Note**: This plugin **will** modify the contents of your links. **_Proceed at your own risk_** and **_please make backups_** when trying it out. For more information, see [how it works](https://github.com/zhaoshenzhai/obsidian-mathlinks#grey_question-how-it-works).
 
-Currently, you can install it by copying `main.js` and `manifest.json` from [the lastest release](https://github.com/zhaoshenzhai/obsidian-mathlinks/releases/tag/0.0.1) to `.obsidian/plugins/obsidian-mathlinks`.
+Currently, you can install it by copying `main.js` and `manifest.json` from [the lastest release](https://github.com/zhaoshenzhai/obsidian-mathlinks/releases/tag/0.0.1) to a folder named `obsidian-mathlinks` in `.obsidian/plugins/`.
 
 ## :bookmark_tabs: Contents
 * [Basic Usage](https://github.com/zhaoshenzhai/obsidian-mathlinks#pencil2-basic-usage); get started with creating mathLinks and templates.
@@ -15,7 +15,7 @@ Currently, you can install it by copying `main.js` and `manifest.json` from [the
 ## :pencil2: Basic Usage
 
 A mathLink for `note.md` can be inserted by adding `mathLink: yourMathLink` to its yaml frontmatter. By default, this will update all links of the form `[[note]]` to `[yourMathLink](note.md)`, even if you create new ones. The rendered MathJax of `yourMathLink` will be displayed in preview mode.
-* Changing `yourMathLink` in `node.md` will update all links of the form `[...](note.md)` accordingly.
+* Changing `yourMathLink` in `note.md` will update all links of the form `[...](note.md)` accordingly.
 * Deleting `mathLink: yourMathLink` will revert all such links back to `[[note]]`.
 
 ### Templates
@@ -33,7 +33,7 @@ This opens a modal which prompts for:
 * _Replace with_: String to replace matches. Do not escape backslashes; they will be formatted internally.
 * _Global match_: Match all instances (instead of just the first). _Default: true_.
 * _Case sensitive_: Matches will be cases sensitive. _Default: true_.
-* _Match whold words_: Only match whole words. _Default: true_.
+* _Match whole words_: Only match whole words. _Default: true_.
 
 ### Edit/delete a template
 This adds a dropdown list containing the titles of all templates added, and two buttons:
