@@ -15,6 +15,7 @@ export default class MathLinks extends Plugin {
 
     async onload() {
         await this.loadSettings();
+        this.addSettingTab(new MathLinksSettingTab(this.app, this));
         const settings = this.settings;
 
         const { vault } = this.app;
@@ -22,12 +23,40 @@ export default class MathLinks extends Plugin {
         const { metadataCache } = this.app;
         const { fileManager } = this.app;
 
-        // Update all links in backLinkFiles if file (with mathLink) is changed.
-        //     Want to modify it so it runs only if a mathLink is updated/generated.
-        // Generate mathLinks of outLinks in file if file  is change.
-        //     Want to midify it so it runs only if a link is created.
+        // Runs when file is updated
+        // Want to modify it so it runs only if a mathLink is updated/generated or if a link is created.
         metadataCache.on('changed', async (file: TFile, data: string, cache: CachedMetaData) => {
+            if (isExcluded(file))
+                return null;
+
             console.log(file.name);
+
+            updateBackLinks(file);
+            updateOutLinks(file);
+        });
+
+        // Update all mathLinks
+        this.addCommand({
+            id: "update_all_mathlinks",
+            name: "Update all links",
+            callback: async () => {
+                let allNotes = await vault.getMarkdownFiles();
+                let updateNotice = new Notice('MathLinks: Updating...');
+
+                allNotes.forEach((note) => {
+                    if (!isExcluded(note)) {
+                        updateBackLinks(note);
+                        updateOutLinks(note);
+                    }
+                });
+
+                updateNotice.hide();
+                new Notice('MathLinks: Done');
+            }
+        });
+
+        // Update all links in backLinkFile if file has a mathLink
+        async function updateBackLinks(file: TFile): void {
             let mathLink = await getMathLink(file);
             if (mathLink != null && mathLink != undefined) {
                 let backLinkFilePaths = getBackLinkFilePaths(file);
@@ -45,14 +74,20 @@ export default class MathLinks extends Plugin {
                     });
                 }
             }
+        }
 
+        // Update outLinks in file
+        async function updateOutLinks(file: TFile): void {
             let fileContent = await vault.read(file);
             let modified = fileContent;
-            if (cache.links != undefined) {
-                cache.links.forEach(async (outLink) => {
+
+            let outLinks = await metadataCache.getFileCache(file).links;
+            if (outLinks != undefined) {
+                outLinks.forEach(async (outLink) => {
                     let outLinkFileName = outLink.link;
                     if (outLink.displayText != "")
                         outLinkFileName = outLinkFileName.replace(/$/, '.md');
+
                     let outLinkFilePath = fileManager.getNewFileParent(outLinkFileName).path + '/' + outLinkFileName;
                     let outLinkFile = vault.getAbstractFileByPath(outLinkFilePath);
 
@@ -68,9 +103,11 @@ export default class MathLinks extends Plugin {
                     }
                 });
             }
-        });
+        }
 
-        // Get mathLink as string (with lineNumber). If key exists but not value, return null (with lineNumber). Undefined otherwise.
+        // Get mathLink as string (with lineNumber).
+        //     If key exists but not value, return null (with lineNumber).
+        //     Undefined otherwise.
         async function getMathLink(file: TFile): [string, number] | [null, number] | undefined {
             let contents = await vault.read(file);
             contents = contents.split(/\r?\n/);
@@ -104,22 +141,7 @@ export default class MathLinks extends Plugin {
             return undefined;
         }
 
-        // Generate backLinkFilePaths of file
-        function getBackLinkFilePaths(file: Tfile): string[] {
-            let backLinkFilePaths: string[] = [];
-            Object.keys(metadataCache.resolvedLinks).forEach((key) => {
-                let links = metadataCache.resolvedLinks[key];
-                Object.keys(links).forEach((link) => {
-                    if (link === file.path) {
-                        backLinkFilePaths.push(key);
-                    }
-                });
-            });
-
-            return backLinkFilePaths;
-        }
-
-        // Generate mathLink from 'mathLink: auto' and file.name
+        // Generate mathLink from file.name
         async function generateMathLinkFromAuto(file: Tfile): string {
             let templates = settings.templates;
             let baseName =  file.name.replace('\.md', '');
@@ -144,6 +166,21 @@ export default class MathLinks extends Plugin {
             return mathLink;
         }
 
+        // Generate backLinkFilePaths of file
+        function getBackLinkFilePaths(file: Tfile): string[] {
+            let backLinkFilePaths: string[] = [];
+            Object.keys(metadataCache.resolvedLinks).forEach((key) => {
+                let links = metadataCache.resolvedLinks[key];
+                Object.keys(links).forEach((link) => {
+                    if (link === file.path) {
+                        backLinkFilePaths.push(key);
+                    }
+                });
+            });
+
+            return backLinkFilePaths;
+        }
+
         // Convert mixed and double links to math links
         function convertToMathLinks(fileName: string, fileContent: string, mathLink: string): string {
             let left = mathLink.replace(/^/, '[').replace(/$/, ']');
@@ -156,12 +193,10 @@ export default class MathLinks extends Plugin {
             return fileContent.replace(mixedLink, newLink).replace(doubleLink, newLink);
         }
 
-        // Add settings tab
-        this.addSettingTab(new MathLinksSettingTab(this.app, this));
-    }
-
-    async onunload() {
-        console.log('Unloaded');
+        // Check if file is excluded; need to add this to settings
+        function isExcluded(file: TFile): boolean {
+            return file.name === 'README.md';
+        }
     }
 
     async loadSettings() {
