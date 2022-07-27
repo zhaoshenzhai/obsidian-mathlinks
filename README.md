@@ -20,7 +20,7 @@ A mathLink for `note.md` can be inserted by adding `mathLink: yourMathLink` to i
 
 ### Templates
 Links where a mathLink makes sense are often repeated throughout.
-* For instance, all of `Invertible iff bijective`, `Linearly dependent iff exists span-redundant element`, and `LUB property iff GLB property` will have mathLinks of the form '$\dots\Leftrightarrow\dots$'.
+* For instance, all of `Invertible iff bijective`, `Linearly dependent iff exists span-redundant element`, and `LUB property iff GLB property` will have mathLinks of the form '...$\Leftrightarrow$...'.
 
 Instead of setting them manually, simply set `mathLink: auto` which will generate a mathLink via a template that replaces `iff` with $\Leftrightarrow$ in the file name. A _template_ consists of a string to be matched and replaced (`iff`), its replacement ($\Leftrightarrow$), and some options (global match, case sensitive, and match whole words). They are created and maintained in the MathLinks settings window.
 
@@ -29,8 +29,8 @@ Instead of setting them manually, simply set `mathLink: auto` which will generat
 ### Add a template
 This opens a modal which prompts for:
 * _Title_: Name of the template to refer back to when editing/deleting a template.
-* _Match for..._: String to be matched and replaced. Do not include regex; they will be formatted internally.
-* _Repllace with..._: String to replace matches. Do not escape backslashes; they will be formatted internally.
+* _Match for_: String to be matched and replaced. Do not include regex; they will be formatted internally.
+* _Replace with_: String to replace matches. Do not escape backslashes; they will be formatted internally.
 * _Global match_: Match all instances (instead of just the first). _Default: true_.
 * _Case sensitive_: Matches will be cases sensitive. _Default: true_.
 * _Match whold words_: Only match whole words. _Default: true_.
