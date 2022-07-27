@@ -1,4 +1,4 @@
-import { App, Plugin, MarkdownView, TFile } from 'obsidian';
+import { App, Plugin, TFile } from 'obsidian';
 import { MathLinksSettingTab } from './settings';
 import { formatToRegex } from './utils';
 
