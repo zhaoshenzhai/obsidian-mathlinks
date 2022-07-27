@@ -59,10 +59,10 @@ export class MathLinksSettingTab extends PluginSettingTab {
                 return b;
             });
 
-        let templateTitleToEdit: string | null;
+        let templateTitle: string | null;
         new Setting(containerEl)
-            .setName('Edit template')
-            .setDesc('Select a template to edit it.')
+            .setName('Edit/delete template')
+            .setDesc('Select a template to edit/delete it.')
             .addDropdown((dropdown: DropdownComponent) => {
                 dropdown.addOption("__select", "Select");
                 for (let i = 0; i < this.plugin.settings.templates.length; i++) {
@@ -70,9 +70,9 @@ export class MathLinksSettingTab extends PluginSettingTab {
                 }
                 dropdown.onChange(async (current) => {
                     if (current != '__select')
-                        templateTitleToEdit = current;
+                        templateTitle = current;
                     else
-                        templateTitleToEdit = null;
+                        templateTitle = null;
                 });
             })
             .addExtraButton((button: ButtonComponent): ButtonComponent => {
@@ -80,9 +80,9 @@ export class MathLinksSettingTab extends PluginSettingTab {
                     .setTooltip("Edit")
                     .setIcon("edit")
                     .onClick(async () => {
-                        if (templateTitleToEdit) {
+                        if (templateTitle) {
                             let originalTemplates = JSON.parse(JSON.stringify(this.plugin.settings.templates));
-                            let modal = new EditTemplatesModal(this.app, templateTitleToEdit, this.plugin.settings.templates);
+                            let modal = new EditTemplatesModal(this.app, templateTitle, this.plugin.settings.templates);
 
                             modal.onClose = async () => {
                                 if (modal.saved) {
@@ -100,39 +100,22 @@ export class MathLinksSettingTab extends PluginSettingTab {
                         }
                     });
                 return b;
-            });
-
-        let templateTitleToDelete: string | null;
-        new Setting(containerEl)
-            .setName('Delete a template')
-            .setDesc('Select a template to delete it.')
-            .addDropdown((dropdown: DropdownComponent) => {
-                dropdown.addOption("__select", "Select");
-                for (let i = 0; i < this.plugin.settings.templates.length; i++) {
-                    dropdown.addOption(this.plugin.settings.templates[i].title, this.plugin.settings.templates[i].title);
-                }
-                dropdown.onChange(async (current) => {
-                    if (current != '__select')
-                        templateTitleToDelete = current;
-                    else
-                        templateTitleToDelete = null;
-                });
             })
             .addExtraButton((button: ButtonComponent): ButtonComponent => {
                 let b = button
                     .setTooltip("Delete")
                     .setIcon("trash")
                     .onClick(async () => {
-                        if (templateTitleToDelete) {
-                            let modal = new DeleteTemplatesModal(this.app, templateTitleToDelete);
+                        if (templateTitle) {
+                            let modal = new DeleteTemplatesModal(this.app, templateTitle);
 
                             modal.onClose = async () => {
                                 if (modal.proceed) {
                                     for (let i = 0; i < this.plugin.settings.templates.length; i++) {
-                                        if (this.plugin.settings.templates[i].title === templateTitleToDelete) {
+                                        if (this.plugin.settings.templates[i].title === templateTitle) {
                                             this.plugin.settings.templates.splice(i, 1);
                                             await this.plugin.saveSettings();
-                                            new Notice(`MathLinks: Template '${templateTitleToDelete}' deleted.`);
+                                            new Notice(`MathLinks: Template '${templateTitle}' deleted.`);
                                             break;
                                         }
                                     }
@@ -181,8 +164,8 @@ class AddTemplatesModal extends Modal {
 
         let replacedText: TextComponent;
         new Setting(contentEl)
-            .setName('Replace all ...')
-            .setDesc('Strings to be matched and replaced.')
+            .setName('Match for...')
+            .setDesc('String to be matched and replaced. Do not include regex.')
             .addText((text) => {
                 replacedText = text;
                 replacedText.setValue(this.replaced).onChange((current) => {
@@ -192,8 +175,8 @@ class AddTemplatesModal extends Modal {
 
         let replacementText: TextComponent;
         new Setting(contentEl)
-            .setName('... with')
-            .setDesc('String to replace all matches. Do not escape backslashes.')
+            .setName('Replace with...')
+            .setDesc('String to replace matches. Do not escape backslashes.')
             .addText((text) => {
                 replacementText = text;
                 replacementText.setValue(this.replacement).onChange((current) => {
@@ -202,7 +185,7 @@ class AddTemplatesModal extends Modal {
             });
 
         new Setting(contentEl)
-            .setName('Global')
+            .setName('Global match')
             .setDesc('Match all instances (instead of just the first).')
             .addToggle((toggle) => {
                 toggle.setValue(true).onChange((current) => (this.globalMatch = current));
@@ -216,7 +199,7 @@ class AddTemplatesModal extends Modal {
             });
 
         new Setting(contentEl)
-            .setName('Whole word')
+            .setName('Match whole words')
             .setDesc('Only match whole words.')
             .addToggle((toggle) => {
                 toggle.setValue(true).onChange((current) => (this.word = current));
@@ -276,8 +259,8 @@ class EditTemplatesModal extends Modal {
 
                 let replacedText: TextComponent;
                 new Setting(contentEl)
-                    .setName('Replace all ...')
-                    .setDesc('Strings to be matched and replaced.')
+                    .setName('Match for...')
+                    .setDesc('String to be matched and replaced. Do not include regex.')
                     .addText((text) => {
                         replacedText = text;
                         replacedText.setValue(this.templates[i].replaced).onChange((current) => {
@@ -287,8 +270,8 @@ class EditTemplatesModal extends Modal {
 
                 let replacementText: TextComponent;
                 new Setting(contentEl)
-                    .setName('... with')
-                    .setDesc('String to replace all matches. Do not escape backslashes.')
+                    .setName('Replace with...')
+                    .setDesc('String to replace matches. Do not escape backslashes.')
                     .addText((text) => {
                         replacementText = text;
                         replacementText.setValue(this.templates[i].replacement).onChange((current) => {
@@ -297,7 +280,7 @@ class EditTemplatesModal extends Modal {
                     });
 
                 new Setting(contentEl)
-                    .setName('Global')
+                    .setName('Global match')
                     .setDesc('Match all instances (instead of just the first)')
                     .addToggle((toggle) => {
                         toggle.setValue(this.templates[i].globalMatch).onChange((current) => (this.templates[i].globalMatch = current));
@@ -311,7 +294,7 @@ class EditTemplatesModal extends Modal {
                     });
 
                 new Setting(contentEl)
-                    .setName('Whole word')
+                    .setName('Match whole words')
                     .setDesc('Only match whole words.')
                     .addToggle((toggle) => {
                         toggle.setValue(this.templates[i].sensitive).onChange((current) => (this.templates[i].word = current));
