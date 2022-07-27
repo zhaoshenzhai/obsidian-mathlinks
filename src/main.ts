@@ -31,7 +31,12 @@ export default class MathLinks extends Plugin {
 
             console.log(file.name);
 
-            updateBackLinks(file);
+            let mathLink = await getMathLink(file);
+            if (mathLink != null && mathLink != undefined)
+                updateBackLinks(file, mathLink[0]);
+            else
+                removeBackMathLinks(file);
+
             updateOutLinks(file);
         });
 
@@ -43,9 +48,14 @@ export default class MathLinks extends Plugin {
                 let allNotes = await vault.getMarkdownFiles();
                 let updateNotice = new Notice('MathLinks: Updating...');
 
-                allNotes.forEach((note) => {
+                allNotes.forEach(async (note) => {
                     if (!isExcluded(note)) {
-                        updateBackLinks(note);
+                        let mathLink = await getMathLink(note);
+                        if (mathLink != null && mathLink != undefined)
+                            updateBackLinks(note, mathLink[0]);
+                        else
+                            removeBackMathLinks(note);
+
                         updateOutLinks(note);
                     }
                 });
@@ -55,24 +65,38 @@ export default class MathLinks extends Plugin {
             }
         });
 
-        // Update all links in backLinkFile if file has a mathLink
-        async function updateBackLinks(file: TFile): void {
-            let mathLink = await getMathLink(file);
-            if (mathLink != null && mathLink != undefined) {
-                let backLinkFilePaths = getBackLinkFilePaths(file);
-                if (backLinkFilePaths.length != 0) {
-                    backLinkFilePaths.forEach(async (backLinkFilePath) => {
-                        let backLinkFile = vault.getAbstractFileByPath(backLinkFilePath);
-                        if (backLinkFile instanceof TFile) {
-                            let backLinkFileContent = await vault.read(backLinkFile);
-                            let modified = convertToMathLinks(file.name, backLinkFileContent, mathLink[0]);
+        // Update all links in backLinkFile
+        async function updateBackLinks(file: TFile, mathLink: string): void {
+            let backLinkFilePaths = getBackLinkFilePaths(file);
+            if (backLinkFilePaths.length != 0) {
+                backLinkFilePaths.forEach(async (backLinkFilePath) => {
+                    let backLinkFile = vault.getAbstractFileByPath(backLinkFilePath);
+                    if (backLinkFile instanceof TFile) {
+                        let backLinkFileContent = await vault.read(backLinkFile);
+                        let modified = convertToMathLinks(file.name, backLinkFileContent, mathLink);
 
-                            if (backLinkFileContent != modified) {
-                                vault.modify(backLinkFile, modified);
-                            }
+                        if (backLinkFileContent != modified) {
+                            vault.modify(backLinkFile, modified);
                         }
-                    });
-                }
+                    }
+                });
+            }
+        }
+
+        async function removeBackMathLinks(file: TFile): void {
+            let backLinkFilePaths = getBackLinkFilePaths(file);
+            if (backLinkFilePaths.length != 0) {
+                backLinkFilePaths.forEach(async (backLinkFilePath) => {
+                    let backLinkFile = vault.getAbstractFileByPath(backLinkFilePath);
+                    if (backLinkFile instanceof TFile) {
+                        let backLinkFileContent = await vault.read(backLinkFile);
+                        let modified = convertToDoubleLinks(file.name, backLinkFileContent);
+
+                        if (backLinkFileContent != modified) {
+                            vault.modify(backLinkFile, modified);
+                        }
+                    }
+                });
             }
         }
 
@@ -181,7 +205,7 @@ export default class MathLinks extends Plugin {
             return backLinkFilePaths;
         }
 
-        // Convert mixed and double links to math links
+        // Convert mixed and double links to mathLinks
         function convertToMathLinks(fileName: string, fileContent: string, mathLink: string): string {
             let left = mathLink.replace(/^/, '[').replace(/$/, ']');
             let right = fileName.replace(/^/, '(').replace(/$/, ')').replace(/\s/g, '%20');
@@ -191,6 +215,16 @@ export default class MathLinks extends Plugin {
             let doubleLink = new RegExp(formatToRegex(fileName.replace(/^/, '\[\[').replace(/\.md$/, '\]\]')), 'g');
 
             return fileContent.replace(mixedLink, newLink).replace(doubleLink, newLink);
+        }
+
+        // Convert mathLinks to double links
+        function convertToDoubleLinks(fileName: string, fileContent: string): string {
+            let formattedName = fileName.replace(/^/, '(').replace(/$/, ')').replace(/\s/g, '%20');
+
+            let mixedLink = new RegExp('\\[((?!\\]\\(|\\]\\]).)*\\]' + formatToRegex(formattedName), 'g');
+            let doubleLink = fileName.replace(/^/, '[[').replace(/\.md$/, ']]');
+
+            return fileContent.replace(mixedLink, doubleLink);
         }
 
         // Check if file is excluded; need to add this to settings
