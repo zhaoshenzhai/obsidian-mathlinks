@@ -1,14 +1,6 @@
 import { App, Plugin, TFile } from 'obsidian';
-import { MathLinksSettingTab } from './settings';
+import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from './settings';
 import { formatToRegex } from './utils';
-
-interface MathLinksSettings {
-    templates: string[];
-}
-
-const DEFAULT_SETTINGS: MathLinksSettings = {
-    templates: []
-}
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
