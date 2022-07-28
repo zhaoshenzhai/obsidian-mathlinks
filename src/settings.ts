@@ -2,10 +2,12 @@ import { Setting, PluginSettingTab, Modal, TextComponent, DropdownComponent, Not
 
 export interface MathLinksSettings {
     templates: string[];
+    autoUpdate: boolean;
 }
 
 export const DEFAULT_SETTINGS: MathLinksSettings = {
     templates: [],
+    autoUpdate: true
 }
 
 export class MathLinksSettingTab extends PluginSettingTab {
@@ -23,11 +25,18 @@ export class MathLinksSettingTab extends PluginSettingTab {
         containerEl.createEl('h2', {text: 'MathLinks Settings'});
 
         new Setting(containerEl)
+            .setName('Update when modified')
+            .setDesc('Automatically update links in the current file when modified.')
+            .addToggle((toggle) => {
+                toggle.setValue(this.plugin.settings.autoUpdate).onChange((current) => (this.plugin.settings.autoUpdate = current));
+            });
+
+        new Setting(containerEl)
             .setName('Add a new template')
             .setDesc(
                 createFragment((e) => {
                     e.createSpan({
-                        text: 'Automatically generate a mathLink with templates. Use '
+                        text: 'Generate mathLinks with a new template. Use '
                     });
                     e.createEl('code', {
                         text: 'mathLink: auto'

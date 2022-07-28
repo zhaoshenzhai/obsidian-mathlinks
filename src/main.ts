@@ -18,18 +18,18 @@ export default class MathLinks extends Plugin {
         // Runs when file is updated
         // Want to modify it so it runs only if a mathLink is updated/generated or if a link is created.
         metadataCache.on('changed', async (file: TFile, data: string, cache: CachedMetaData) => {
-            if (isExcluded(file))
-                return null;
+            if (settings.autoUpdate) {
+                if (isExcluded(file))
+                    return null;
 
-            console.log(file.name);
+                let mathLink = await getMathLink(file);
+                if (mathLink != null && mathLink != undefined)
+                    updateBackLinks(file, mathLink[0]);
+                else
+                    removeBackMathLinks(file);
 
-            let mathLink = await getMathLink(file);
-            if (mathLink != null && mathLink != undefined)
-                updateBackLinks(file, mathLink[0]);
-            else
-                removeBackMathLinks(file);
-
-            updateOutLinks(file);
+                updateOutLinks(file);
+            }
         });
 
         // Update all mathLinks
