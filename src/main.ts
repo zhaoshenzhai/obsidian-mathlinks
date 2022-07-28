@@ -1,6 +1,6 @@
 import { App, Plugin, TFile } from 'obsidian';
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from './settings';
-import { formatToRegex } from './utils';
+import { formatRegex } from './utils';
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
@@ -51,13 +51,12 @@ export default class MathLinks extends Plugin {
 
                         updateOutLinks(note);
 
-                        count++;
-                        updateNotice.setMessage(`MathLinks: Updating... ${count}/${allNotes.length - 1}`);
-
-                        if (count === allNotes.length - 1) {
-                            updateNotice.hide();
-                            new Notice('MathLinks: Updated all links.');
-                        }
+                        updateNotice.setMessage(`MathLinks: Updating... ${count}`);
+                    }
+                    count++;
+                    if (count === allNotes.length) {
+                        updateNotice.hide();
+                        new Notice('MathLinks: Updated all links.');
                     }
                 });
             }
@@ -169,7 +168,7 @@ export default class MathLinks extends Plugin {
             let baseName =  file.name.replace('\.md', '');
             let mathLink = baseName;
             for (let i = 0; i < templates.length; i++) {
-                let replaced = new RegExp(formatToRegex(templates[i].replaced));
+                let replaced = new RegExp(formatRegex(templates[i].replaced));
                 let replacement = templates[i].replacement;
 
                 let flags = '';
@@ -209,8 +208,8 @@ export default class MathLinks extends Plugin {
             let right = fileName.replace(/^/, '(').replace(/$/, ')').replace(/\s/g, '%20');
             let newLink = `${left}${right}`;
 
-            let mixedLink = new RegExp('\\[((?!\\]\\(|\\]\\]).)*\\]' + formatToRegex(right), 'g');
-            let doubleLink = new RegExp(formatToRegex(fileName.replace(/^/, '\[\[').replace(/\.md$/, '\]\]')), 'g');
+            let mixedLink = new RegExp('\\[((?!\\]\\(|\\]\\]).)*\\]' + formatRegex(right), 'g');
+            let doubleLink = new RegExp(formatRegex(fileName.replace(/^/, '\[\[').replace(/\.md$/, '\]\]')), 'g');
 
             return fileContent.replace(mixedLink, newLink).replace(doubleLink, newLink);
         }
@@ -219,7 +218,7 @@ export default class MathLinks extends Plugin {
         function convertToDoubleLinks(fileName: string, fileContent: string): string {
             let formattedName = fileName.replace(/^/, '(').replace(/$/, ')').replace(/\s/g, '%20');
 
-            let mixedLink = new RegExp('\\[((?!\\]\\(|\\]\\]).)*\\]' + formatToRegex(formattedName), 'g');
+            let mixedLink = new RegExp('\\[((?!\\]\\(|\\]\\]).)*\\]' + formatRegex(formattedName), 'g');
             let doubleLink = fileName.replace(/^/, '[[').replace(/\.md$/, ']]');
 
             return fileContent.replace(mixedLink, doubleLink);
@@ -227,7 +226,21 @@ export default class MathLinks extends Plugin {
 
         // Check if file is excluded; need to add this to settings
         function isExcluded(file: TFile): boolean {
-            return file.name === 'README.md';
+            for (let i = 0; i < settings.excludedFilePaths.length; i++) {
+                let path = settings.excludedFilePaths[i];
+                if (path.isFile && file.path === path.path) {
+                    return true;
+                } else if (!path.isFile) {
+                    let pathRegex = new RegExp(`\\b${path.path}/`);
+                    if (pathRegex.test(file.path)) {
+                        return true;
+                    }
+                }
+
+                if (i === settings.excludedFilePaths.length) {
+                    return false;
+                }
+           }
         }
     }
 
