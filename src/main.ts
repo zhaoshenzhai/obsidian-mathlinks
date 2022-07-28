@@ -40,6 +40,7 @@ export default class MathLinks extends Plugin {
                 let allNotes = await vault.getMarkdownFiles();
                 let updateNotice = new Notice('MathLinks: Updating...');
 
+                let count = 0;
                 allNotes.forEach(async (note) => {
                     if (!isExcluded(note)) {
                         let mathLink = await getMathLink(note);
@@ -49,11 +50,16 @@ export default class MathLinks extends Plugin {
                             removeBackMathLinks(note);
 
                         updateOutLinks(note);
+
+                        count++;
+                        updateNotice.setMessage(`MathLinks: Updating... ${count}/${allNotes.length - 1}`);
+
+                        if (count === allNotes.length - 1) {
+                            updateNotice.hide();
+                            new Notice('MathLinks: Updated all links.');
+                        }
                     }
                 });
-
-                updateNotice.hide();
-                new Notice('MathLinks: Done');
             }
         });
 
