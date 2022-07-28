@@ -28,9 +28,9 @@ Instead of setting them manually, simply set `mathLink: auto` which will generat
 
 ## :gear: Settings
 ### Update when modified
-Automatically update links in the current file when modified. _DefaultW: true_.
+Automatically update links in the current file when modified. _Default: true_.
 
-### Add a template
+### Add a new template
 This opens a modal which prompts for:
 * **Title**: Name of the template to refer back to when editing/deleting a template.
 * **Match for**: String to be matched and replaced. Do not include regex; they will be formatted internally.
@@ -43,6 +43,12 @@ This opens a modal which prompts for:
 This adds a dropdown list containing the titles of all templates added, and two buttons:
 * **Edit**: Opens the same modal as before with all the saved options.
 * **Delete**: Opens a modal to confirm deletion.
+
+### Add an excluded file
+MathLinks will ignore those files. If `path` is entered, all files under `path` will be ignored.
+
+### Remove from excluded file
+Remove a file/path from the list of excluded files.
 
 ## :grey_question: How it works
 

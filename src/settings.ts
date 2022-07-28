@@ -159,7 +159,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
         // containerEl.createEl('h3', {text: 'Excluded Files'});
 
         new Setting(containerEl)
-            .setName('Add an excluded file.')
+            .setName('Add an excluded file')
             .setDesc('MathLinks will ignore those files.')
             .addButton((button: ButtonComponent): ButtonComponent => {
                 let b = button
@@ -193,8 +193,8 @@ export class MathLinksSettingTab extends PluginSettingTab {
 
         let excludedFilePath: string | null;
         new Setting(containerEl)
-            .setName('Remove from excluded files.')
-            .setDesc('Remove a file from the list of existing excluded files.')
+            .setName('Remove from excluded files')
+            .setDesc('Remove a file from the list of excluded files.')
             .addDropdown(async (dropdown: DropdownComponent) => {
                 dropdown.addOption("__select", "Select");
                 this.plugin.settings.excludedFilePaths.forEach((excludedFilePath) => {
