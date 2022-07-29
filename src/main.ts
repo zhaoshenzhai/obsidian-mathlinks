@@ -1,6 +1,6 @@
 import { App, Plugin, TFile } from 'obsidian';
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from './settings';
-import { formatRegex } from './utils';
+import { formatRegex, isExcluded, countIncluded } from './utils';
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
@@ -19,7 +19,7 @@ export default class MathLinks extends Plugin {
         // Want to modify it so it runs only if a mathLink is updated/generated or if a link is created.
         metadataCache.on('changed', async (file: TFile, data: string, cache: CachedMetaData) => {
             if (settings.autoUpdate) {
-                if (isExcluded(file))
+                if (isExcluded(file, settings.excludedFilePaths))
                     return null;
 
                 let mathLink = await getMathLink(file);
@@ -40,9 +40,18 @@ export default class MathLinks extends Plugin {
                 let allNotes = await vault.getMarkdownFiles();
                 let updateNotice = new Notice('MathLinks: Updating...');
 
+                let numNotes;
+                if (settings.numIncluded === null || settings.numIncluded === undefined) {
+                    numNotes = await countIncluded(allNotes, settings.excludedFilePaths);
+                    settings.numIncluded = numNotes;
+                    await this.saveSettings();
+                } else {
+                    numNotes = settings.numIncluded;
+                }
+
                 let count = 0;
                 allNotes.forEach(async (note) => {
-                    if (!isExcluded(note)) {
+                    if (!isExcluded(note, settings.excludedFilePaths)) {
                         let mathLink = await getMathLink(note);
                         if (mathLink != null && mathLink != undefined)
                             updateBackLinks(note, mathLink[0]);
@@ -51,12 +60,12 @@ export default class MathLinks extends Plugin {
 
                         updateOutLinks(note);
 
-                        updateNotice.setMessage(`MathLinks: Updating... ${count}`);
-                    }
-                    count++;
-                    if (count === allNotes.length) {
-                        updateNotice.hide();
-                        new Notice('MathLinks: Updated all links.');
+                        count++;
+                        updateNotice.setMessage(`MathLinks: Updating... ${count}/${numNotes}`);
+                        if (count === numNotes) {
+                            updateNotice.hide();
+                            new Notice('MathLinks: Updated all links.');
+                        }
                     }
                 });
             }
@@ -222,25 +231,6 @@ export default class MathLinks extends Plugin {
             let doubleLink = fileName.replace(/^/, '[[').replace(/\.md$/, ']]');
 
             return fileContent.replace(mixedLink, doubleLink);
-        }
-
-        // Check if file is excluded; need to add this to settings
-        function isExcluded(file: TFile): boolean {
-            for (let i = 0; i < settings.excludedFilePaths.length; i++) {
-                let path = settings.excludedFilePaths[i];
-                if (path.isFile && file.path === path.path) {
-                    return true;
-                } else if (!path.isFile) {
-                    let pathRegex = new RegExp(`\\b${path.path}/`);
-                    if (pathRegex.test(file.path)) {
-                        return true;
-                    }
-                }
-
-                if (i === settings.excludedFilePaths.length) {
-                    return false;
-                }
-           }
         }
     }
 
