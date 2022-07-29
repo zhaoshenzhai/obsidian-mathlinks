@@ -23,20 +23,16 @@ export function isExcluded(file: TFile, excludedFilePaths: string[]): boolean {
                 return true;
             }
         }
-
-        if (i === excludedFilePaths.length) {
-            return false;
-        }
-   }
+    }
+    return false;
 }
 
-export function countIncluded(allNotes: TFile[], excludedFilePaths: string[]): number {
-    let numNotes = 0;
+export function getIncludedNotes(allNotes: TFile[], excludedFilePaths: string[]): TFile[] {
+    let allIncludedNotes: TFile[] = [];
     allNotes.forEach((note) => {
         if (!isExcluded(note, excludedFilePaths)) {
-            numNotes++;
+            allIncludedNotes.push(note);
         }
     });
-
-    return numNotes;
+    return allIncludedNotes;
 }

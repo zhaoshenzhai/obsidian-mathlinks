@@ -4,14 +4,12 @@ import { isExcluded, countIncluded } from './utils';
 export interface MathLinksSettings {
     templates: string[];
     excludedFilePaths: string[];
-    numIncluded: number | null;
     autoUpdate: boolean;
 }
 
 export const DEFAULT_SETTINGS: MathLinksSettings = {
     templates: [],
     excludedFilePaths: [],
-    numIncluded: null,
     autoUpdate: true
 }
 
@@ -179,10 +177,6 @@ export class MathLinksSettingTab extends PluginSettingTab {
                                 }
 
                                 this.plugin.settings.excludedFilePaths.push(excludedFilePath);
-
-                                let allNotes = await this.app.vault.getMarkdownFiles();
-                                this.plugin.settings.numIncluded = countIncluded(allNotes, this.plugin.settings.excludedFilePaths);
-
                                 await this.plugin.saveSettings();
 
                                 if (modal.isFile)
@@ -227,10 +221,6 @@ export class MathLinksSettingTab extends PluginSettingTab {
                                     for (let i = 0; i < this.plugin.settings.excludedFilePaths.length; i++) {
                                         if (this.plugin.settings.excludedFilePaths[i].path === excludedFilePath) {
                                             this.plugin.settings.excludedFilePaths.splice(i, 1);
-
-                                            let allNotes = await this.app.vault.getMarkdownFiles();
-                                            this.plugin.settings.numIncluded = countIncluded(allNotes, this.plugin.settings.excludedFilePaths);
-
                                             await this.plugin.saveSettings();
                                             new Notice(`MathLinks: '${excludedFilePath}' removed from excluded files.`);
                                             break;

@@ -1,6 +1,6 @@
 import { App, Plugin, TFile } from 'obsidian';
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from './settings';
-import { formatRegex, isExcluded, countIncluded } from './utils';
+import { formatRegex, isExcluded, getIncludedNotes } from './utils';
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
@@ -38,34 +38,24 @@ export default class MathLinks extends Plugin {
             name: "Update all links",
             callback: async () => {
                 let allNotes = await vault.getMarkdownFiles();
+                let allIncludedNotes = getIncludedNotes(allNotes, settings.excludedFilePaths);
                 let updateNotice = new Notice('MathLinks: Updating...');
 
-                let numNotes;
-                if (settings.numIncluded === null || settings.numIncluded === undefined) {
-                    numNotes = await countIncluded(allNotes, settings.excludedFilePaths);
-                    settings.numIncluded = numNotes;
-                    await this.saveSettings();
-                } else {
-                    numNotes = settings.numIncluded;
-                }
-
                 let count = 0;
-                allNotes.forEach(async (note) => {
-                    if (!isExcluded(note, settings.excludedFilePaths)) {
-                        let mathLink = await getMathLink(note);
-                        if (mathLink != null && mathLink != undefined)
-                            updateBackLinks(note, mathLink[0]);
-                        else
-                            removeBackMathLinks(note);
+                allIncludedNotes.forEach(async (note) => {
+                    let mathLink = await getMathLink(note);
+                    if (mathLink != null && mathLink != undefined)
+                        updateBackLinks(note, mathLink[0]);
+                    else
+                        removeBackMathLinks(note);
 
-                        updateOutLinks(note);
+                    updateOutLinks(note);
 
-                        count++;
-                        updateNotice.setMessage(`MathLinks: Updating... ${count}/${numNotes}`);
-                        if (count === numNotes) {
-                            updateNotice.hide();
-                            new Notice('MathLinks: Updated all links.');
-                        }
+                    count++;
+                    updateNotice.setMessage(`MathLinks: Updating... ${count}/${allIncludedNotes.length}`);
+                    if (count === allIncludedNotes.length) {
+                        updateNotice.hide();
+                        new Notice('MathLinks: Updated all links.');
                     }
                 });
             }
