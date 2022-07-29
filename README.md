@@ -2,15 +2,14 @@
 
 An [Obsidian.md](https://obsidian.md) plugin to manage and display [MathJax](https://www.mathjax.org/) in your links. Work in progress!
 
-**Note**: This plugin **will** modify the contents of your links. **_Proceed at your own risk_** and **_please make backups_** when trying it out. For more information, see [how it works](https://github.com/zhaoshenzhai/obsidian-mathlinks#grey_question-how-it-works).
+**Note**: This plugin **will** modify the contents of your links. **_Proceed at your own risk_** and **_please make backups_** before trying it out.
 
 Currently, you can install it by copying `main.js` and `manifest.json` from [the lastest release](https://github.com/zhaoshenzhai/obsidian-mathlinks/releases/tag/0.0.1) to a folder named `obsidian-mathlinks` in `.obsidian/plugins/`.
 
 ## :bookmark_tabs: Contents
-* [Basic Usage](https://github.com/zhaoshenzhai/obsidian-mathlinks#pencil2-basic-usage); get started with creating mathLinks and templates.
-* [Settings](https://github.com/zhaoshenzhai/obsidian-mathlinks#gear-settings); configure MathLinks: add/edit/delete templates, change update criteria, etc.
-* [How it works](https://github.com/zhaoshenzhai/obsidian-mathlinks#grey_question-how-it-works); detailed description on how it works and what it modifies.
-* [Changelog](https://github.com/zhaoshenzhai/obsidian-mathlinks#clipboard-changelog); see whats new!
+* [Basic Usage](https://github.com/zhaoshenzhai/obsidian-mathlinks#pencil2-basic-usage)
+* [Settings](https://github.com/zhaoshenzhai/obsidian-mathlinks#gear-settings)
+* [Changelog](https://github.com/zhaoshenzhai/obsidian-mathlinks#clipboard-changelog)
 
 ## :pencil2: Basic Usage
 
@@ -24,7 +23,7 @@ A command is available in the Command Palette which updates _all_ mathLinks in y
 Links where a mathLink makes sense are often repeated throughout.
 * For instance, all of `Invertible iff bijective`, `Linearly dependent iff exists span-redundant element`, and `LUB property iff GLB property` will have mathLinks of the form '...$\Leftrightarrow$...'.
 
-Instead of setting them manually, simply set `mathLink: auto` which will generate a mathLink via a template that replaces `iff` with $\Leftrightarrow$ in the file name. A _template_ consists of a string to be matched and replaced (`iff`), its replacement ($\Leftrightarrow$), and some options (global match, case sensitive, and match whole words). They are created and maintained in the MathLinks settings window.
+Instead of setting them manually, simply set `mathLink: auto` which will generate a mathLink via a template that replaces `iff` with $\Leftrightarrow$ in the file name. A _template_ consists of a string to be matched (`iff`), its replacement ($\Leftrightarrow$), and some options (global match, case sensitive, and match whole words). They are created and maintained in the MathLinks settings window.
 
 ## :gear: Settings
 ### Update when modified
@@ -50,10 +49,20 @@ MathLinks will ignore those files. If `path` is entered, all files under `path` 
 ### Remove from excluded file
 Remove a file/path from the list of excluded files.
 
-## :grey_question: How it works
-
-
-
 ## :clipboard: Changelog
+### 0.0.2
+* New features:
+    * Added option to exclude notes/paths. MathLinks will ignore them.
+    * Added option to turn off `autoUpdate`.
+* Bug fixes:
+    * Show progress when updating all mathLinks.
+    * `getMathLink()` returns whether it is generated from a template.
+    * Automatically update mathLinks that link to `mathLink: auto` when templates are changed; reverts them when deleted.
 
-
+### 0.0.1
+* New features:
+    * Automatically creates a mathLink whenever a new link is created. This only happens if the file that is linked to has a mathLink, as indicated in its yaml as `mathLink: ...`.
+    * Automatically update links of the form `[...](fileName)` in all backlinks when `fileName.md` is updated. This only happens if `fileName.md` has a mathLink.
+    * Automatically revert links of the form `[...](fileName)` back to `[[fileName]]` in all backlinks when `mathLink: ...` is removed from the yaml in `fileName.md`.
+    * MathLink Templates, which automatically generate mathLinks by matching certain substrings of `fileName` to be replaced. Use `mathLink: auto` in `fileName.md` to use templates.
+    * Command to update all mathLinks.
