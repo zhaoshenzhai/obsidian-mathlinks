@@ -30,9 +30,8 @@ export function isExcluded(file: TFile, excludedFilePaths: string[]): boolean {
 export function getIncludedNotes(allNotes: TFile[], excludedFilePaths: string[]): TFile[] {
     let allIncludedNotes: TFile[] = [];
     allNotes.forEach((note) => {
-        if (!isExcluded(note, excludedFilePaths)) {
+        if (!isExcluded(note, excludedFilePaths))
             allIncludedNotes.push(note);
-        }
     });
     return allIncludedNotes;
 }

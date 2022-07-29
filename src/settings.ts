@@ -1,5 +1,4 @@
 import { Setting, PluginSettingTab, Modal, TextComponent, DropdownComponent, Notice, TFile } from 'obsidian';
-import { isExcluded, countIncluded } from './utils';
 
 export interface MathLinksSettings {
     templates: string[];
@@ -38,8 +37,6 @@ export class MathLinksSettingTab extends PluginSettingTab {
                 });
             });
 
-        // containerEl.createEl('h3', {text: 'Templates'});
-
         new Setting(containerEl)
             .setName('Add a new template')
             .setDesc(
@@ -75,6 +72,8 @@ export class MathLinksSettingTab extends PluginSettingTab {
 
                                 this.plugin.settings.templates.push(template);
                                 await this.plugin.saveSettings();
+                                this.plugin.updateAutoNotes();
+
                                 new Notice('MathLinks: Template added.');
                             }
                         };
@@ -113,6 +112,8 @@ export class MathLinksSettingTab extends PluginSettingTab {
                             modal.onClose = async () => {
                                 if (modal.saved) {
                                     await this.plugin.saveSettings();
+                                    this.plugin.updateAutoNotes();
+
                                     new Notice('MathLinks: Template saved.');
                                 } else {
                                     this.plugin.settings.templates = originalTemplates;
@@ -156,8 +157,6 @@ export class MathLinksSettingTab extends PluginSettingTab {
                     });
                 return b;
             });
-
-        // containerEl.createEl('h3', {text: 'Excluded Files'});
 
         new Setting(containerEl)
             .setName('Add an excluded file')
