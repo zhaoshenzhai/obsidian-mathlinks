@@ -6,7 +6,6 @@ An [Obsidian.md](https://obsidian.md) plugin to manage and display [MathJax](htt
 
 Currently, you can install it by copying `main.js` and `manifest.json` from [the lastest release](https://github.com/zhaoshenzhai/obsidian-mathlinks/releases/tag/0.0.1) to a folder named `obsidian-mathlinks` in `.obsidian/plugins/`.
 
-## :bookmark_tabs: Contents
 * [Basic Usage](https://github.com/zhaoshenzhai/obsidian-mathlinks#pencil2-basic-usage)
 * [Settings](https://github.com/zhaoshenzhai/obsidian-mathlinks#gear-settings)
 * [Changelog](https://github.com/zhaoshenzhai/obsidian-mathlinks#clipboard-changelog)
