@@ -4,7 +4,7 @@ An [Obsidian.md](https://obsidian.md) plugin to manage and display [MathJax](htt
 
 **Note**: This plugin **will** modify the contents of your links. **_Proceed at your own risk_** and **_please make backups_** before trying it out.
 
-Currently, you can install it by copying `main.js` and `manifest.json` from [the lastest release](https://github.com/zhaoshenzhai/obsidian-mathlinks/releases/tag/0.0.2) to a folder named `obsidian-mathlinks` in `.obsidian/plugins/`.
+You can currently install it using [BRAT](https://github.com/TfTHacker/obsidian42-brat) or by copying `main.js` and `manifest.json` from [the lastest release](https://github.com/zhaoshenzhai/obsidian-mathlinks/releases/tag/0.1.0) to a folder named `obsidian-mathlinks` in `.obsidian/plugins/`.
 
 * [Basic Usage](https://github.com/zhaoshenzhai/obsidian-mathlinks#pencil2-basic-usage)
 * [Settings](https://github.com/zhaoshenzhai/obsidian-mathlinks#gear-settings)
@@ -12,7 +12,7 @@ Currently, you can install it by copying `main.js` and `manifest.json` from [the
 
 ## :pencil2: Basic Usage
 
-A mathLink for `note.md` can be inserted by adding `mathLink: yourMathLink` to its yaml frontmatter. By default, this will update all links of the form `[[note]]` to `[yourMathLink](note.md)`, even if you create new ones. The rendered MathJax of `yourMathLink` will be displayed in preview mode.
+A mathLink for `note.md` can be inserted by adding `mathLink: yourMathLink` to its yaml frontmatter. By default, this will update all links of the form `[[note]]` to `[yourMathLink](note.md)`, even when you create new ones. The rendered MathJax of `yourMathLink` will be displayed in reading mode.
 * Changing `yourMathLink` in `note.md` will update all links of the form `[...](note.md)` accordingly.
 * Deleting `mathLink: yourMathLink` will revert all such links back to `[[note]]`.
 
