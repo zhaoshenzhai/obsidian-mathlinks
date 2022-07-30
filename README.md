@@ -49,19 +49,12 @@ MathLinks will ignore those files. If `path` is entered, all files under `path` 
 Remove a file/path from the list of excluded files.
 
 ## :clipboard: Changelog
-### 0.0.2
-* New features:
-    * Added option to exclude notes/paths. MathLinks will ignore them.
-    * Added option to turn off `autoUpdate`.
-* Bug fixes:
-    * Show progress when updating all mathLinks.
-    * `getMathLink()` returns whether it is generated from a template.
-    * Automatically update mathLinks that link to `mathLink: auto` when templates are changed; reverts them when deleted.
-
-### 0.0.1
-* New features:
-    * Automatically creates a mathLink whenever a new link is created. This only happens if the file that is linked to has a mathLink, as indicated in its yaml as `mathLink: ...`.
-    * Automatically update links of the form `[...](fileName)` in all backlinks when `fileName.md` is updated. This only happens if `fileName.md` has a mathLink.
-    * Automatically revert links of the form `[...](fileName)` back to `[[fileName]]` in all backlinks when `mathLink: ...` is removed from the yaml in `fileName.md`.
-    * MathLink Templates, which automatically generate mathLinks by matching certain substrings of `fileName` to be replaced. Use `mathLink: auto` in `fileName.md` to use templates.
-    * Command to update all mathLinks.
+### 0.1.0
+Initial release!
+* Automatically creates a mathLink whenever a new link is created. This only happens if the file that is linked to has a mathLink, as indicated in its yaml as `mathLink: ...`.
+* Automatically update links of the form `[...](fileName)` in all backlinks when `fileName.md` is updated. This only happens if `fileName.md` has a mathLink.
+* Automatically revert links of the form `[...](fileName)` back to `[[fileName]]` in all backlinks when `mathLink: ...` is removed from the yaml in `fileName.md`.
+* MathLink Templates, which automatically generate mathLinks by matching certain substrings of `fileName` to be replaced. Use `mathLink: auto` in `fileName.md` to use templates.
+* Command to update all mathLinks.
+* Exclude certain notes/paths; MathLinks will ignore them.
+* Option to turn off `autoUpdate`.
