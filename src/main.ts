@@ -10,24 +10,19 @@ export default class MathLinks extends Plugin {
         this.addSettingTab(new MathLinksSettingTab(this.app, this));
         const settings = this.settings;
 
-        // Runs when file is updated
-        // Want to modify it so it runs only if a mathLink is updated/generated or if a link is created.
         this.app.metadataCache.on('changed', async (file: TFile, data: string, cache: CachedMetaData) => {
-            if (settings.autoUpdate) {
-                if (isExcluded(file, settings.excludedFilePaths))
-                    return null;
+            if (!settings.autoUpdate || isExcluded(file, settings.excludedFilePaths))
+                return null;
 
-                let mathLink = await this.getMathLink(file);
-                if (mathLink != null && mathLink != undefined)
-                    this.updateBackLinks(file, mathLink[0]);
-                else
-                    this.removeBackMathLinks(file);
+            let mathLink = await this.getMathLink(file);
+            if (mathLink != null && mathLink != undefined)
+                this.updateBackLinks(file, mathLink[0]);
+            else
+                this.removeBackMathLinks(file);
 
-                this.updateOutLinks(file);
-            }
+            this.updateOutLinks(file);
         });
 
-        // Update all mathLinks
         this.addCommand({
             id: "update_all_mathlinks",
             name: "Update all links",
@@ -44,8 +39,6 @@ export default class MathLinks extends Plugin {
                     else
                         this.removeBackMathLinks(note);
 
-                    this.updateOutLinks(note);
-
                     count++;
                     updateNotice.setMessage(`MathLinks: Updating... ${count}/${allIncludedNotes.length}`);
                     if (count === allIncludedNotes.length) {
@@ -57,9 +50,6 @@ export default class MathLinks extends Plugin {
         });
     }
 
-    // Get mathLink as string (with isAuto).
-    //     If key exists but not value, return null.
-    //     Undefined otherwise.
     async getMathLink(file: TFile): [string, boolean] | null | undefined {
         let contents = await this.app.vault.read(file);
         contents = contents.split(/\r?\n/);
@@ -93,7 +83,6 @@ export default class MathLinks extends Plugin {
         return undefined;
     }
 
-    // Generate mathLink from file.name
     async generateMathLinkFromAuto(file: Tfile): string {
         let templates = this.settings.templates;
         let baseName =  file.name.replace('\.md', '');
@@ -118,7 +107,6 @@ export default class MathLinks extends Plugin {
         return mathLink;
     }
 
-    // Update all links in backLinkFile
     async updateBackLinks(file: TFile, mathLink: string): void {
         let backLinkFilePaths = this.getBackLinkFilePaths(file);
         if (backLinkFilePaths.length != 0) {
@@ -136,7 +124,6 @@ export default class MathLinks extends Plugin {
         }
     }
 
-    // Remove mathLinks in backLinkFile
     async removeBackMathLinks(file: TFile): void {
         let backLinkFilePaths = this.getBackLinkFilePaths(file);
         if (backLinkFilePaths.length != 0) {
@@ -154,11 +141,11 @@ export default class MathLinks extends Plugin {
         }
     }
 
-    // Update outLinks in file
     async updateOutLinks(file: TFile): void {
         let fileContent = await this.app.vault.read(file);
         let modified = fileContent;
 
+        let count = 0;
         let outLinks = await this.app.metadataCache.getFileCache(file).links;
         if (outLinks != undefined) {
             outLinks.forEach(async (outLink) => {
@@ -173,17 +160,17 @@ export default class MathLinks extends Plugin {
                     let outLinkMathLink = await this.getMathLink(outLinkFile);
                     if (outLinkMathLink != null && outLinkMathLink != undefined) {
                         modified = this.convertToMathLinks(outLinkFileName, modified, outLinkMathLink[0]);
-
-                        if (fileContent != modified) {
-                            await this.app.vault.modify(file, modified);
-                        }
                     }
+                }
+
+                count++;
+                if (count === outLinks.length && fileContent != modified) {
+                    await this.app.vault.modify(file, modified);
                 }
             });
         }
     }
 
-    // Runs when template is modified
     async updateAutoNotes(): void {
         let allNotes = await this.app.vault.getMarkdownFiles();
         let allIncludedNotes = getIncludedNotes(allNotes, this.settings.excludedFilePaths);
@@ -199,7 +186,6 @@ export default class MathLinks extends Plugin {
         });
     }
 
-    // Generate backLinkFilePaths of file
     getBackLinkFilePaths(file: Tfile): string[] {
         let backLinkFilePaths: string[] = [];
         Object.keys(this.app.metadataCache.resolvedLinks).forEach((key) => {
@@ -214,7 +200,6 @@ export default class MathLinks extends Plugin {
         return backLinkFilePaths;
     }
 
-    // Convert mixed and double links to mathLinks
     convertToMathLinks(fileName: string, fileContent: string, mathLink: string): string {
         let left = mathLink.replace(/^/, '[').replace(/$/, ']');
         let right = fileName.replace(/^/, '(').replace(/$/, ')').replace(/\s/g, '%20');
@@ -226,7 +211,6 @@ export default class MathLinks extends Plugin {
         return fileContent.replace(mixedLink, newLink).replace(doubleLink, newLink);
     }
 
-    // Convert mathLinks to double links
     convertToDoubleLinks(fileName: string, fileContent: string): string {
         let formattedName = fileName.replace(/^/, '(').replace(/$/, ')').replace(/\s/g, '%20');
 
