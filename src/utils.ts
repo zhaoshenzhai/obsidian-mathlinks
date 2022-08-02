@@ -19,9 +19,8 @@ export function isExcluded(file: TFile, excludedFilePaths: string[]): boolean {
             return true;
         } else if (!path.isFile) {
             let pathRegex = new RegExp(`\\b${path.path}/`);
-            if (pathRegex.test(file.path)) {
+            if (pathRegex.test(file.path))
                 return true;
-            }
         }
     }
     return false;

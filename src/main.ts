@@ -43,7 +43,7 @@ export default class MathLinks extends Plugin {
                     updateNotice.setMessage(`MathLinks: Updating... ${count}/${allIncludedNotes.length}`);
                     if (count === allIncludedNotes.length) {
                         updateNotice.hide();
-                        new Notice('MathLinks: Updated all links.');
+                        new Notice('MathLinks: Updated all links');
                     }
                 });
             }
@@ -85,8 +85,7 @@ export default class MathLinks extends Plugin {
 
     async generateMathLinkFromAuto(file: Tfile): string {
         let templates = this.settings.templates;
-        let baseName =  file.name.replace('\.md', '');
-        let mathLink = baseName;
+        let mathLink = file.name.replace('\.md', '');
         for (let i = 0; i < templates.length; i++) {
             let replaced = new RegExp(formatRegex(templates[i].replaced));
             let replacement = templates[i].replacement;
@@ -116,9 +115,8 @@ export default class MathLinks extends Plugin {
                     let backLinkFileContent = await this.app.vault.read(backLinkFile);
                     let modified = this.convertToMathLinks(file.name, backLinkFileContent, mathLink);
 
-                    if (backLinkFileContent != modified) {
+                    if (backLinkFileContent != modified)
                         this.app.vault.modify(backLinkFile, modified);
-                    }
                 }
             });
         }
@@ -133,9 +131,8 @@ export default class MathLinks extends Plugin {
                     let backLinkFileContent = await this.app.vault.read(backLinkFile);
                     let modified = this.convertToDoubleLinks(file.name, backLinkFileContent);
 
-                    if (backLinkFileContent != modified) {
+                    if (backLinkFileContent != modified)
                         this.app.vault.modify(backLinkFile, modified);
-                    }
                 }
             });
         }
@@ -158,15 +155,13 @@ export default class MathLinks extends Plugin {
 
                 if (outLinkFile instanceof TFile) {
                     let outLinkMathLink = await this.getMathLink(outLinkFile);
-                    if (outLinkMathLink != null && outLinkMathLink != undefined) {
+                    if (outLinkMathLink != null && outLinkMathLink != undefined)
                         modified = this.convertToMathLinks(outLinkFileName, modified, outLinkMathLink[0]);
-                    }
                 }
 
                 count++;
-                if (count === outLinks.length && fileContent != modified) {
+                if (count === outLinks.length && fileContent != modified)
                     await this.app.vault.modify(file, modified);
-                }
             });
         }
     }
@@ -176,13 +171,10 @@ export default class MathLinks extends Plugin {
         let allIncludedNotes = getIncludedNotes(allNotes, this.settings.excludedFilePaths);
         allIncludedNotes.forEach(async (note) => {
             let mathLink = await this.getMathLink(note);
-            if (mathLink != null && mathLink != undefined) {
-                if (mathLink[1]) {
-                    this.updateBackLinks(note, mathLink[0]);
-                }
-            } else {
+            if (mathLink != null && mathLink != undefined && mathLink[1])
+                this.updateBackLinks(note, mathLink[0]);
+            else
                 this.removeBackMathLinks(note);
-            }
         });
     }
 
@@ -191,9 +183,8 @@ export default class MathLinks extends Plugin {
         Object.keys(this.app.metadataCache.resolvedLinks).forEach((key) => {
             let links = this.app.metadataCache.resolvedLinks[key];
             Object.keys(links).forEach((link) => {
-                if (link === file.path) {
+                if (link === file.path)
                     backLinkFilePaths.push(key);
-                }
             });
         });
 

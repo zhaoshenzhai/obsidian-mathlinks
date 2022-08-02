@@ -41,15 +41,9 @@ export class MathLinksSettingTab extends PluginSettingTab {
             .setName('Add a new template')
             .setDesc(
                 createFragment((e) => {
-                    e.createSpan({
-                        text: 'Generate mathLinks with a new template. Use '
-                    });
-                    e.createEl('code', {
-                        text: 'mathLink: auto'
-                    });
-                    e.createSpan({
-                        text: ' to use templates in a file.'
-                    });
+                    e.createSpan({text: 'Generate mathLinks with a new template. Use '});
+                    e.createEl('code', {text: 'mathLink: auto'});
+                    e.createSpan({text: ' to use templates in a file.'});
                 })
             )
             .addButton((button: ButtonComponent): ButtonComponent => {
@@ -74,7 +68,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                                 await this.plugin.saveSettings();
                                 this.plugin.updateAutoNotes();
 
-                                new Notice('MathLinks: Template added.');
+                                new Notice('MathLinks: Template added');
                             }
                         };
 
@@ -114,7 +108,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                                     await this.plugin.saveSettings();
                                     this.plugin.updateAutoNotes();
 
-                                    new Notice('MathLinks: Template saved.');
+                                    new Notice('MathLinks: Template saved');
                                 } else {
                                     this.plugin.settings.templates = originalTemplates;
                                 }
@@ -123,7 +117,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                             modal.open();
                             this.display();
                         } else {
-                            new Notice('MathLinks: Please select a template.');
+                            new Notice('MathLinks: Please select a template');
                         }
                     });
                 return b;
@@ -142,7 +136,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                                         if (this.plugin.settings.templates[i].title === templateTitle) {
                                             this.plugin.settings.templates.splice(i, 1);
                                             await this.plugin.saveSettings();
-                                            new Notice(`MathLinks: Template '${templateTitle}' deleted.`);
+                                            new Notice(`MathLinks: Template '${templateTitle}' deleted`);
                                             break;
                                         }
                                     }
@@ -152,7 +146,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                             modal.open();
                             this.display();
                         } else {
-                            new Notice('MathLinks: Please select a template.');
+                            new Notice('MathLinks: Please select a template');
                         }
                     });
                 return b;
@@ -179,9 +173,9 @@ export class MathLinksSettingTab extends PluginSettingTab {
                                 await this.plugin.saveSettings();
 
                                 if (modal.isFile)
-                                    new Notice('MathLinks: File excluded.');
+                                    new Notice('MathLinks: File excluded');
                                 else
-                                    new Notice('MathLinks: Path exclcuded.');
+                                    new Notice('MathLinks: Path exclcuded');
                             }
                         };
 
@@ -221,7 +215,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                                         if (this.plugin.settings.excludedFilePaths[i].path === excludedFilePath) {
                                             this.plugin.settings.excludedFilePaths.splice(i, 1);
                                             await this.plugin.saveSettings();
-                                            new Notice(`MathLinks: '${excludedFilePath}' removed from excluded files.`);
+                                            new Notice(`MathLinks: '${excludedFilePath}' removed from excluded files`);
                                             break;
                                         }
                                     }
@@ -231,7 +225,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                             modal.open();
                             this.display();
                         } else {
-                            new Notice('MathLinks: Please select a file.');
+                            new Notice('MathLinks: Please select a file');
                         }
                     });
                 return b;
@@ -312,21 +306,11 @@ class AddExcludedModal extends Modal {
             .setName('File name/path of folder')
             .setDesc(
                 createFragment((e) => {
-                    e.createSpan({
-                        text: 'Enter a file as'
-                    });
-                    e.createEl('code', {
-                        text: 'path/name.md'
-                    });
-                    e.createSpan({
-                        text: ' and a folder as '
-                    });
-                    e.createEl('code', {
-                        text: 'path'
-                    });
-                    e.createSpan({
-                        text: '.'
-                    });
+                    e.createSpan({text: 'Enter a file as'});
+                    e.createEl('code', {text: 'path/name.md'});
+                    e.createSpan({text: ' and a folder as '});
+                    e.createEl('code', {text: 'path'});
+                    e.createSpan({text: '.'});
                 })
             )
             .addText((text) => {
@@ -434,7 +418,7 @@ function loadButtonsToClose(modal: Modal, element: HTMLElement, proceed: boolean
             .setIcon(trueIcon)
             .onClick(async () => {
                 if (!proceed) {
-                    new Notice('MathLinks: Please enter a valid path/file.');
+                    new Notice('MathLinks: Please enter a valid path/file');
                 } else {
                     modal.saved = true;
                     modal.close();
