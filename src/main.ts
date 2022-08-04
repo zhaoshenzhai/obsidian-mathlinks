@@ -1,6 +1,7 @@
 import { App, Plugin, TFile } from 'obsidian';
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from './settings';
 import { formatRegex, isExcluded, getIncludedNotes } from './utils';
+import * as fs from 'fs';
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
@@ -129,10 +130,17 @@ export default class MathLinks extends Plugin {
                 let backLinkFile = this.app.vault.getAbstractFileByPath(backLinkFilePath);
                 if (backLinkFile instanceof TFile) {
                     let backLinkFileContent = await this.app.vault.read(backLinkFile);
-                    let modified = this.convertToDoubleLinks(file.name, backLinkFileContent);
+                    let vaultPath = this.app.vault.getRoot().vault.adapter.basePath;
+                    let modified = '';
+                    let obsidianConfigFile = await fs.readFile(`${vaultPath}/.obsidian/app.json`, 'utf8', (err, data) => {
+                        if (JSON.parse(data).useMarkdownLinks)
+                            modified = this.convertToMarkdownLinks(file.name, backLinkFileContent);
+                        else
+                            modified = this.convertToDoubleLinks(file.name, backLinkFileContent);
 
-                    if (backLinkFileContent != modified)
-                        this.app.vault.modify(backLinkFile, modified);
+                        if (backLinkFileContent != modified)
+                            this.app.vault.modify(backLinkFile, modified);
+                    });
                 }
             });
         }
@@ -209,6 +217,15 @@ export default class MathLinks extends Plugin {
         let doubleLink = fileName.replace(/^/, '[[').replace(/\.md$/, ']]');
 
         return fileContent.replace(mixedLink, doubleLink);
+    }
+
+    convertToMarkdownLinks(fileName: string, fileContent: string): string {
+        let formattedName = fileName.replace(/^/, '(').replace(/$/, ')').replace(/\s/g, '%20');
+
+        let mixedLink = new RegExp('\\[((?!\\]\\(|\\]\\]).)*\\]' + formatRegex(formattedName), 'g');
+        let markdownLink = fileName.replace(/^/, '[').replace(/\.md$/, `]${formattedName}`);
+
+        return fileContent.replace(mixedLink, markdownLink);
     }
 
     async loadSettings() {
