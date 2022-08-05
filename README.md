@@ -60,6 +60,8 @@ MathLinks will ignore those files. If `path` is entered, all files under `path` 
 Remove a file/path from the list of excluded files.
 
 ## :clipboard: Changelog
+### 0.1.2
+* Use `this.app.vault.configDir` instead of `.obsidian`.
 ### 0.1.1
 * Fixed reverting back to wikilinks when `Use [[Wikilinks]]` is disabled. Instead, revert back to its markdown link.
 ### 0.1.0
