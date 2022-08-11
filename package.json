@@ -4,8 +4,8 @@
     "description": "Manage and display MathJax in your links",
     "main": "main.js",
     "scripts": {
-        "dev": "node esbuild.config.mjs",
-        "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+        "dev": "node esbuild.mjs",
+        "build": "tsc -noEmit -skipLibCheck && node esbuild.mjs production",
         "version": "node version-bump.mjs && git add manifest.json versions.json"
     },
     "keywords": [],
