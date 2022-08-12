@@ -108,46 +108,42 @@ export default class MathLinks extends Plugin {
     }
 
     async updateBackLinks(file: TFile, mathLink: string): void {
-        if (!isExcluded(file, settings.excludedFilePaths)) {
-            let backLinkFilePaths = this.getBackLinkFilePaths(file);
-            if (backLinkFilePaths.length != 0) {
-                backLinkFilePaths.forEach(async (backLinkFilePath) => {
-                    let backLinkFile = this.app.vault.getAbstractFileByPath(backLinkFilePath);
-                    if (backLinkFile instanceof TFile) {
-                        let backLinkFileContent = await this.app.vault.read(backLinkFile);
-                        let modified = this.convertToMathLinks(file.name, backLinkFileContent, mathLink);
+        let backLinkFilePaths = this.getBackLinkFilePaths(file);
+        if (backLinkFilePaths.length != 0) {
+            backLinkFilePaths.forEach(async (backLinkFilePath) => {
+                let backLinkFile = this.app.vault.getAbstractFileByPath(backLinkFilePath);
+                if (backLinkFile instanceof TFile && !isExcluded(backLinkFile, this.settings.excludedFilePaths)) {
+                    let backLinkFileContent = await this.app.vault.read(backLinkFile);
+                    let modified = this.convertToMathLinks(file.name, backLinkFileContent, mathLink);
 
-                        if (backLinkFileContent != modified)
-                            this.app.vault.modify(backLinkFile, modified);
-                    }
-                });
-            }
+                    if (backLinkFileContent != modified)
+                        this.app.vault.modify(backLinkFile, modified);
+                }
+            });
         }
     }
 
     async removeBackMathLinks(file: TFile): void {
-        if (!isExcluded(file, settings.excludedFilePaths)) {
-            let backLinkFilePaths = this.getBackLinkFilePaths(file);
-            if (backLinkFilePaths.length != 0) {
-                backLinkFilePaths.forEach(async (backLinkFilePath) => {
-                    let backLinkFile = this.app.vault.getAbstractFileByPath(backLinkFilePath);
-                    if (backLinkFile instanceof TFile) {
-                        let backLinkFileContent = await this.app.vault.read(backLinkFile);
-                        let vaultPath = this.app.vault.getRoot().vault.adapter.basePath;
-                        let configDir = this.app.vault.configDir;
-                        let modified = '';
-                        let obsidianConfigFile = await fs.readFile(`${vaultPath}/${configDir}/app.json`, 'utf8', (err, data) => {
-                            if (JSON.parse(data).useMarkdownLinks)
-                                modified = this.convertToMarkdownLinks(file.name, backLinkFileContent);
-                            else
-                                modified = this.convertToDoubleLinks(file.name, backLinkFileContent);
+        let backLinkFilePaths = this.getBackLinkFilePaths(file);
+        if (backLinkFilePaths.length != 0) {
+            backLinkFilePaths.forEach(async (backLinkFilePath) => {
+                let backLinkFile = this.app.vault.getAbstractFileByPath(backLinkFilePath);
+                if (backLinkFile instanceof TFile && !isExcluded(backLinkFile, this.settings.excludedFilePaths)) {
+                    let backLinkFileContent = await this.app.vault.read(backLinkFile);
+                    let vaultPath = this.app.vault.getRoot().vault.adapter.basePath;
+                    let configDir = this.app.vault.configDir;
+                    let modified = '';
+                    let obsidianConfigFile = await fs.readFile(`${vaultPath}/${configDir}/app.json`, 'utf8', (err, data) => {
+                        if (JSON.parse(data).useMarkdownLinks)
+                            modified = this.convertToMarkdownLinks(file.name, backLinkFileContent);
+                        else
+                            modified = this.convertToDoubleLinks(file.name, backLinkFileContent);
 
-                            if (backLinkFileContent != modified)
-                                this.app.vault.modify(backLinkFile, modified);
-                        });
-                    }
-                });
-            }
+                        if (backLinkFileContent != modified)
+                            this.app.vault.modify(backLinkFile, modified);
+                    });
+                }
+            });
         }
     }
 
