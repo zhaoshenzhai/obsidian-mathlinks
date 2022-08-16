@@ -16,7 +16,7 @@ export default class MathLinks extends Plugin {
                 return null;
 
             let mathLink = await this.getMathLink(file);
-            if (mathLink != null && mathLink != undefined)
+            if (mathLink != null)
                 this.updateBackLinks(file, mathLink[0]);
             else
                 this.removeBackMathLinks(file);
@@ -35,7 +35,7 @@ export default class MathLinks extends Plugin {
                 let count = 0;
                 allIncludedNotes.forEach(async (note) => {
                     let mathLink = await this.getMathLink(note);
-                    if (mathLink != null && mathLink != undefined)
+                    if (mathLink != null)
                         this.updateBackLinks(note, mathLink[0]);
                     else
                         this.removeBackMathLinks(note);
@@ -51,7 +51,7 @@ export default class MathLinks extends Plugin {
         });
     }
 
-    async getMathLink(file: TFile): [string, boolean] | null | undefined {
+    async getMathLink(file: TFile): [string, boolean] | null {
         let contents = await this.app.vault.read(file);
         contents = contents.split(/\r?\n/);
 
@@ -74,14 +74,14 @@ export default class MathLinks extends Plugin {
                             return null;
                         }
                     } else if (line === '---') {
-                        return undefined;
+                        return null;
                     } else {
                         lineNumber++;
                     }
                 }
             }
         }
-        return undefined;
+        return null;
     }
 
     async generateMathLinkFromAuto(file: Tfile): string {
@@ -164,7 +164,7 @@ export default class MathLinks extends Plugin {
 
                 if (outLinkFile instanceof TFile) {
                     let outLinkMathLink = await this.getMathLink(outLinkFile);
-                    if (outLinkMathLink != null && outLinkMathLink != undefined)
+                    if (outLinkMathLink != null)
                         modified = this.convertToMathLinks(outLinkFileName, modified, outLinkMathLink[0]);
                 }
 
@@ -180,7 +180,7 @@ export default class MathLinks extends Plugin {
         let allIncludedNotes = getIncludedNotes(allNotes, this.settings.excludedFilePaths);
         allIncludedNotes.forEach(async (note) => {
             let mathLink = await this.getMathLink(note);
-            if (mathLink != null && mathLink != undefined && mathLink[1])
+            if (mathLink != null && mathLink[1])
                 this.updateBackLinks(note, mathLink[0]);
             else
                 this.removeBackMathLinks(note);
