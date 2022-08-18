@@ -12,7 +12,9 @@ You can currently install it using [BRAT](https://github.com/TfTHacker/obsidian4
 
 ## :pencil2: Description and Usage
 
-This plugin renders all links to `fileName.md` by way of a `mathLink`, which is a string of text that can contain inline MathJax. To add a `mathLink` to `fileName.md`, simply insert `mathLink: yourMathLink` to the YAML frontmatter of `fileName.md` like so:
+As far as I know, the standard wiki-style links of the form `[[fileName]]` used in Obsidian does not support MathJax. Instead, one should use markdown-style links which are of the form `[displayedText](fileName.md)`; here, `displayedText` can contain MathJax. However, text remains unchanged when link is updated, so, if one wishes to have links with math, one needs to update them manually.
+
+This plugin aims to solve this issue by assigning `fileName.md` a `mathLink`, i.e. some specified text to be displayed and rendered when a note links to `fileName.md`. It can be done by inserting `mathLink: yourMathLink` to the YAML frontmatter of `fileName.md` like so:
 
 ```
 ---
@@ -22,7 +24,7 @@ mathLink: yourMathLink
 Content starts here.
 ```
 
-That's it! All links of the form `[[fileName]]` or `[fileName](fileName.md)` will now be displayed as `yourMathLink` rendered in MathJax.
+That's it! All links of the form `[[fileName]]` or `[fileName](fileName.md)` will now be displayed as the rendered MathJax of `yourMathLink`.
 
 ### Templates
 Oftentimes, the `mathLink` of `fileName.md` involves replacing some text with its math counterpart. For instance, all of `Invertible iff bijective.md`, `Linearly dependent iff exists span-redundant element.md`, and `LUB property iff GLB property.md` will have mathLinks of the form '... $\Leftrightarrow$ ...'.
