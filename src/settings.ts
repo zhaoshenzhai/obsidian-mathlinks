@@ -68,7 +68,6 @@ export class MathLinksSettingTab extends PluginSettingTab {
 
                                 this.plugin.settings.templates.push(template);
                                 await this.plugin.saveSettings();
-                                this.plugin.updateAutoNotes();
 
                                 new Notice('MathLinks: Template added');
                             }
@@ -109,7 +108,6 @@ export class MathLinksSettingTab extends PluginSettingTab {
                             modal.onClose = async () => {
                                 if (modal.saved) {
                                     await this.plugin.saveSettings();
-                                    this.plugin.updateAutoNotes();
 
                                     new Notice('MathLinks: Template saved');
                                 } else {

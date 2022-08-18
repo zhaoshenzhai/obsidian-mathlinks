@@ -1,7 +1,6 @@
 import { App, Plugin, TFile, renderMath, finishRenderMath } from 'obsidian';
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from './settings';
-import { formatRegex, isExcluded, getIncludedNotes } from './utils';
-import * as fs from 'fs';
+import { formatRegex, isExcluded } from './utils';
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
@@ -11,20 +10,13 @@ export default class MathLinks extends Plugin {
         this.addSettingTab(new MathLinksSettingTab(this.app, this));
         const settings = this.settings;
 
-        this.app.metadataCache.on('changed', async (file: TFile, data: string, cache: CachedMetaData) => {
-            if (!settings.autoUpdate || isExcluded(file, settings.excludedFilePaths))
+        this.registerMarkdownPostProcessor((element, context) => {
+            let file = this.app.vault.getAbstractFileByPath(context.sourcePath);
+            if (!(file instanceof TFile))
+                return null;
+            else if (isExcluded(file, settings.excludedFilePaths))
                 return null;
 
-            let mathLink = await this.getMathLink(file);
-            if (mathLink != null)
-                this.updateBackLinks(file, mathLink[0]);
-            else
-                this.removeBackMathLinks(file);
-
-            this.updateOutLinks(file);
-        });
-
-        this.registerMarkdownPostProcessor((element, context) => {
             element.querySelectorAll('.internal-link').forEach(async (outLinkEl) => {
                 let outLinkFileName = outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, '').replace(/%20/g, ' ');
                 let outLinkFileExt = outLinkFileName.substring(outLinkFileName.length - 3, outLinkFileName.length);
@@ -73,32 +65,6 @@ export default class MathLinks extends Plugin {
                     finishRenderMath();
                 }
             })
-        });
-
-        this.addCommand({
-            id: "update_all_mathlinks",
-            name: "Update all links",
-            callback: async () => {
-                let allNotes = await this.app.vault.getMarkdownFiles();
-                let allIncludedNotes = getIncludedNotes(allNotes, settings.excludedFilePaths);
-                let updateNotice = new Notice('MathLinks: Updating...');
-
-                let count = 0;
-                allIncludedNotes.forEach(async (note) => {
-                    let mathLink = await this.getMathLink(note);
-                    if (mathLink != null)
-                        this.updateBackLinks(note, mathLink[0]);
-                    else
-                        this.removeBackMathLinks(note);
-
-                    count++;
-                    updateNotice.setMessage(`MathLinks: Updating... ${count}/${allIncludedNotes.length}`);
-                    if (count === allIncludedNotes.length) {
-                        updateNotice.hide();
-                        new Notice('MathLinks: Updated all links');
-                    }
-                });
-            }
         });
     }
 
@@ -156,128 +122,6 @@ export default class MathLinks extends Plugin {
             mathLink = mathLink.replace(replaced, replacement);
         }
         return mathLink;
-    }
-
-    async updateBackLinks(file: TFile, mathLink: string): void {
-        let backLinkFilePaths = this.getBackLinkFilePaths(file);
-        if (backLinkFilePaths.length != 0) {
-            backLinkFilePaths.forEach(async (backLinkFilePath) => {
-                let backLinkFile = this.app.vault.getAbstractFileByPath(backLinkFilePath);
-                if (backLinkFile instanceof TFile && !isExcluded(backLinkFile, this.settings.excludedFilePaths)) {
-                    let backLinkFileContent = await this.app.vault.read(backLinkFile);
-                    let modified = this.convertToMathLinks(file.name, backLinkFileContent, mathLink);
-
-                    if (backLinkFileContent != modified)
-                        this.app.vault.modify(backLinkFile, modified);
-                }
-            });
-        }
-    }
-
-    async removeBackMathLinks(file: TFile): void {
-        let backLinkFilePaths = this.getBackLinkFilePaths(file);
-        if (backLinkFilePaths.length != 0) {
-            backLinkFilePaths.forEach(async (backLinkFilePath) => {
-                let backLinkFile = this.app.vault.getAbstractFileByPath(backLinkFilePath);
-                if (backLinkFile instanceof TFile && !isExcluded(backLinkFile, this.settings.excludedFilePaths)) {
-                    let backLinkFileContent = await this.app.vault.read(backLinkFile);
-                    let vaultPath = this.app.vault.getRoot().vault.adapter.basePath;
-                    let configDir = this.app.vault.configDir;
-                    let modified = '';
-                    let obsidianConfigFile = await fs.readFile(`${vaultPath}/${configDir}/app.json`, 'utf8', (err, data) => {
-                        if (JSON.parse(data).useMarkdownLinks)
-                            modified = this.convertToMarkdownLinks(file.name, backLinkFileContent);
-                        else
-                            modified = this.convertToDoubleLinks(file.name, backLinkFileContent);
-
-                        if (backLinkFileContent != modified)
-                            this.app.vault.modify(backLinkFile, modified);
-                    });
-                }
-            });
-        }
-    }
-
-    async updateOutLinks(file: TFile): void {
-        let fileContent = await this.app.vault.read(file);
-        let modified = fileContent;
-
-        let count = 0;
-        let outLinks = await this.app.metadataCache.getFileCache(file).links;
-        if (outLinks != undefined) {
-            outLinks.forEach(async (outLink) => {
-                let outLinkFileName = outLink.link;
-                if (outLink.displayText != "")
-                    outLinkFileName = outLinkFileName.replace(/$/, '.md');
-
-                let outLinkFilePath = this.app.fileManager.getNewFileParent(outLinkFileName).path + '/' + outLinkFileName;
-                let outLinkFile = this.app.vault.getAbstractFileByPath(outLinkFilePath);
-
-                if (outLinkFile instanceof TFile) {
-                    let outLinkMathLink = await this.getMathLink(outLinkFile);
-                    if (outLinkMathLink != null)
-                        modified = this.convertToMathLinks(outLinkFileName, modified, outLinkMathLink[0]);
-                }
-
-                count++;
-                if (count === outLinks.length && fileContent != modified)
-                    await this.app.vault.modify(file, modified);
-            });
-        }
-    }
-
-    async updateAutoNotes(): void {
-        let allNotes = await this.app.vault.getMarkdownFiles();
-        let allIncludedNotes = getIncludedNotes(allNotes, this.settings.excludedFilePaths);
-        allIncludedNotes.forEach(async (note) => {
-            let mathLink = await this.getMathLink(note);
-            if (mathLink != null && mathLink[1])
-                this.updateBackLinks(note, mathLink[0]);
-            else
-                this.removeBackMathLinks(note);
-        });
-    }
-
-    getBackLinkFilePaths(file: Tfile): string[] {
-        let backLinkFilePaths: string[] = [];
-        Object.keys(this.app.metadataCache.resolvedLinks).forEach((key) => {
-            let links = this.app.metadataCache.resolvedLinks[key];
-            Object.keys(links).forEach((link) => {
-                if (link === file.path)
-                    backLinkFilePaths.push(key);
-            });
-        });
-
-        return backLinkFilePaths;
-    }
-
-    convertToMathLinks(fileName: string, fileContent: string, mathLink: string): string {
-        let left = mathLink.replace(/^/, '[').replace(/$/, ']');
-        let right = fileName.replace(/^/, '(').replace(/$/, ')').replace(/\s/g, '%20');
-        let newLink = `${left}${right}`;
-
-        let mixedLink = new RegExp('\\[((?!\\]\\(|\\]\\]).)*\\]' + formatRegex(right), 'g');
-        let doubleLink = new RegExp(formatRegex(fileName.replace(/^/, '\[\[').replace(/\.md$/, '\]\]')), 'g');
-
-        return fileContent.replace(mixedLink, newLink).replace(doubleLink, newLink);
-    }
-
-    convertToDoubleLinks(fileName: string, fileContent: string): string {
-        let formattedName = fileName.replace(/^/, '(').replace(/$/, ')').replace(/\s/g, '%20');
-
-        let mixedLink = new RegExp('\\[((?!\\]\\(|\\]\\]).)*\\]' + formatRegex(formattedName), 'g');
-        let doubleLink = fileName.replace(/^/, '[[').replace(/\.md$/, ']]');
-
-        return fileContent.replace(mixedLink, doubleLink);
-    }
-
-    convertToMarkdownLinks(fileName: string, fileContent: string): string {
-        let formattedName = fileName.replace(/^/, '(').replace(/$/, ')').replace(/\s/g, '%20');
-
-        let mixedLink = new RegExp('\\[((?!\\]\\(|\\]\\]).)*\\]' + formatRegex(formattedName), 'g');
-        let markdownLink = fileName.replace(/^/, '[').replace(/\.md$/, `]${formattedName}`);
-
-        return fileContent.replace(mixedLink, markdownLink);
     }
 
     async loadSettings() {
