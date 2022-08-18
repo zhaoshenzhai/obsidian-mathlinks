@@ -1,10 +1,10 @@
 # :symbols: Obsidian MathLinks
 
-An [Obsidian.md](https://obsidian.md) plugin to manage and display [MathJax](https://www.mathjax.org/) in your links. Work in progress!
+An [Obsidian.md](https://obsidian.md) plugin to render [MathJax](https://www.mathjax.org/) in your links.
 
-**Note**: This plugin **will** modify the contents of your links. **_Proceed at your own risk_** and **_please make backups_** before trying it out.
+**Note**: As of `0.2.0`, this plugin will no longer edit the links themselves. Yay!
 
-You can currently install it using [BRAT](https://github.com/TfTHacker/obsidian42-brat) or by copying `main.js` and `manifest.json` from [the latest release](https://github.com/zhaoshenzhai/obsidian-mathlinks/releases/tag/0.1.4) to a folder named `obsidian-mathlinks` in `.obsidian/plugins/`.
+You can currently install it using [BRAT](https://github.com/TfTHacker/obsidian42-brat) or by copying `main.js` and `manifest.json` from [the latest release](https://github.com/zhaoshenzhai/obsidian-mathlinks/releases/tag/0.2.0) to a folder named `obsidian-mathlinks` in `.obsidian/plugins/`.
 
 * [Description and Usage](https://github.com/zhaoshenzhai/obsidian-mathlinks#pencil2-description-and-usage)
 * [Settings](https://github.com/zhaoshenzhai/obsidian-mathlinks#gear-settings)
@@ -12,9 +12,7 @@ You can currently install it using [BRAT](https://github.com/TfTHacker/obsidian4
 
 ## :pencil2: Description and Usage
 
-As far as I know, the standard wiki-style links of the form `[[fileName]]` used in Obsidian does not support MathJax. Instead, one should use markdown-style links which are of the form `[displayedText](fileName.md)`; here, `displayedText` can contain MathJax and will be rendered appropriately in reading mode. However, it remains unchanged when `fileName.md` is updated, so your links might become inconsistent over time as your notes grow.
-
-This plugin aims to solve this issue by assigning `fileName.md` a `mathLink`, i.e. some specified text to be displayed when a note links to `fileName.md`. It can be done by inserting `mathLink: yourMathLink` to the YAML frontmatter of `fileName.md` like so:
+This plugin renders all links to `fileName.md` by way of a `mathLink`, which is a string of text that can contain inline MathJax. To add a `mathLink` to `fileName.md`, simply insert `mathLink: yourMathLink` to the YAML frontmatter of `fileName.md` like so:
 
 ```
 ---
@@ -24,11 +22,7 @@ mathLink: yourMathLink
 Content starts here.
 ```
 
-By default, changing `yourMathLink` will update all links of the form `[...](fileName.md)` accordingly.
-* If `Use [[Wikilinks]]` is enabled in `Settings/Files & Links`, this plugin will convert `[[fileName]]` to `[mathLink](fileName.md)` whenever it is inserted, and deleting `mathLink: yourMathLink` in `fileName.md` will revert all such links to `[[fileName]]`.
-* Otherwise, this plugin will update `[fileName](fileName.md)` to `[mathLink](fileName.md)` whenever it is inserted, and deleting `mathLink: yourMathLink` in `fileName.md` will revert it back.
-
-A command is available in the Command Palette to update _all_ mathLinks in your vault. This should not normally be used unless `autoUpdate` is disabled.
+That's it! All links of the form `[[fileName]]` or `[fileName](fileName.md)` will now be displayed as `yourMathLink` rendered in MathJax.
 
 ### Templates
 Oftentimes, the `mathLink` of `fileName.md` involves replacing some text with its math counterpart. For instance, all of `Invertible iff bijective.md`, `Linearly dependent iff exists span-redundant element.md`, and `LUB property iff GLB property.md` will have mathLinks of the form '... $\Leftrightarrow$ ...'.
@@ -36,9 +30,6 @@ Oftentimes, the `mathLink` of `fileName.md` involves replacing some text with it
 Instead of setting them manually, simply use `mathLink: auto`. This will generate its `mathLink` via a template that replaces `iff` with $\Leftrightarrow$. A _template_ consists of a string to be matched (`iff`), its replacement $(\Leftrightarrow)$, and some options (global match, case sensitive, and match whole words). They are created and maintained in the MathLinks settings window.
 
 ## :gear: Settings
-### Update when modified
-Automatically update links in the current file when modified. _Default: true_.
-
 ### Add a new template
 This opens a modal which prompts for:
 * **Title**: Name of the template to refer back to when editing/deleting a template.
@@ -60,6 +51,8 @@ MathLinks will ignore those files. If `path` is entered, all files under `path` 
 Remove a file/path from the list of excluded files.
 
 ## :clipboard: Changelog
+### 0.2.0
+* No longer edit the links themselves. Instead, a markdown post-processor is registered which renders individual inline MathJax equations (like `$...$`) and patches them back together.
 ### 0.1.4
 * Fixed duplicate templates and excluded files/paths.
 ### 0.1.3
