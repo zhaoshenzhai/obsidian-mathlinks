@@ -2,7 +2,7 @@
 
 An [Obsidian.md](https://obsidian.md) plugin to render [MathJax](https://www.mathjax.org/) in your links.
 
-**Note**: As of `0.2.0`, this plugin will no longer edit the links themselves. Yay!
+**Note**: As of `0.2.0`, this plugin will no longer edit the links themselves.
 
 You can currently install it using [BRAT](https://github.com/TfTHacker/obsidian42-brat) or by copying `main.js` and `manifest.json` from [the latest release](https://github.com/zhaoshenzhai/obsidian-mathlinks/releases/tag/0.2.0) to a folder named `obsidian-mathlinks` in `.obsidian/plugins/`.
 
