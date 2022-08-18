@@ -1,4 +1,4 @@
-import { App, Plugin, TFile } from 'obsidian';
+import { App, Plugin, TFile, renderMath, finishRenderMath } from 'obsidian';
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from './settings';
 import { formatRegex, isExcluded, getIncludedNotes } from './utils';
 import * as fs from 'fs';
@@ -22,6 +22,57 @@ export default class MathLinks extends Plugin {
                 this.removeBackMathLinks(file);
 
             this.updateOutLinks(file);
+        });
+
+        this.registerMarkdownPostProcessor((element, context) => {
+            element.querySelectorAll('.internal-link').forEach(async (outLinkEl) => {
+                let outLinkFileName = outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, '').replace(/%20/g, ' ');
+                let outLinkFileExt = outLinkFileName.substring(outLinkFileName.length - 3, outLinkFileName.length);
+                if (outLinkFileExt != '.md')
+                    outLinkFileName = outLinkFileName.replace(/$/, '.md');
+
+                let outLinkFilePath = this.app.fileManager.getNewFileParent(outLinkFileName).path + '/' + outLinkFileName;
+                let outLinkFile = this.app.vault.getAbstractFileByPath(outLinkFilePath);
+                let outLinkMathLink = await this.getMathLink(outLinkFile);
+
+                if (outLinkMathLink != null) {
+                    let splits: [string, boolean][] = [];
+
+                    let split = '';
+                    let isMath = false;
+                    for (let i = 0; i < outLinkMathLink[0].length; i++) {
+                        let character = outLinkMathLink[0][i];
+                        if (character === '$') {
+                            if (split != '') {
+                                splits.push([split, isMath]);
+                                split = '';
+                            }
+                            isMath = !isMath;
+                        } else {
+                            split += character;
+                        }
+
+                        if (i == outLinkMathLink[0].length - 1 && split != '') {
+                            splits.push([split, isMath]);
+                        }
+                    }
+
+                    outLinkEl.innerText = '';
+                    for (let i = 0; i < splits.length; i++) {
+                        let word = splits[i][0];
+                        if (splits[i][1]) {
+                            let wordMath = renderMath(word, false);
+                            let mathEl = outLinkEl.createSpan();
+                            mathEl.replaceWith(wordMath);
+                        } else {
+                            let wordEl = outLinkEl.createSpan();
+                            wordEl.innerText += word;
+                        }
+                    }
+
+                    finishRenderMath();
+                }
+            })
         });
 
         this.addCommand({
