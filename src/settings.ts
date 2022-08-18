@@ -3,13 +3,11 @@ import { Setting, PluginSettingTab, Modal, TextComponent, DropdownComponent, Not
 export interface MathLinksSettings {
     templates: string[];
     excludedFilePaths: string[];
-    autoUpdate: boolean;
 }
 
 export const DEFAULT_SETTINGS: MathLinksSettings = {
     templates: [],
     excludedFilePaths: [],
-    autoUpdate: true
 }
 
 export class MathLinksSettingTab extends PluginSettingTab {
@@ -25,18 +23,6 @@ export class MathLinksSettingTab extends PluginSettingTab {
 
         containerEl.empty();
         containerEl.createEl('h2', {text: 'MathLinks Settings'});
-
-        // Update when modified
-        new Setting(containerEl)
-            .setName('Update when modified')
-            .setDesc('Automatically update links in the current file when modified.')
-            .addToggle((toggle) => {toggle
-                .setValue(this.plugin.settings.autoUpdate)
-                .onChange(async (current) => {
-                    this.plugin.settings.autoUpdate = current;
-                    await this.plugin.saveSettings();
-                });
-            });
 
         // Add a new template
         new Setting(containerEl)
@@ -129,7 +115,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                     .setIcon('trash')
                     .onClick(async () => {
                         if (templateTitle) {
-                            let modal = new DeleteModal(this.app, `Are you sure you want to delete '${templateTitle}'?`);
+                            let modal = new ConfirmModal(this.app, `Are you sure you want to delete '${templateTitle}'?`, 'Yes', 'No');
 
                             modal.onClose = async () => {
                                 if (modal.saved) {
@@ -210,7 +196,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                     .setIcon('trash')
                     .onClick(async () => {
                         if (excludedFilePath) {
-                            let modal = new DeleteModal(this.app, `Are you sure you want to remove '${excludedFilePath}' from the list of excluded files/paths?`);
+                            let modal = new ConfirmModal(this.app, `Are you sure you want to remove '${excludedFilePath}' from the list of excluded files/paths?`, 'Yes', 'No');
 
                             modal.onClose = async () => {
                                 if (modal.saved) {
@@ -353,14 +339,19 @@ class AddExcludedModal extends Modal {
     }
 }
 
-class DeleteModal extends Modal {
+class ConfirmModal extends Modal {
     saved: boolean = false;
+    error: string[] = [];
 
     areYouSure: string;
+    proceed: string;
+    noProceed: string;
 
-    constructor(app: App, areYouSure: string) {
+    constructor(app: App, areYouSure: string, proceed: string, noProceed: string) {
         super(app);
         this.areYouSure = areYouSure;
+        this.proceed = proceed;
+        this.noProceed = noProceed;
     }
 
     onOpen() {
@@ -368,7 +359,7 @@ class DeleteModal extends Modal {
         contentEl.empty();
 
         contentEl.createEl('h3', {text: this.areYouSure});
-        loadButtonsToClose(this, this.contentEl.createDiv(), 'Yes', 'No');
+        loadButtonsToClose(this, this.contentEl.createDiv(), this.proceed, this.noProceed);
     }
 }
 
