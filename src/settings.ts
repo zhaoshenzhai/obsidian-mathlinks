@@ -374,8 +374,8 @@ function loadTemplateSettings(contentEl: HTMLElement, template: string, modal: M
                 template.title = current;
                 modal.error[0] = '';
                 if (modalType === 'add') {
-                    template.templates.every((template) => {
-                        if (template.title != '' && template.title == template.title) {
+                    template.templates.every((t) => {
+                        if (template.title != '' && template.title == t.title) {
                             modal.error[0] = 'MathLinks: Duplicate title';
                             return false;
                         }
