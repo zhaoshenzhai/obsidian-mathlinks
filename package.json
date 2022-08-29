@@ -1,5 +1,5 @@
 {
-    "name": "obsidian-mathlinks",
+    "name": "MathLinks",
     "version": "0.2.1",
     "description": "Render MathJax in your links",
     "main": "main.js",
