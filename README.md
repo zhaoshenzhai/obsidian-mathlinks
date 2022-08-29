@@ -54,7 +54,7 @@ Remove a file/path from the list of excluded files.
 
 ## :clipboard: Changelog
 ### 0.2.2
-* Simplified `getMathLink()`
+* Simplified `getMathLink()`.
 ### 0.2.1
 * Fixed duplicate title.
 ### 0.2.0

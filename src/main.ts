@@ -1,6 +1,5 @@
 import { App, Plugin, TFile, renderMath, finishRenderMath } from 'obsidian';
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from './settings';
-import { formatRegex, isExcluded } from './utils';
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
@@ -14,10 +13,10 @@ export default class MathLinks extends Plugin {
             let file = this.app.vault.getAbstractFileByPath(context.sourcePath);
             if (!(file instanceof TFile))
                 return null;
-            else if (isExcluded(file, settings.excludedFilePaths))
+            else if (this.isExcluded(file, settings.excludedFilePaths))
                 return null;
 
-            element.querySelectorAll('.internal-link').forEach(async (outLinkEl) => {
+            element.querySelectorAll('.internal-link').forEach((outLinkEl) => {
                 let outLinkFileName = outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, '').replace(/%20/g, ' ');
                 let outLinkFileExt = outLinkFileName.substring(outLinkFileName.length - 3, outLinkFileName.length);
                 if (outLinkFileExt != '.md')
@@ -25,15 +24,15 @@ export default class MathLinks extends Plugin {
 
                 let outLinkFilePath = this.app.fileManager.getNewFileParent(outLinkFileName).path + '/' + outLinkFileName;
                 let outLinkFile = this.app.vault.getAbstractFileByPath(outLinkFilePath);
-                let outLinkMathLink = await this.getMathLink(outLinkFile);
+                let outLinkMathLink = this.getMathLink(outLinkFile);
 
                 if (outLinkMathLink) {
                     let splits: [string, boolean][] = [];
 
                     let split = '';
                     let isMath = false;
-                    for (let i = 0; i < outLinkMathLink[0].length; i++) {
-                        let character = outLinkMathLink[0][i];
+                    for (let i = 0; i < outLinkMathLink.length; i++) {
+                        let character = outLinkMathLink[i];
                         if (character === '$') {
                             if (split != '') {
                                 splits.push([split, isMath]);
@@ -44,7 +43,7 @@ export default class MathLinks extends Plugin {
                             split += character;
                         }
 
-                        if (i == outLinkMathLink[0].length - 1 && split != '') {
+                        if (i == outLinkMathLink.length - 1 && split != '') {
                             splits.push([split, isMath]);
                         }
                     }
@@ -68,28 +67,23 @@ export default class MathLinks extends Plugin {
         });
     }
 
-    async getMathLink(file: TFile): [string, boolean] | undefined {
+    getMathLink(file: TFile): string {
         if (!file)
             return undefined;
 
         let mathLink = this.app.metadataCache.getFileCache(file)?.frontmatter?.mathLink;
-        let auto = false;
 
-        if (!mathLink) {
-            return undefined;
-        } else if (mathLink === 'auto') {
-            mathLink = await this.generateMathLinkFromAuto(file);
-            auto = true;
-        }
+        if (mathLink === 'auto')
+            mathLink = this.generateMathLinkFromAuto(file);
 
-        return [mathLink, auto];
+        return mathLink;
     }
 
-    async generateMathLinkFromAuto(file: Tfile): string {
+    generateMathLinkFromAuto(file: Tfile): string {
         let templates = this.settings.templates;
         let mathLink = file.name.replace('\.md', '');
         for (let i = 0; i < templates.length; i++) {
-            let replaced = new RegExp(formatRegex(templates[i].replaced));
+            let replaced = new RegExp(templates[i].replaced);
             let replacement = templates[i].replacement;
 
             let flags = '';
@@ -105,7 +99,22 @@ export default class MathLinks extends Plugin {
 
             mathLink = mathLink.replace(replaced, replacement);
         }
+
         return mathLink;
+    }
+
+    isExcluded(file: TFile, excludedFilePaths: string[]): boolean {
+        for (let i = 0; i < excludedFilePaths.length; i++) {
+            let path = excludedFilePaths[i];
+            if (path.isFile && file.path === path.path) {
+                return true;
+            } else if (!path.isFile) {
+                let pathRegex = new RegExp(`\\b${path.path}/`);
+                if (pathRegex.test(file.path))
+                    return true;
+            }
+        }
+        return false;
     }
 
     async loadSettings() {
