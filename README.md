@@ -4,7 +4,7 @@ An [Obsidian.md](https://obsidian.md) plugin to render [MathJax](https://www.mat
 
 **Note**: As of `0.2.0`, this plugin will no longer edit the links themselves.
 
-You can currently install it using [BRAT](https://github.com/TfTHacker/obsidian42-brat) or by copying `main.js` and `manifest.json` from [the latest release](https://github.com/zhaoshenzhai/obsidian-mathlinks/releases/tag/0.2.1) to a folder named `obsidian-mathlinks` in `.obsidian/plugins/`.
+You can currently install it using [BRAT](https://github.com/TfTHacker/obsidian42-brat) or by copying `main.js` and `manifest.json` from [the latest release](https://github.com/zhaoshenzhai/obsidian-mathlinks/releases/tag/0.2.2) to a folder named `obsidian-mathlinks` in `.obsidian/plugins/`.
 
 * [Description and Usage](https://github.com/zhaoshenzhai/obsidian-mathlinks#pencil2-description-and-usage)
 * [Settings](https://github.com/zhaoshenzhai/obsidian-mathlinks#gear-settings)
@@ -53,6 +53,8 @@ MathLinks will ignore those files. If `path` is entered, all files under `path` 
 Remove a file/path from the list of excluded files.
 
 ## :clipboard: Changelog
+### 0.2.2
+* Simplified `getMathLink()`
 ### 0.2.1
 * Fixed duplicate title.
 ### 0.2.0
