@@ -27,7 +27,7 @@ export default class MathLinks extends Plugin {
                 let outLinkFile = this.app.vault.getAbstractFileByPath(outLinkFilePath);
                 let outLinkMathLink = await this.getMathLink(outLinkFile);
 
-                if (outLinkMathLink != null) {
+                if (outLinkMathLink) {
                     let splits: [string, boolean][] = [];
 
                     let split = '';
@@ -68,37 +68,21 @@ export default class MathLinks extends Plugin {
         });
     }
 
-    async getMathLink(file: TFile): [string, boolean] | null {
-        let contents = await this.app.vault.read(file);
-        contents = contents.split(/\r?\n/);
+    async getMathLink(file: TFile): [string, boolean] | undefined {
+        if (!file)
+            return undefined;
 
-        if (contents[0] === '---') {
-            for (let lineNumber = 1; lineNumber < contents.length; lineNumber++) {
-                let line = contents[lineNumber];
-                if (line.length < 10) {
-                    lineNumber++;
-                } else {
-                    let key = line.substring(0, 10);
-                    if (key === 'mathLink: ') {
-                        let value = line.replace(key, '');
-                        if (value != '') {
-                            if (value === 'auto') {
-                                let mathLink = await this.generateMathLinkFromAuto(file);
-                                return [mathLink, true];
-                            }
-                            return [value, false];
-                        } else {
-                            return null;
-                        }
-                    } else if (line === '---') {
-                        return null;
-                    } else {
-                        lineNumber++;
-                    }
-                }
-            }
+        let mathLink = this.app.metadataCache.getFileCache(file)?.frontmatter?.mathLink;
+        let auto = false;
+
+        if (!mathLink) {
+            return undefined;
+        } else if (mathLink === 'auto') {
+            mathLink = await this.generateMathLinkFromAuto(file);
+            auto = true;
         }
-        return null;
+
+        return [mathLink, auto];
     }
 
     async generateMathLinkFromAuto(file: Tfile): string {
