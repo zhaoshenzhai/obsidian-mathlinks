@@ -18,12 +18,7 @@ export default class MathLinks extends Plugin {
 
             element.querySelectorAll('.internal-link').forEach((outLinkEl) => {
                 let outLinkFileName = outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, '').replace(/%20/g, ' ');
-                let outLinkFileExt = outLinkFileName.substring(outLinkFileName.length - 3, outLinkFileName.length);
-                if (outLinkFileExt != '.md')
-                    outLinkFileName = outLinkFileName.replace(/$/, '.md');
-
-                let outLinkFilePath = this.app.fileManager.getNewFileParent(outLinkFileName).path + '/' + outLinkFileName;
-                let outLinkFile = this.app.vault.getAbstractFileByPath(outLinkFilePath);
+                let outLinkFile = this.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
                 let outLinkMathLink = this.getMathLink(outLinkFile);
 
                 if (outLinkMathLink) {
