@@ -54,7 +54,7 @@ Remove a file/path from the list of excluded files.
 
 ## :clipboard: Changelog
 ### 0.2.3
-* #1: Fixed only checking for files in `fileManager.getNewFileParent()`.
+* [#1](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/1): Fixed only checking for files in `fileManager.getNewFileParent()`.
 ### 0.2.2
 * Simplified `getMathLink()`.
 ### 0.2.1
