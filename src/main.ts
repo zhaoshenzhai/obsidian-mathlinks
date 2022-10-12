@@ -1,4 +1,4 @@
-import { App, Plugin, TFile, renderMath, finishRenderMath } from 'obsidian';
+import { App, Plugin, TFile, renderMath, finishRenderMath, loadMathJax } from 'obsidian';
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from './settings';
 
 export default class MathLinks extends Plugin {
@@ -6,6 +6,7 @@ export default class MathLinks extends Plugin {
 
     async onload() {
         await this.loadSettings();
+        await loadMathJax();
         this.addSettingTab(new MathLinksSettingTab(this.app, this));
         const settings = this.settings;
 
