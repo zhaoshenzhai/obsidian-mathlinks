@@ -18,46 +18,48 @@ export default class MathLinks extends Plugin {
                 return null;
 
             element.querySelectorAll('.internal-link').forEach((outLinkEl) => {
-                let outLinkFileName = outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, '').replace(/%20/g, ' ');
-                let outLinkFile = this.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
-                let outLinkMathLink = this.getMathLink(outLinkFile);
+                if (outLinkEl.ariaLabel == null) {
+                    let outLinkFileName = outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, '').replace(/%20/g, ' ');
+                    let outLinkFile = this.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
+                    let outLinkMathLink = this.getMathLink(outLinkFile);
 
-                if (outLinkMathLink) {
-                    let splits: [string, boolean][] = [];
+                    if (outLinkMathLink) {
+                        let splits: [string, boolean][] = [];
 
-                    let split = '';
-                    let isMath = false;
-                    for (let i = 0; i < outLinkMathLink.length; i++) {
-                        let character = outLinkMathLink[i];
-                        if (character === '$') {
-                            if (split != '') {
-                                splits.push([split, isMath]);
-                                split = '';
+                        let split = '';
+                        let isMath = false;
+                        for (let i = 0; i < outLinkMathLink.length; i++) {
+                            let character = outLinkMathLink[i];
+                            if (character === '$') {
+                                if (split != '') {
+                                    splits.push([split, isMath]);
+                                    split = '';
+                                }
+                                isMath = !isMath;
+                            } else {
+                                split += character;
                             }
-                            isMath = !isMath;
-                        } else {
-                            split += character;
+
+                            if (i == outLinkMathLink.length - 1 && split != '') {
+                                splits.push([split, isMath]);
+                            }
                         }
 
-                        if (i == outLinkMathLink.length - 1 && split != '') {
-                            splits.push([split, isMath]);
+                        outLinkEl.innerText = '';
+                        for (let i = 0; i < splits.length; i++) {
+                            let word = splits[i][0];
+                            if (splits[i][1]) {
+                                let wordMath = renderMath(word, false);
+                                let mathEl = outLinkEl.createSpan();
+                                mathEl.replaceWith(wordMath);
+                            } else {
+                                let wordEl = outLinkEl.createSpan();
+                                wordEl.innerText += word;
+                            }
                         }
+
+                        finishRenderMath();
                     }
-
-                    outLinkEl.innerText = '';
-                    for (let i = 0; i < splits.length; i++) {
-                        let word = splits[i][0];
-                        if (splits[i][1]) {
-                            let wordMath = renderMath(word, false);
-                            let mathEl = outLinkEl.createSpan();
-                            mathEl.replaceWith(wordMath);
-                        } else {
-                            let wordEl = outLinkEl.createSpan();
-                            wordEl.innerText += word;
-                        }
-                    }
-
-                    finishRenderMath();
                 }
             })
         });
