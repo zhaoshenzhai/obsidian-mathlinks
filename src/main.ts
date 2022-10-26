@@ -19,7 +19,7 @@ export default class MathLinks extends Plugin {
 
             element.querySelectorAll('.internal-link').forEach((outLinkEl) => {
                 if (outLinkEl.ariaLabel == null) {
-                    let outLinkFileName = outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, '').replace(/%20/g, ' ');
+                    let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, ''));
                     let outLinkFile = this.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
                     let outLinkMathLink = this.getMathLink(outLinkFile);
 
