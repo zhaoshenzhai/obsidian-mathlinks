@@ -35,12 +35,14 @@ Instead of setting them manually, simply use `mathLink: auto`. This will generat
 ## :gear: Settings
 ### Add a new template
 This opens a modal which prompts for:
-* **Title**: Name of the template to refer back to when editing/deleting a template.
-* **Match for**: String to be matched and replaced. Do not include regex; they will be formatted internally.
-* **Replace with**: String to replace matches. Do not escape backslashes; they will be formatted internally.
-* **Global match**: Match all instances (instead of just the first). _Default: true_.
-* **Case sensitive**: Matches will be cases sensitive. _Default: true_.
-* **Match whole words**: Only match whole words. _Default: true_.
+| Field             | Description                                                             | Default |
+| -----             | ----------------------------------------------------------------------- | ------- |
+| Title             | Name of the template to refer back to when editing/deleting a template. |         | 
+| Match for         | String to be matched and replaced. Do not include regex.                |         |
+| Replace with      | String to replace matches. Do not escape backslashes.                   |         |
+| Global match      | Match all instances (instead of just the first).                        | `true`  |
+| Case sensitive    | Matches will be case sensitive.                                         | `true`  |
+| Match whole words | Only match whole workds.                                                | `true`  |
 
 ### Edit/delete a template
 This adds a drop-down list containing the titles of all templates added, and two buttons:
