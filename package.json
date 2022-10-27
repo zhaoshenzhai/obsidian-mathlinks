@@ -17,5 +17,8 @@
         "esbuild": "0.14.47",
         "obsidian": "latest",
         "tslib": "2.4.0"
+    },
+    "dependencies": {
+        "typescript": "^4.8.4"
     }
 }
