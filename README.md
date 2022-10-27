@@ -1,11 +1,12 @@
 # :symbols: Obsidian MathLinks
 
-An [Obsidian.md](https://obsidian.md) plugin to render [MathJax](https://www.mathjax.org/) in your links.
+An [Obsidian.md](https://obsidian.md) plugin to render and manage [MathJax](https://www.mathjax.org/) in your links.
 
-**Note**: As of `0.2.0`, this plugin will no longer edit the links themselves.
+**No changes are made to your notes!** Simply associate a `mathLink` to your note, containing arbitrary MathJax, and have it displayed in all links to the note.
 
-You can currently install it using [BRAT](https://github.com/TfTHacker/obsidian42-brat) or by copying `main.js` and `manifest.json` from [the latest release](https://github.com/zhaoshenzhai/obsidian-mathlinks/releases/tag/0.2.5) to a folder named `obsidian-mathlinks` in `.obsidian/plugins/`.
+![](https://raw.githubusercontent.com/zhaoshenzhai/obsidian-mathlinks/master/.github/example.png)
 
+## :bookmark_tabs: Contents
 * [Description and Usage](https://github.com/zhaoshenzhai/obsidian-mathlinks#pencil2-description-and-usage)
 * [Settings](https://github.com/zhaoshenzhai/obsidian-mathlinks#gear-settings)
 * [Changelog](https://github.com/zhaoshenzhai/obsidian-mathlinks#clipboard-changelog)
@@ -24,7 +25,7 @@ mathLink: yourMathLink
 Content starts here.
 ```
 
-That's it! All links of the form `[[fileName]]` or `[fileName](fileName.md)` will now be displayed as the rendered MathJax of `yourMathLink`. _**No changes are made to your notes**_, and updates to `yourMathLink` will be reflected once the note with the link is reopened.
+That's it! All links of the form `[[fileName]]` or `[fileName](fileName.md)` will now be displayed as the rendered MathJax of `yourMathLink`. No changes are made to your notes, and updates to `yourMathLink` will be reflected once the note with the link is reopened.
 
 ### Templates
 Oftentimes, the `mathLink` of `fileName.md` involves replacing some text with its math counterpart. For instance, all of `Invertible iff bijective.md`, `Linearly dependent iff exists span-redundant element.md`, and `LUB property iff GLB property.md` will have mathLinks of the form '... $\Leftrightarrow$ ...'.
@@ -53,32 +54,16 @@ MathLinks will ignore those files. If `path` is entered, all files under `path` 
 Remove a file/path from the list of excluded files.
 
 ## :clipboard: Changelog
-### 0.2.5
-* [#3](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/3): Fixed decoding `UTf-8` characters in `fileName`.
-### 0.2.4
-* [#2](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/2): Fixed not respecting custom link names.
-### 0.2.3
-* [#1](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/1): Fixed only checking for files in `fileManager.getNewFileParent()`.
-### 0.2.2
-* Simplified `getMathLink()`.
-### 0.2.1
-* Fixed duplicate title.
-### 0.2.0
-* No longer edit the links themselves. Instead, a markdown post-processor is registered which renders individual inline MathJax equations (like `$...$`) and patches them back together.
-### 0.1.4
-* Fixed duplicate templates and excluded files/paths.
-### 0.1.3
-* Fixed excluding files when updating backlinks.
-### 0.1.2
-* Use `this.app.vault.configDir` instead of `.obsidian`.
-### 0.1.1
-* Fixed reverting back to wikilinks when `Use [[Wikilinks]]` is disabled. Instead, revert back to its markdown link.
-### 0.1.0
-Initial release!
-* Automatically creates a mathLink whenever a new link is created. This only happens if the file that is linked to has a mathLink, as indicated in its YAML as `mathLink: ...`.
-* Automatically update links of the form `[...](fileName)` in all backlinks when `fileName.md` is updated. This only happens if `fileName.md` has a mathLink.
-* Automatically revert links of the form `[...](fileName)` back to `[[fileName]]` in all backlinks when `mathLink: ...` is removed from the YAML in `fileName.md`.
-* MathLink Templates, which automatically generate mathLinks by matching certain substrings of `fileName` to be replaced. Use `mathLink: auto` in `fileName.md` to use templates.
-* Command to update all mathLinks.
-* Exclude certain notes/paths; MathLinks will ignore them.
-* Option to turn off `autoUpdate`.
+### 0.2.x: _No longer edit the links themselves._
+* 0.2.5: [#3](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/3): Fixed decoding `UTf-8` characters in `fileName`.
+* 0.2.4: [#2](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/2): Fixed not respecting custom link names.
+* 0.2.3: [#1](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/1): Fixed only checking for files in `fileManager.getNewFileParent()`.
+* 0.2.2: Simplified `getMathLink()`.
+* 0.2.1: Fixed duplicate title.
+* 0.2.0: No longer edit the links themselves. Instead, a markdown post-processor is registered which renders individual inline MathJax equations (like `$...$`) and patches them back together.
+### 0.1.x: _Initial release._
+* 0.1.4: Fixed duplicate templates and excluded files/paths.
+* 0.1.3: Fixed excluding files when updating backlinks.
+* 0.1.2: Use `this.app.vault.configDir` instead of `.obsidian`.
+* 0.1.1: Fixed reverting back to wikilinks when `Use [[Wikilinks]]` is disabled. Instead, revert back to its markdown link.
+* 0.1.0: Initial release!
