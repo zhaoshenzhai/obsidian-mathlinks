@@ -4,7 +4,7 @@ An [Obsidian.md](https://obsidian.md) plugin to render and manage [MathJax](http
 
 **No changes are made to your notes!** Simply associate a `mathLink` to your note, containing arbitrary MathJax, and have it displayed in all links to the note.
 
-![](https://raw.githubusercontent.com/zhaoshenzhai/obsidian-mathlinks/master/.github/example.png)
+![](https://raw.githubusercontent.com/zhaoshenzhai/obsidian-mathlinks/master/.github/sample.png)
 
 ## :bookmark_tabs: Contents
 * [Description and Usage](https://github.com/zhaoshenzhai/obsidian-mathlinks#pencil2-description-and-usage)
