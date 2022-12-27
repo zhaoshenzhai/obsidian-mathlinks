@@ -42,7 +42,7 @@ This opens a modal which prompts for:
 | Replace with      | String to replace matches. Do not escape backslashes.                   |         |
 | Global match      | Match all instances (instead of just the first).                        | `true`  |
 | Case sensitive    | Matches will be case sensitive.                                         | `true`  |
-| Match whole words | Only match whole workds.                                                | `true`  |
+| Match whole words | Only match whole words.                                                 | `true`  |
 
 ### Edit/delete a template
 This adds a drop-down list containing the titles of all templates added, and two buttons:
@@ -67,5 +67,5 @@ Remove a file/path from the list of excluded files.
 * 0.1.4: Fixed duplicate templates and excluded files/paths.
 * 0.1.3: Fixed excluding files when updating backlinks.
 * 0.1.2: Use `this.app.vault.configDir` instead of `.obsidian`.
-* 0.1.1: Fixed reverting back to wikilinks when `Use [[Wikilinks]]` is disabled. Instead, revert back to its markdown link.
+* 0.1.1: Fixed reverting back to Wikilinks when `Use [[Wikilinks]]` is disabled. Instead, revert back to its markdown link.
 * 0.1.0: Initial release!
