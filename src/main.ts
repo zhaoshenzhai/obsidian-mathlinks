@@ -18,7 +18,7 @@ export default class MathLinks extends Plugin {
                 return null;
 
             element.querySelectorAll('.internal-link').forEach((outLinkEl) => {
-                if (outLinkEl.ariaLabel == null) {
+                if (outLinkEl.ariaLabel == null || outLinkEl.closest(".dataview") != null) {
                     let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, ''));
                     let outLinkFile = this.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
                     let outLinkMathLink = this.getMathLink(outLinkFile);
