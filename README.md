@@ -57,6 +57,7 @@ Remove a file/path from the list of excluded files.
 
 ## :clipboard: Changelog
 ### 0.2.x: _No longer edit the links themselves._
+* 0.2.6: [#4](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/4): Added Dataview support.
 * 0.2.5: [#3](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/3): Fixed decoding `UTf-8` characters in `fileName`.
 * 0.2.4: [#2](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/2): Fixed not respecting custom link names.
 * 0.2.3: [#1](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/1): Fixed only checking for files in `fileManager.getNewFileParent()`.
