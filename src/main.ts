@@ -18,12 +18,12 @@ export default class MathLinks extends Plugin {
                 return null;
 
             element.querySelectorAll('.internal-link').forEach((outLinkEl) => {
-                if (outLinkEl.ariaLabel == null) {
-                    let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, ''));
-                    let outLinkFile = this.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
-                    let outLinkMathLink = this.getMathLink(outLinkFile);
+                let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, ''));
+                let outLinkFile = this.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
+                let outLinkMathLink = this.getMathLink(outLinkFile);
 
-                    if (outLinkMathLink) {
+                if (outLinkMathLink) {
+                    if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename) {
                         let splits: [string, boolean][] = [];
 
                         let split = '';
