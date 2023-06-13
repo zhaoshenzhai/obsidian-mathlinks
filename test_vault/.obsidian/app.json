@@ -1,0 +1,28 @@
+{
+  "userIgnoreFilters": [
+    "Images/",
+    "README.md"
+  ],
+  "livePreview": false,
+  "defaultViewMode": "preview",
+  "alwaysUpdateLinks": true,
+  "newFileLocation": "folder",
+  "newFileFolderPath": "Notes",
+  "vimMode": true,
+  "showLineNumber": true,
+  "trashOption": "none",
+  "useMarkdownLinks": false,
+  "pdfExportSettings": {
+    "pageSize": "A4",
+    "landscape": false,
+    "margin": "0",
+    "downscalePercent": 75
+  },
+  "showIndentGuide": false,
+  "showFrontmatter": false,
+  "readableLineLength": false,
+  "promptDelete": false,
+  "showInlineTitle": false,
+  "foldIndent": true,
+  "spellcheck": false
+}

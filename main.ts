@@ -12,6 +12,7 @@ export default class MathLinks extends Plugin {
 
         this.registerMarkdownPostProcessor((element, context) => {
             let file = this.app.vault.getAbstractFileByPath(context.sourcePath);
+            console.log(file);
             if (!(file instanceof TFile))
                 return null;
             else if (this.isExcluded(file, settings.excludedFilePaths))

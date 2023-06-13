@@ -1,0 +1,20 @@
+{
+  "baseFontSize": 16,
+  "translucency": false,
+  "cssTheme": "Minimal",
+  "enabledCssSnippets": [
+    "imageMargins",
+    "links",
+    "lists",
+    "fonts",
+    "admonition"
+  ],
+  "theme": "obsidian",
+  "baseFontSizeAction": false,
+  "interfaceFontFamily": "CMU Serif",
+  "textFontFamily": "CMU Serif",
+  "monospaceFontFamily": "Courier Prime",
+  "showViewHeader": true,
+  "accentColor": "#56b6c2",
+  "nativeMenus": true
+}

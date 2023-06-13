@@ -1,0 +1,58 @@
+{
+  "collapse-filter": true,
+  "search": "path:Notes",
+  "showTags": false,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": false,
+  "collapse-color-groups": true,
+  "colorGroups": [
+    {
+      "query": "tag:#Type/Definition",
+      "color": {
+        "a": 1,
+        "rgb": 6537198
+      }
+    },
+    {
+      "query": "tag:#Type/Proposition",
+      "color": {
+        "a": 1,
+        "rgb": 15099319
+      }
+    },
+    {
+      "query": "tag:#Type/Theorem",
+      "color": {
+        "a": 1,
+        "rgb": 6683493
+      }
+    },
+    {
+      "query": "tag:#Type/Axiom",
+      "color": {
+        "a": 1,
+        "rgb": 16342365
+      }
+    },
+    {
+      "query": "tag:#Type/MOC",
+      "color": {
+        "a": 1,
+        "rgb": 16773058
+      }
+    }
+  ],
+  "collapse-display": true,
+  "showArrow": true,
+  "textFadeMultiplier": -3,
+  "nodeSizeMultiplier": 1.80688778393039,
+  "lineSizeMultiplier": 1.29302181037405,
+  "collapse-forces": false,
+  "centerStrength": 0.102440953780088,
+  "repelStrength": 20,
+  "linkStrength": 0.294101028364787,
+  "linkDistance": 500,
+  "scale": 0.015049901337467315,
+  "close": false
+}
