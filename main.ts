@@ -11,12 +11,7 @@ export default class MathLinks extends Plugin {
         const settings = this.settings;
 
         this.registerMarkdownPostProcessor((element, context) => {
-            let file = this.app.vault.getAbstractFileByPath(context.sourcePath);
-            console.log(file);
-            if (!(file instanceof TFile))
-                return null;
-            else if (this.isExcluded(file, settings.excludedFilePaths))
-                return null;
+            if (!this.isValid(context, settings)) return null;
 
             element.querySelectorAll('.internal-link').forEach((outLinkEl) => {
                 let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, ''));
@@ -100,6 +95,24 @@ export default class MathLinks extends Plugin {
         }
 
         return mathLink;
+    }
+
+    isValid(context, settings): boolean {
+        let element = context.containerEl;
+        while(element.parentNode && element.parentNode.nodeName.toLowerCase() != 'body') {
+            element = element.parentNode;
+            if (element.className.toLowerCase().includes("canvas")) {
+                return true;
+            }
+        }
+
+        let file = this.app.vault.getAbstractFileByPath(context.sourcePath);
+        if (!(file instanceof TFile))
+            return false;
+        else if (this.isExcluded(file, settings.excludedFilePaths))
+            return false;
+
+        return true;
     }
 
     isExcluded(file: TFile, excludedFilePaths: string[]): boolean {

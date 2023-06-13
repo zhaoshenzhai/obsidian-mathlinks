@@ -13,10 +13,10 @@
             "state": {
               "type": "canvas",
               "state": {
-                "file": "Untitled.canvas",
+                "file": "Canvas.canvas",
                 "viewState": {
-                  "x": 0,
-                  "y": 0,
+                  "x": -21,
+                  "y": -113,
                   "zoom": 0
                 }
               }
@@ -118,7 +118,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Untitled.canvas",
+                "file": "Canvas.canvas",
                 "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -150,7 +150,7 @@
             "state": {
               "type": "localgraph",
               "state": {
-                "file": "Untitled.canvas",
+                "file": "Canvas.canvas",
                 "options": {
                   "collapse-filter": false,
                   "search": "",
@@ -235,8 +235,8 @@
   "active": "f32798d6c3bb51e0",
   "lastOpenFiles": [
     "Notes/Note 1.md",
-    "Untitled.canvas",
     "Notes/Note 2.md",
+    "Canvas.canvas",
     "sedOydTYD",
     "sedB1fo67",
     "sed8E5QSi",
