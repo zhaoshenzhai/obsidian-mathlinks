@@ -8,21 +8,6 @@
         "type": "tabs",
         "children": [
           {
-            "id": "f32798d6c3bb51e0",
-            "type": "leaf",
-            "state": {
-              "type": "canvas",
-              "state": {
-                "file": "Canvas.canvas",
-                "viewState": {
-                  "x": -21,
-                  "y": -113,
-                  "zoom": 0
-                }
-              }
-            }
-          },
-          {
             "id": "0cf07fb2ef42ee30",
             "type": "leaf",
             "state": {
@@ -30,7 +15,7 @@
               "state": {
                 "file": "Notes/Note 1.md",
                 "mode": "preview",
-                "source": true
+                "source": false
               }
             }
           },
@@ -43,6 +28,21 @@
                 "file": "Notes/Note 2.md",
                 "mode": "preview",
                 "source": true
+              }
+            }
+          },
+          {
+            "id": "f32798d6c3bb51e0",
+            "type": "leaf",
+            "state": {
+              "type": "canvas",
+              "state": {
+                "file": "Canvas.canvas",
+                "viewState": {
+                  "x": -21,
+                  "y": -113,
+                  "zoom": 0
+                }
               }
             }
           }
@@ -118,7 +118,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Canvas.canvas",
+                "file": "Notes/Note 1.md",
                 "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -150,7 +150,7 @@
             "state": {
               "type": "localgraph",
               "state": {
-                "file": "Canvas.canvas",
+                "file": "Notes/Note 1.md",
                 "options": {
                   "collapse-filter": false,
                   "search": "",
@@ -232,11 +232,11 @@
       "canvas:Create new canvas": false
     }
   },
-  "active": "f32798d6c3bb51e0",
+  "active": "0cf07fb2ef42ee30",
   "lastOpenFiles": [
-    "Notes/Note 1.md",
     "Notes/Note 2.md",
     "Canvas.canvas",
+    "Notes/Note 1.md",
     "sedOydTYD",
     "sedB1fo67",
     "sed8E5QSi",

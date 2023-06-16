@@ -13,7 +13,7 @@ https://github.com/zhaoshenzhai/obsidian-mathlinks
 const prod = (process.argv[2] === 'production');
 
 esbuild.build({
-    entryPoints: ['./main.ts'],
+    entryPoints: ['./src/main.ts'],
     bundle: true,
     banner: { js: banner },
     external: [

@@ -1,7 +1,7 @@
 import { App, Plugin, TFile, renderMath, finishRenderMath, loadMathJax } from 'obsidian';
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from './settings';
 
-export default class MathLinks extends Plugin {
+export default class MathLinks extends Plugin implements PluginValue {
     settings: MathLinksSettings;
 
     async onload() {
@@ -11,6 +11,8 @@ export default class MathLinks extends Plugin {
         const settings = this.settings;
 
         this.registerMarkdownPostProcessor((element, context) => {
+            console.log(element);
+            console.log(context);
             if (!this.isValid(context, settings)) return null;
 
             element.querySelectorAll('.internal-link').forEach((outLinkEl) => {
