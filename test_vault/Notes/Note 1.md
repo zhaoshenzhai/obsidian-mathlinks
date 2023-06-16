@@ -1,2 +1,3 @@
-[[Note 2]]
-This is live-preview: $\int$
+[[Note 1]], 
+[[Note 2]], 
+[[Note 3]]
