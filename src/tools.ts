@@ -7,7 +7,7 @@ export function getMathLink(plugin: MathLinks, file: TFile): string {
     let mathLink = plugin.app.metadataCache.getFileCache(file)?.frontmatter?.mathLink;
 
     if (mathLink === 'auto')
-        mathLink = generateMathLinkFromAuto(plugin.settings, file);
+        mathLink = generateMathLinkFromAuto(plugin, plugin.settings, file);
 
     return mathLink;
 }
@@ -69,7 +69,7 @@ export function isValid(app, context, settings): boolean {
     return true;
 }
 
-function generateMathLinkFromAuto(settings: MathLinksSettings, file: Tfile): string {
+function generateMathLinkFromAuto(plugin: MathLinks, settings: MathLinksSettings, file: Tfile): string {
     let templates = plugin.settings.templates;
     let mathLink = file.name.replace('\.md', '');
     for (let i = 0; i < templates.length; i++) {
