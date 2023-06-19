@@ -2,7 +2,10 @@
 
 An [Obsidian.md](https://obsidian.md) plugin to render and manage [MathJax](https://www.mathjax.org/) in your links.
 
-**No changes are made to your notes!** Simply associate a `mathLink` to your note, containing arbitrary MathJax, and have it displayed in all links to the note.
+Associate a `mathLink` to your note, containing arbitrary MathJax, and have it displayed in all links to the note.
+* Works in both reading and live-preview modes, as well as canvases.
+* Add custom [templates](https://github.com/zhaoshenzhai/obsidian-mathlinks/tree/master#templates) for `mathLinks`.
+* Compatible with [Extended MathJax](https://github.com/xldenis/obsidian-latex) and [Dataview](https://github.com/blacksmithgu/obsidian-dataview).
 
 ![](https://raw.githubusercontent.com/zhaoshenzhai/obsidian-mathlinks/master/.github/sample.png)
 
@@ -23,32 +26,25 @@ Content starts here.
 That's it! All links of the form `[[fileName]]` or `[fileName](fileName.md)` will now be displayed as the rendered MathJax of `yourMathLink`. No changes are made to your notes, and updates to `yourMathLink` will be reflected once the note with the link is reopened.
 
 ### Templates
-Oftentimes, the `mathLink` of `fileName.md` involves replacing some text with its math counterpart. For instance, all of `Invertible iff bijective.md`, `Linearly dependent iff exists span-redundant element.md`, and `LUB property iff GLB property.md` will have mathLinks of the form '... $\Leftrightarrow$ ...'.
+Oftentimes, the `mathLink` of `fileName.md` involves replacing some text with its math counterpart. For instance, all of `Invertible iff bijective.md`, `Linearly dependent iff exists span-redundant element.md`, and `LUB property iff GLB property.md` will have `mathLinks` of the form '... $\Leftrightarrow$ ...'.
 
 Instead of setting them manually, simply use `mathLink: auto`. This will generate its `mathLink` via a template that replaces `iff` with $\Leftrightarrow$. A _template_ consists of a string to be matched (`iff`), its replacement $(\Leftrightarrow)$, and some options (global match, case sensitive, and match whole words). They are created and maintained in the MathLinks settings window.
 
 ## Settings
-### Add a new template
-This opens a modal which prompts for:
+### Templates
+Each template has the following options, which can be configured when the template is created/edited.
 | Field | Description | Default |
-| ----- | ----------------------------------------------------------------------- | ------- |
-| Title | Name of the template to refer back to when editing/deleting a template. | | 
-| Match for | String to be matched and replaced. Do not include regex. | |
-| Replace with | String to replace matches. Do not escape backslashes. | |
-| Global match | Match all instances (instead of just the first). | `true`  |
-| Case sensitive | Matches will be case sensitive. | `true`  |
-| Match whole words | Only match whole words. | `true`  |
+| ----- | ----------- | ------- |
+| Title | Name of the template to refer back to when editing/deleting a template. | _None_ |
+| Match for | String to be matched and replaced. Do not include regex. | _None_ |
+| Replace with | String to replace matches. Do not escape backslashes. | _None |
+| Global match | Match all instances (instead of just the first). | `true` |
+| Case sensitive | Matches will be case sensitive. | `true` |
+| Match whole words | Only match whole words. | `true` |
 
-### Edit/delete a template
-This adds a drop-down list containing the titles of all templates added, and two buttons:
-* **Edit**: Opens the same modal as before with all the saved options.
-* **Delete**: Opens a modal to confirm deletion.
-
-### Add an excluded file
+### Excluded Files
 MathLinks will ignore those files. If `path` is entered, all files under `path` will be ignored.
-
-### Remove from excluded file
-Remove a file/path from the list of excluded files.
+* Note that `path` must be relative to the vault directory.
 
 ## Changelog
 ### 0.2.x: _No longer edit the links themselves._

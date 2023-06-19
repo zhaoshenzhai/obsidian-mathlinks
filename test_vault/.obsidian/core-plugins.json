@@ -5,10 +5,16 @@
   "graph",
   "backlink",
   "canvas",
+  "outgoing-link",
   "tag-pane",
   "page-preview",
+  "daily-notes",
+  "templates",
+  "note-composer",
   "command-palette",
+  "editor-status",
   "bookmarks",
-  "random-note",
-  "workspaces"
+  "outline",
+  "word-count",
+  "file-recovery"
 ]

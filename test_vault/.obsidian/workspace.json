@@ -1,14 +1,14 @@
 {
   "main": {
-    "id": "12319c0b10323134",
+    "id": "a7b549bd24f20377",
     "type": "split",
     "children": [
       {
-        "id": "6ca09fd51f996acd",
+        "id": "c01f4eb5ff19391e",
         "type": "tabs",
         "children": [
           {
-            "id": "930eb3089b92ff71",
+            "id": "59d621ef30d05a24",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -20,61 +20,44 @@
             }
           },
           {
-            "id": "4679f8178056a98b",
+            "id": "17f40a3849c888a6",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Notes/Note 2.md",
+                "mode": "preview",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "68147581805d82a5",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
                 "file": "Notes/Note 3.md",
-                "mode": "source",
-                "source": true
-              }
-            }
-          },
-          {
-            "id": "c37cf3a5f75ee901",
-            "type": "leaf",
-            "state": {
-              "type": "canvas",
-              "state": {
-                "file": "Canvas.canvas",
-                "viewState": {
-                  "x": -21,
-                  "y": -113,
-                  "zoom": 0
-                }
-              }
-            }
-          },
-          {
-            "id": "89884a0c7a0c1f5a",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Notes/Note 1.md",
                 "mode": "preview",
-                "source": true
+                "source": false
               }
             }
           }
-        ],
-        "currentTab": 3
+        ]
       }
     ],
     "direction": "vertical"
   },
   "left": {
-    "id": "7b81910cd462cacc",
+    "id": "55ffa72895c528c6",
     "type": "split",
     "children": [
       {
-        "id": "9d00dbe0d1a2729a",
+        "id": "365aafdc45fc1c10",
         "type": "tabs",
-        "dimension": 56.41379310344827,
         "children": [
           {
-            "id": "3e6bfdd211453c3d",
+            "id": "e43166709fd499f3",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -84,7 +67,7 @@
             }
           },
           {
-            "id": "0f2cba3fb28dc11b",
+            "id": "63e5c6c91c9579ba",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -92,14 +75,66 @@
                 "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
-                "collapseAll": true,
+                "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical"
               }
             }
           },
           {
-            "id": "e4f1073403767469",
+            "id": "b1f46ccc5fdad1d4",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "right": {
+    "id": "6ea2e89e90c4d731",
+    "type": "split",
+    "children": [
+      {
+        "id": "d14f533c5890d6ce",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "10d6b255125c271d",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Notes/Note 1.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "4920f28a53e5204c",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Notes/Note 1.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "c89f72ff4a1a0e0d",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -110,35 +145,12 @@
             }
           },
           {
-            "id": "1ed8ee5e01c908d5",
+            "id": "63144f61abdccd4a",
             "type": "leaf",
             "state": {
-              "type": "bookmarks",
-              "state": {}
-            }
-          }
-        ],
-        "currentTab": 1
-      },
-      {
-        "id": "294597bc1a532b30",
-        "type": "tabs",
-        "dimension": 43.58620689655173,
-        "children": [
-          {
-            "id": "e8c5400882b51657",
-            "type": "leaf",
-            "state": {
-              "type": "backlink",
+              "type": "outline",
               "state": {
-                "file": "Notes/Note 1.md",
-                "collapseAll": true,
-                "extraContext": false,
-                "sortOrder": "alphabetical",
-                "showSearch": false,
-                "searchQuery": "",
-                "backlinkCollapsed": false,
-                "unlinkedCollapsed": true
+                "file": "Notes/Note 1.md"
               }
             }
           }
@@ -146,152 +158,25 @@
       }
     ],
     "direction": "horizontal",
-    "width": 266.5,
-    "collapsed": true
-  },
-  "right": {
-    "id": "5b3c2ad05cc53b8f",
-    "type": "split",
-    "children": [
-      {
-        "id": "0aa6b9202d872b96",
-        "type": "tabs",
-        "children": [
-          {
-            "id": "4a13b5925ef8b07d",
-            "type": "leaf",
-            "state": {
-              "type": "localgraph",
-              "state": {
-                "file": "Notes/Note 1.md",
-                "options": {
-                  "collapse-filter": false,
-                  "search": "",
-                  "localJumps": 4,
-                  "localBacklinks": true,
-                  "localForelinks": true,
-                  "localInterlinks": true,
-                  "showTags": false,
-                  "showAttachments": false,
-                  "hideUnresolved": false,
-                  "collapse-color-groups": true,
-                  "colorGroups": [
-                    {
-                      "query": "tag:#Type/Definition",
-                      "color": {
-                        "a": 1,
-                        "rgb": 6537198
-                      }
-                    },
-                    {
-                      "query": "tag:#Type/Proposition",
-                      "color": {
-                        "a": 1,
-                        "rgb": 15099319
-                      }
-                    },
-                    {
-                      "query": "tag:#Type/Theorem",
-                      "color": {
-                        "a": 1,
-                        "rgb": 6683493
-                      }
-                    },
-                    {
-                      "query": "tag:#Type/Axiom",
-                      "color": {
-                        "a": 1,
-                        "rgb": 16342365
-                      }
-                    },
-                    {
-                      "query": "tag:#MOC",
-                      "color": {
-                        "a": 1,
-                        "rgb": 16773058
-                      }
-                    }
-                  ],
-                  "collapse-display": true,
-                  "showArrow": true,
-                  "textFadeMultiplier": -3,
-                  "nodeSizeMultiplier": 1,
-                  "lineSizeMultiplier": 1,
-                  "collapse-forces": true,
-                  "centerStrength": 0,
-                  "repelStrength": 20,
-                  "linkStrength": 1,
-                  "linkDistance": 500,
-                  "scale": 0.028093741292605157,
-                  "close": true
-                }
-              }
-            }
-          }
-        ]
-      }
-    ],
-    "direction": "horizontal",
-    "width": 1066.4,
+    "width": 300,
     "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
       "switcher:Open quick switcher": false,
       "graph:Open graph view": false,
-      "command-palette:Open command palette": false,
-      "random-note:Open random note": false,
-      "workspaces:Manage workspace layouts": false,
-      "canvas:Create new canvas": false
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
     }
   },
-  "active": "89884a0c7a0c1f5a",
+  "active": "e43166709fd499f3",
   "lastOpenFiles": [
+    "2023-06-19.md",
+    "Notes/Note 1.md",
     "Notes/Note 2.md",
     "Notes/Note 3.md",
-    "Notes/Note 1.md",
-    "Canvas.canvas",
-    "Notes/No2ljjjje 2.md",
-    "sedOydTYD",
-    "sedB1fo67",
-    "sed8E5QSi",
-    "sed8AZmCa",
-    "sedMKBUfw",
-    "sedFC3D63",
-    "sedpD8ogn",
-    "sed5BDf9A",
-    "sedILeW0U",
-    "sedj5rInZ",
-    "Notes/Untitled.md",
-    "Notes/Continuous Extension Theorem.md",
-    "Notes/Bounded Space.md",
-    "Notes/Diameter.md",
-    "Notes/Direct Product.md",
-    "Notes/Product (Category Theory).md",
-    "Notes/Linear Subspace.md",
-    "Notes/Ring.md",
-    "Notes/Linear Algebra.md",
-    "Notes/Internal Direct Sum (Linear Algebra).md",
-    "Notes/Minkowski Sum (Linear Algebra).md",
-    "Notes/Vector Space.md",
-    "Notes/Cartesian Product.md",
-    "Notes/Normal Subgroup.md",
-    "Notes/Internal Direct Product (Group Theory).md",
-    "Notes/External Direct Product (Vector Space).md",
-    "Notes/Ring Theory.md",
-    "Notes/Isomorphism Theorems.md",
-    "Notes/Universal Property of Quotients.md",
-    "Notes/Universal Property of Abelianization.md",
-    "Notes/Quotient Group.md",
-    "Images/2023-06-04_163210/image.svg",
-    "Images/2023-05-25_143528/image.svg",
-    "Images/2023-05-25_131843/image.svg",
-    "Images/2023-05-24_152618/image.svg",
-    "Images/2023-05-24_143333/image.svg",
-    "Images/2023-05-23_213854/image.svg",
-    "Images/2023-05-23_164130/image.svg",
-    "Images/2023-05-22_233431/image.svg",
-    "Images/2023-05-22_132245/image.svg",
-    "Images/2023-05-21_113729/image.svg"
+    "Canvas.canvas"
   ]
 }
