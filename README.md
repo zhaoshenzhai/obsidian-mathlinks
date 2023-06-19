@@ -1,4 +1,4 @@
-# :symbols: Obsidian MathLinks
+# Obsidian MathLinks
 
 An [Obsidian.md](https://obsidian.md) plugin to render and manage [MathJax](https://www.mathjax.org/) in your links.
 
@@ -6,12 +6,7 @@ An [Obsidian.md](https://obsidian.md) plugin to render and manage [MathJax](http
 
 ![](https://raw.githubusercontent.com/zhaoshenzhai/obsidian-mathlinks/master/.github/sample.png)
 
-## :bookmark_tabs: Contents
-* [Description and Usage](https://github.com/zhaoshenzhai/obsidian-mathlinks#pencil2-description-and-usage)
-* [Settings](https://github.com/zhaoshenzhai/obsidian-mathlinks#gear-settings)
-* [Changelog](https://github.com/zhaoshenzhai/obsidian-mathlinks#clipboard-changelog)
-
-## :pencil2: Description and Usage
+## Description and Usage
 
 As far as I know, the standard wiki-style links of the form `[[fileName]]` used in Obsidian does not support MathJax. Instead, one should use markdown-style links which are of the form `[displayedText](fileName.md)`; here, `displayedText` can contain MathJax. However, `displayedText` remains unchanged when link is updated, so, if one wishes to have links with math, one needs to update them manually. This can get out of hand really fast.
 
@@ -32,17 +27,17 @@ Oftentimes, the `mathLink` of `fileName.md` involves replacing some text with it
 
 Instead of setting them manually, simply use `mathLink: auto`. This will generate its `mathLink` via a template that replaces `iff` with $\Leftrightarrow$. A _template_ consists of a string to be matched (`iff`), its replacement $(\Leftrightarrow)$, and some options (global match, case sensitive, and match whole words). They are created and maintained in the MathLinks settings window.
 
-## :gear: Settings
+## Settings
 ### Add a new template
 This opens a modal which prompts for:
-| Field             | Description                                                             | Default |
-| -----             | ----------------------------------------------------------------------- | ------- |
-| Title             | Name of the template to refer back to when editing/deleting a template. |         | 
-| Match for         | String to be matched and replaced. Do not include regex.                |         |
-| Replace with      | String to replace matches. Do not escape backslashes.                   |         |
-| Global match      | Match all instances (instead of just the first).                        | `true`  |
-| Case sensitive    | Matches will be case sensitive.                                         | `true`  |
-| Match whole words | Only match whole words.                                                 | `true`  |
+| Field | Description | Default |
+| ----- | ----------------------------------------------------------------------- | ------- |
+| Title | Name of the template to refer back to when editing/deleting a template. | | 
+| Match for | String to be matched and replaced. Do not include regex. | |
+| Replace with | String to replace matches. Do not escape backslashes. | |
+| Global match | Match all instances (instead of just the first). | `true`  |
+| Case sensitive | Matches will be case sensitive. | `true`  |
+| Match whole words | Only match whole words. | `true`  |
 
 ### Edit/delete a template
 This adds a drop-down list containing the titles of all templates added, and two buttons:
@@ -55,7 +50,7 @@ MathLinks will ignore those files. If `path` is entered, all files under `path` 
 ### Remove from excluded file
 Remove a file/path from the list of excluded files.
 
-## :clipboard: Changelog
+## Changelog
 ### 0.2.x: _No longer edit the links themselves._
 * 0.2.8: [#7](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/7): Render `mathLinks` in live-preview.
 * 0.2.7: [#6](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/6): Render `mathLinks` in Canvas.
