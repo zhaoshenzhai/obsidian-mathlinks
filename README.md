@@ -37,7 +37,7 @@ Each template has the following options, which can be configured when the templa
 | ----- | ----------- | ------- |
 | Title | Name of the template to refer back to when editing/deleting a template. | _None_ |
 | Match for | String to be matched and replaced. Do not include regex. | _None_ |
-| Replace with | String to replace matches. Do not escape backslashes. | _None |
+| Replace with | String to replace matches. Do not escape backslashes. | _None_ |
 | Global match | Match all instances (instead of just the first). | `true` |
 | Case sensitive | Matches will be case sensitive. | `true` |
 | Match whole words | Only match whole words. | `true` |
