@@ -14,7 +14,7 @@
               "type": "markdown",
               "state": {
                 "file": "Notes/Note 1.md",
-                "mode": "preview",
+                "mode": "source",
                 "source": false
               }
             }
@@ -171,7 +171,7 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "e43166709fd499f3",
+  "active": "59d621ef30d05a24",
   "lastOpenFiles": [
     "2023-06-19.md",
     "Notes/Note 1.md",

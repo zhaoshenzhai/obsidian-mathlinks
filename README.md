@@ -33,6 +33,7 @@ Instead of setting them manually, simply use `mathLink: auto`. This will generat
 ## Settings
 ### Templates
 Each template has the following options, which can be configured when the template is created/edited.
+
 | Field | Description | Default |
 | ----- | ----------- | ------- |
 | Title | Name of the template to refer back to when editing/deleting a template. | _None_ |
