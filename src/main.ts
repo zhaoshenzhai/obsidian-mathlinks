@@ -14,13 +14,18 @@ export default class MathLinks extends Plugin {
             if (!isValid(this.app, context, settings)) return null;
 
             element.querySelectorAll('.internal-link').forEach((outLinkEl) => {
+                let outLinkText = outLinkEl.textContent.trim();
                 let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, ''));
-                let outLinkFile = this.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
-                let outLinkMathLink = getMathLink(this, outLinkFile);
 
-                if (outLinkMathLink) {
-                    if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename) {
-                        outLinkEl = replaceWithMathLink(outLinkEl, outLinkMathLink);
+                if (outLinkText != outLinkFileName && outLinkText != '') {
+                    outLinkEl = replaceWithMathLink(outLinkEl, outLinkText);
+                } else {
+                    let outLinkFile = this.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
+                    let outLinkMathLink = getMathLink(this, outLinkFile);
+                    if (outLinkMathLink) {
+                        if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename) {
+                            outLinkEl = replaceWithMathLink(outLinkEl, outLinkMathLink);
+                        }
                     }
                 }
             })
