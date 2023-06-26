@@ -4,7 +4,7 @@ import { RangeSetBuilder } from '@codemirror/state';
 import { Decoration, DecorationSet, ViewUpdate, PluginValue, EditorView, ViewPlugin, WidgetType } from '@codemirror/view';
 import { getMathLink, replaceWithMathLink } from './tools'
 
-export function buildLivePreview(plugin: Plugin, app: App)
+export function buildLivePreview(plugin: Plugin, app: App, leaf: WorkspaceLeaf)
 {
     class MathWidget extends WidgetType {
         outLinkFileName: string;
@@ -42,7 +42,7 @@ export function buildLivePreview(plugin: Plugin, app: App)
             }
 
             update(update: ViewUpdate) {
-                let viewState = app.workspace.getLeaf().getViewState().state;
+                let viewState = leaf.getViewState().state;
                 if (viewState.mode == "source" && viewState.source == false) {
                     this.decorations = this.buildDecorations(update.view);
                 } else {

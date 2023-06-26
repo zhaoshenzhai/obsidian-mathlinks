@@ -26,10 +26,10 @@ export default class MathLinks extends Plugin {
             })
         });
 
-        this.app.workspace.on("layout-change", () => {
-            let viewState = this.app.workspace.getLeaf().getViewState().state;
+        this.app.workspace.on("active-leaf-change", (leaf: WorkspaceLeaf) => {
+            let viewState = leaf.getViewState().state;
             if (viewState.mode == "source" && viewState.source == false) {
-                let livePreview = buildLivePreview(this, this.app);
+                let livePreview = buildLivePreview(this, this.app, leaf);
                 this.registerEditorExtension(livePreview);
             }
         });
