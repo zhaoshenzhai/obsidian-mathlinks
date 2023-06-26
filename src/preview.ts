@@ -54,30 +54,70 @@ export function buildLivePreview(plugin: Plugin, app: App)
                 const builder = new RangeSetBuilder<Decoration>();
 
                 for (let { from, to } of view.visibleRanges) {
+                    let start, end, outLinkFileName, outLinkMathLink;
                     syntaxTree(view.state).iterate({
                         from,
                         to,
                         enter(node) {
-                            if (node.type.name.contains("internal-link")) {
-                                let start = node.from - 2;
-                                let end = node.to + 2;
+                            let name = node.type.name;
+                            switch (name) {
+                                // Start
+                                case "formatting-link_formatting-link-start":
+                                    start = node.from;
+                                    break;
+                                case "formatting_formatting-link_link":
+                                    if (start == -1)
+                                        start = node.from;
+                                    break;
 
-                                let cursorRange = view.state.selection.ranges[0];
-                                if (start > cursorRange.to || end < cursorRange.from) {
-                                    let outLink = view.state.doc.sliceString(start, end);
-                                    let outLinkFileName = outLink.replace('[[', '').replace(']]', '');
-                                    let outLinkFile = app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
-                                    let outLinkMathLink = getMathLink(plugin, outLinkFile);
-                                    if (outLinkMathLink) {
-                                        builder.add(
-                                            start,
-                                            end,
-                                            Decoration.widget({
-                                                widget: new MathWidget(outLinkFileName, outLinkMathLink),
-                                            })
-                                        );
+                                // No alias: Get outLinkFileName with its outLinkMathLink
+                                case "hmd-internal-link":
+                                    outLinkFileName = view.state.doc.sliceString(node.from, node.to);
+                                    outLinkMathLink = getMathLink(plugin, app.metadataCache.getFirstLinkpathDest(outLinkFileName, ""));
+                                    break;
+
+                                // Alias: Add to outLinkFileName
+                                case "hmd-internal-link_link-has-alias":
+                                    outLinkFileName = view.state.doc.sliceString(node.from, node.to);
+                                    break;
+                                case "string_url":
+                                    outLinkFileName = decodeURI(view.state.doc.sliceString(node.from, node.to));
+                                    break;
+
+                                // Alias: Get its outLinkMathLink
+                                case "hmd-internal-link_link-alias":
+                                case "formatting-escape_hmd-internal-link_link-alias":
+                                case "link":
+                                case "formatting-escape_hmd-escape-backslash_link":
+                                case "escape_hmd-escape-char_link":
+                                    outLinkMathLink += view.state.doc.sliceString(node.from, node.to);
+                                    break;
+
+                                // End
+                                case "formatting_formatting-link-string_string_url":
+                                case "formatting-link_formatting-link-end":
+                                    if (!name.contains("end") && end == -1) {
+                                        end = -2;
+                                    } else {
+                                        end = node.to;
+                                        let cursorRange = view.state.selection.ranges[0];
+                                        if (start > cursorRange.to || end < cursorRange.from) {
+                                            if (outLinkFileName && outLinkMathLink) {
+                                                builder.add(
+                                                    start,
+                                                    end,
+                                                    Decoration.widget({
+                                                        widget: new MathWidget(outLinkFileName, outLinkMathLink),
+                                                    })
+                                                );
+                                            }
+                                        }
+                                        start = -1;
+                                        end = -1;
+                                        outLinkFileName = '';
+                                        outLinkMathLink = '';
                                     }
-                                }
+                                    break;
                             }
                         }
                     });
@@ -95,6 +135,7 @@ export function buildLivePreview(plugin: Plugin, app: App)
 
                 return builder.finish();
             }
+
         }, {decorations: v => v.decorations}
     );
 
