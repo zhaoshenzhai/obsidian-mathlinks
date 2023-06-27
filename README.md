@@ -25,9 +25,9 @@ Content starts here.
 This plugin also makes Wikilinks and Markdown Links compatible with MathJax, so links like `[[note|yourAlias]]` and `[yourAlias](note.md)` will be displayed as the rendered MathJax of `yourAlias`. A `mathLink` in `note`, if present, will be overridden by `yourAlias`.
 
 ### Templates
-Oftentimes, the `mathLink` of `note.md` involves replacing some text with its math counterpart. For instance, you might have many notes whose title is of the form `... iff ...`.
+Oftentimes, `mathLinks` of notes involve replacing some text with its math counterpart. For instance, you might have many notes whose title is of the form `... iff ...`.
 
-Instead of setting the `mathLinks` manually as `... $\Leftrightarrow$ ...` to each note, simply use `mathLink: auto`. This will generate its `mathLink` via a template that replaces `iff` with `$\Leftrightarrow$`. A _template_ consists of a string to be matched (`iff`), its replacement (`$\Leftrightarrow$`), and some options (global match, case sensitive, and match whole words). They are created and maintained in the MathLinks settings window.
+Instead of setting the `mathLinks` of each note manually as `... $\Leftrightarrow$ ...`, simply use `mathLink: auto`. This will generate its `mathLink` via a template that replaces `iff` with `$\Leftrightarrow$`. A _template_ consists of a string to be matched (`iff`), its replacement (`$\Leftrightarrow$`), and some options (global match, case sensitive, and match whole words). They are created and maintained in the MathLinks settings window.
 
 ## Settings
 ### Templates
