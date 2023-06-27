@@ -1,7 +1,7 @@
 import { App, Plugin } from 'obsidian';
 import { syntaxTree } from '@codemirror/language';
 import { RangeSetBuilder } from '@codemirror/state';
-import { Decoration, DecorationSet, ViewUpdate, PluginValue, EditorView, ViewPlugin, WidgetType } from '@codemirror/view';
+import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType } from '@codemirror/view';
 import { getMathLink, replaceWithMathLink } from './tools'
 
 export function buildLivePreview(plugin: Plugin, app: App, leaf: WorkspaceLeaf)
@@ -42,8 +42,8 @@ export function buildLivePreview(plugin: Plugin, app: App, leaf: WorkspaceLeaf)
             }
 
             update(update: ViewUpdate) {
-                let viewState = leaf.getViewState().state;
-                if (viewState.mode == "source" && viewState.source == false) {
+                let view = leaf.getViewState();
+                if ((view.state.mode == "source" && view.state.source == false) || view.type == "canvas") {
                     this.decorations = this.buildDecorations(update.view);
                 } else {
                     this.decorations = this.destroyDecorations(update.view);
@@ -54,7 +54,8 @@ export function buildLivePreview(plugin: Plugin, app: App, leaf: WorkspaceLeaf)
                 const builder = new RangeSetBuilder<Decoration>();
 
                 for (let { from, to } of view.visibleRanges) {
-                    let start, end, outLinkFileName, outLinkMathLink;
+                    let start = -1, end = -1, outLinkFileName = '', outLinkMathLink = '';
+
                     syntaxTree(view.state).iterate({
                         from,
                         to,
@@ -107,7 +108,7 @@ export function buildLivePreview(plugin: Plugin, app: App, leaf: WorkspaceLeaf)
                                                     start,
                                                     end,
                                                     Decoration.widget({
-                                                        widget: new MathWidget(outLinkFileName, outLinkMathLink),
+                                                        widget: new MathWidget(outLinkFileName, outLinkMathLink.replace(/\\\$/, '$')),
                                                     })
                                                 );
                                             }

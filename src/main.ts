@@ -15,9 +15,10 @@ export default class MathLinks extends Plugin {
 
             element.querySelectorAll('.internal-link').forEach((outLinkEl) => {
                 let outLinkText = outLinkEl.textContent.trim();
-                let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, ''));
+                let outLinkHTML = outLinkEl.innerHTML
+                let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, '')).replace(/\.md$/, '');
 
-                if (outLinkText != outLinkFileName && outLinkText != '') {
+                if (outLinkText != outLinkFileName && outLinkText != '' && outLinkHTML == outLinkText) {
                     outLinkEl = replaceWithMathLink(outLinkEl, outLinkText);
                 } else {
                     let outLinkFile = this.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
@@ -32,8 +33,8 @@ export default class MathLinks extends Plugin {
         });
 
         this.app.workspace.on("active-leaf-change", (leaf: WorkspaceLeaf) => {
-            let viewState = leaf.getViewState().state;
-            if (viewState.mode == "source" && viewState.source == false) {
+            let view = leaf.getViewState();
+            if ((view.state.mode == "source" && view.state.source == false) || view.type == "canvas") {
                 let livePreview = buildLivePreview(this, this.app, leaf);
                 this.registerEditorExtension(livePreview);
             }
