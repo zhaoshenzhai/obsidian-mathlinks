@@ -22,7 +22,7 @@ mathLink: yourMathLink
 Content starts here.
 ```
 
-This plugin also makes Wikilinks and Markdown links compatible with MathJax, so links like `[[note|yourAlias]]` and `[yourAlias](note.md)` will be displayed as the rendered MathJax of `yourAlias`. A `mathLink` in `note`, if present, will be overridden by `yourAlias`.
+This plugin also makes Wikilinks and Markdown Links compatible with MathJax, so links like `[[note|yourAlias]]` and `[yourAlias](note.md)` will be displayed as the rendered MathJax of `yourAlias`. A `mathLink` in `note`, if present, will be overridden by `yourAlias`.
 
 ### Templates
 Oftentimes, the `mathLink` of `note.md` involves replacing some text with its math counterpart. For instance, you might have many notes whose title is of the form `... iff ...`.
@@ -47,8 +47,8 @@ MathLinks will ignore those files. If `path` is entered, all files under `path` 
 * Note that `path` must be relative to the vault directory.
 
 ## Changelog
-### 0.3.x: _Merged with [`obsidian-mathjax-wikilinks`](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks)._
-* 0.3.0: [#9](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/9): Merged with [`obsidian-mathjax-wikilinks`](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks). Credits to [aaron-jack-manning](https://github.com/aaron-jack-manning). Extended its functionality to include live-preview for both wikilinks and markdownlinks.
+### 0.3.x: _Merged with [obsidian-mathjax-wikilinks](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks)._
+* 0.3.0: [#9](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/9): Merged with [obsidian-mathjax-wikilinks](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks), with credits to [aaron-jack-manning](https://github.com/aaron-jack-manning). Extended its functionality to include live-preview for both Wikilinks and Markdown Links.
 ### 0.2.x: _No longer edit the links themselves._
 * 0.2.9: [#10](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/10), [#11](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/11): Fixed hanging and 'creating new notes' on `layout-changed` for pinned notes.
 * 0.2.8: [#7](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/7): Render `mathLinks` in live-preview.
@@ -64,5 +64,5 @@ MathLinks will ignore those files. If `path` is entered, all files under `path` 
 * 0.1.4: Fixed duplicate templates and excluded files/paths.
 * 0.1.3: Fixed excluding files when updating backlinks.
 * 0.1.2: Use `this.app.vault.configDir` instead of `.obsidian`.
-* 0.1.1: Fixed reverting back to Wikilinks when `Use [[Wikilinks]]` is disabled. Instead, revert back to its markdown link.
+* 0.1.1: Fixed reverting back to Wikilinks when `Use [[Wikilinks]]` is disabled. Instead, revert back to its Markdown Link.
 * 0.1.0: Initial release!
