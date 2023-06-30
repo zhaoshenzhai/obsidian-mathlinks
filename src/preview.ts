@@ -56,47 +56,60 @@ export function buildLivePreview(plugin: Plugin, app: App, leaf: WorkspaceLeaf)
                 for (let { from, to } of view.visibleRanges) {
                     let start = -1, end = -1, outLinkFileName = "", outLinkMathLink = "";
 
+                    console.log("==== START ====");
                     syntaxTree(view.state).iterate({
                         from,
                         to,
                         enter(node) {
                             let name = node.type.name;
+                            console.log(name + " | " + view.state.doc.sliceString(node.from, node.to));
                             switch (name) {
                                 // Start
                                 case "formatting-link_formatting-link-start":
+                                case "formatting-link_formatting-link-start_list-1":
                                     start = node.from;
                                     break;
                                 case "formatting_formatting-link_link":
+                                case "formatting_formatting-link_link_list-1":
                                     if (start == -1)
                                         start = node.from;
                                     break;
 
                                 // No alias: Get outLinkFileName with its outLinkMathLink
                                 case "hmd-internal-link":
+                                case "hmd-internal-link_list-1":
                                     outLinkFileName = view.state.doc.sliceString(node.from, node.to);
                                     outLinkMathLink = getMathLink(plugin, app.metadataCache.getFirstLinkpathDest(outLinkFileName, ""));
                                     break;
 
                                 // Alias: Add to outLinkFileName
                                 case "hmd-internal-link_link-has-alias":
+                                case "hmd-internal-link_link-has-alias_list-1":
                                     outLinkFileName = view.state.doc.sliceString(node.from, node.to);
                                     break;
                                 case "string_url":
+                                case "list-1_string_url":
                                     outLinkFileName = decodeURI(view.state.doc.sliceString(node.from, node.to));
                                     break;
 
                                 // Alias: Get its outLinkMathLink
                                 case "hmd-internal-link_link-alias":
+                                case "hmd-internal-link_link-alias_list-1":
                                 case "formatting-escape_hmd-internal-link_link-alias":
                                 case "link":
+                                case "link_list-1":
                                 case "formatting-escape_hmd-escape-backslash_link":
+                                case "formatting-escape_hmd-escape-backslash_link_list-1":
                                 case "escape_hmd-escape-char_link":
+                                case "escape_hmd-escape-char_link_list-1":
                                     outLinkMathLink += view.state.doc.sliceString(node.from, node.to);
                                     break;
 
                                 // End
                                 case "formatting_formatting-link-string_string_url":
+                                case "formatting_formatting-link-string_list-1_string_url":
                                 case "formatting-link_formatting-link-end":
+                                case "formatting-link_formatting-link-end_list-1":
                                     if (!name.contains("end") && end == -1) {
                                         end = -2;
                                     } else {
@@ -123,6 +136,7 @@ export function buildLivePreview(plugin: Plugin, app: App, leaf: WorkspaceLeaf)
                         }
                     });
                 }
+                console.log("====  END  ====\n\n\n\n");
 
                 return builder.finish();
             }
