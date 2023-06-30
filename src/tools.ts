@@ -2,7 +2,6 @@ import { TFile, renderMath, finishRenderMath } from "obsidian";
 
     export function generateMathLinks(plugin: MathLinks, element: HTMLElement): Promise<void> {
         for (let outLinkEl of element.querySelectorAll(".internal-link")) {
-            if (outLinkEl.classList.contains("mathLinkEl")) break;
             let outLinkText = outLinkEl.textContent.trim();
             let outLinkHTML = outLinkEl.innerHTML;
             let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, "")).replace(/\.md$/, "");
@@ -70,7 +69,6 @@ export function replaceWithMathLink(element: HTMLElement, mathLink: string): HTM
         }
     }
 
-    element.classList.add("mathLinkEl");
     finishRenderMath();
     return element;
 }

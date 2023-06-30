@@ -1,3 +1,3 @@
 [[Main]]
-[[Main|$\int$]]
+[[Main|$\alpha$]]
 [$\int$](Main.md)
