@@ -47,9 +47,14 @@ MathLinks will ignore those files. If `path` is entered, all files under `path` 
 * Note that `path` must be relative to the vault directory.
 
 ## Changelog
-### 0.3.x: _Merged with [obsidian-mathjax-wikilinks](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks)._
-* 0.3.0: [#9](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/9): Merged with [obsidian-mathjax-wikilinks](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks), with credits to [aaron-jack-manning](https://github.com/aaron-jack-manning). Extended its functionality to include live-preview for both Wikilinks and Markdown Links.
-### 0.2.x: _No longer edit the links themselves._
+<details> 
+    <summary><h3>0.3.x: <i>Merged with <a href=https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks>obsidian-mathjax-wikilinks</a>.</i></h3></summary>
+    <ul>
+        <li>0.3.0: <a href=https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/9>#9</a>: Merged with <a href=https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks>obsidian-mathjax-wikilinks</a>, with credits to <a href=https://github.com/aaron-jack-manning>aaron-jack-manning</a>. Extended its functionality to include live-preview for both Wikilinks and Markdown Links.</li>
+    </ul>
+</details>
+
+## 0.2.x: _No longer edit the links themselves._
 * 0.2.9: [#10](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/10), [#11](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/11): Fixed hanging and 'creating new notes' on `layout-changed` for pinned notes.
 * 0.2.8: [#7](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/7): Render `mathLinks` in live-preview.
 * 0.2.7: [#6](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/6): Render `mathLinks` in canvas.
