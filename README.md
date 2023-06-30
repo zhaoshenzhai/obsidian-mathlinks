@@ -47,27 +47,34 @@ MathLinks will ignore those files. If `path` is entered, all files under `path` 
 * Note that `path` must be relative to the vault directory.
 
 ## Changelog
-<details> 
+<details>
     <summary><h3>0.3.x: <i>Merged with <a href=https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks>obsidian-mathjax-wikilinks</a>.</i></h3></summary>
     <ul>
         <li>0.3.0: <a href=https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/9>#9</a>: Merged with <a href=https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks>obsidian-mathjax-wikilinks</a>, with credits to <a href=https://github.com/aaron-jack-manning>aaron-jack-manning</a>. Extended its functionality to include live-preview for both Wikilinks and Markdown Links.</li>
     </ul>
 </details>
-
-## 0.2.x: _No longer edit the links themselves._
-* 0.2.9: [#10](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/10), [#11](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/11): Fixed hanging and 'creating new notes' on `layout-changed` for pinned notes.
-* 0.2.8: [#7](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/7): Render `mathLinks` in live-preview.
-* 0.2.7: [#6](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/6): Render `mathLinks` in canvas.
-* 0.2.6: [#4](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/4), [#5](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/5): Added Dataview support.
-* 0.2.5: [#3](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/3): Fixed decoding `UTf-8` characters in `fileName`.
-* 0.2.4: [#2](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/2): Fixed not respecting custom link names.
-* 0.2.3: [#1](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/1): Fixed only checking for files in `fileManager.getNewFileParent()`.
-* 0.2.2: Simplified `getMathLink()`.
-* 0.2.1: Fixed duplicate title.
-* 0.2.0: No longer edit the links themselves. Instead, a markdown post-processor is registered which renders individual inline MathJax equations (like `$...$`) and patches them back together.
-### 0.1.x: _Initial release._
-* 0.1.4: Fixed duplicate templates and excluded files/paths.
-* 0.1.3: Fixed excluding files when updating backlinks.
-* 0.1.2: Use `this.app.vault.configDir` instead of `.obsidian`.
-* 0.1.1: Fixed reverting back to Wikilinks when `Use [[Wikilinks]]` is disabled. Instead, revert back to its Markdown Link.
-* 0.1.0: Initial release!
+<details>
+    <summary><h3>0.2.x: <i>No longer edit the links themselves.</i></h3></summary>
+    <ul>
+        <li>0.2.9: <a href=https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/10>#10</a>, <a href=https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/11>#11</a>: Fixed hanging and 'creating new notes' on `layout-changed` for pinned notes.</li>
+        <li>0.2.8: <a href=https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/7>#7</a>: Render `mathLinks` in live-preview.</li>
+        <li>0.2.7: <a href=https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/6>#6</a>: Render `mathLinks` in canvas.</li>
+        <li>0.2.6: <a href=https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/4>#4</a>, <a href=https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/5>#5</a>: Added Dataview support.</li>
+        <li>0.2.5: <a href=https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/3>#3</a>: Fixed decoding `UTf-8` characters in `fileName`.</li>
+        <li>0.2.4: <a href=https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/2>#2</a>: Fixed not respecting custom link names.</li>
+        <li>0.2.3: <a href=https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/1>#1</a>: Fixed only checking for files in `fileManager.getNewFileParent()`.</li>
+        <li>0.2.2: Simplified `getMathLink()`.</li>
+        <li>0.2.1: Fixed duplicate title.</li>
+        <li>0.2.0: No longer edit the links themselves. Instead, a markdown post-processor is registered which renders individual inline MathJax equations (like `$...$`) and patches them back together.</li>
+    </ul>
+</details>
+<details>
+    <summary><h3>0.1.x: <i>Initial release.</i></h3></summary>
+    <ul>
+        <li>0.1.4: Fixed duplicate templates and excluded files/paths.</li>
+        <li>0.1.3: Fixed excluding files when updating backlinks.</li>
+        <li>0.1.2: Use `this.app.vault.configDir` instead of `.obsidian`.</li>
+        <li>0.1.1: Fixed reverting back to Wikilinks when `Use [[Wikilinks]]` is disabled. Instead, revert back to its Markdown Link.</li>
+        <li>0.1.0: Initial release!</li>
+    </ul>
+</details>
