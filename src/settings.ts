@@ -1,4 +1,4 @@
-import { Setting, PluginSettingTab, Modal, TextComponent, DropdownComponent, Notice, TFile } from 'obsidian';
+import { Setting, PluginSettingTab, Modal, TextComponent, DropdownComponent, Notice, TFile } from "obsidian";
 
 export interface MathLinksSettings {
     templates: string[];
@@ -22,22 +22,22 @@ export class MathLinksSettingTab extends PluginSettingTab {
         const { containerEl } = this;
 
         containerEl.empty();
-        containerEl.createEl('h2', {text: 'MathLinks Settings'});
+        containerEl.createEl("h2", {text: "MathLinks Settings"});
 
         // Add a new template
         new Setting(containerEl)
-            .setName('Add a new template')
+            .setName("Add a new template")
             .setDesc(
                 createFragment((e) => {
-                    e.createSpan({text: 'Generate mathLinks with a new template. Use '});
-                    e.createEl('code', {text: 'mathLink: auto'});
-                    e.createSpan({text: ' to use templates in a file.'});
+                    e.createSpan({text: "Generate mathLinks with a new template. Use "});
+                    e.createEl("code", {text: "mathLink: auto"});
+                    e.createSpan({text: " to use templates in a file."});
                 })
             )
             .addButton((button: ButtonComponent): ButtonComponent => {
                 let b = button
-                    .setTooltip('Add')
-                    .setIcon('plus')
+                    .setTooltip("Add")
+                    .setIcon("plus")
                     .onClick(async () => {
                         let modal = new AddTemplatesModal(this.app, this.plugin.settings.templates);
 
@@ -55,7 +55,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                                 this.plugin.settings.templates.push(template);
                                 await this.plugin.saveSettings();
 
-                                new Notice('MathLinks: Template added');
+                                new Notice("MathLinks: Template added");
                             }
                         };
 
@@ -68,15 +68,15 @@ export class MathLinksSettingTab extends PluginSettingTab {
         // Edit/delete template
         let templateTitle: string | null;
         new Setting(containerEl)
-            .setName('Edit/delete template')
-            .setDesc('Select a template to edit/delete it.')
+            .setName("Edit/delete template")
+            .setDesc("Select a template to edit/delete it.")
             .addDropdown((dropdown: DropdownComponent) => {
-                dropdown.addOption('__select', 'Select');
+                dropdown.addOption("__select", "Select");
                 this.plugin.settings.templates.forEach((template) => {
                     dropdown.addOption(template.title, template.title);
                 })
                 dropdown.onChange(async (current) => {
-                    if (current != '__select')
+                    if (current != "__select")
                         templateTitle = current;
                     else
                         templateTitle = null;
@@ -84,8 +84,8 @@ export class MathLinksSettingTab extends PluginSettingTab {
             })
             .addExtraButton((button: ButtonComponent): ButtonComponent => {
                 let b = button
-                    .setTooltip('Edit')
-                    .setIcon('edit')
+                    .setTooltip("Edit")
+                    .setIcon("edit")
                     .onClick(async () => {
                         if (templateTitle) {
                             let originalTemplates = JSON.parse(JSON.stringify(this.plugin.settings.templates));
@@ -95,7 +95,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                                 if (modal.saved) {
                                     await this.plugin.saveSettings();
 
-                                    new Notice('MathLinks: Template saved');
+                                    new Notice("MathLinks: Template saved");
                                 } else {
                                     this.plugin.settings.templates = originalTemplates;
                                 }
@@ -104,26 +104,26 @@ export class MathLinksSettingTab extends PluginSettingTab {
                             modal.open();
                             this.display();
                         } else {
-                            new Notice('MathLinks: Please select a template');
+                            new Notice("MathLinks: Please select a template");
                         }
                     });
                 return b;
             })
             .addExtraButton((button: ButtonComponent): ButtonComponent => {
                 let b = button
-                    .setTooltip('Delete')
-                    .setIcon('trash')
+                    .setTooltip("Delete")
+                    .setIcon("trash")
                     .onClick(async () => {
                         if (templateTitle) {
-                            let modal = new ConfirmModal(this.app, `Are you sure you want to delete '${templateTitle}'?`, 'Yes', 'No');
+                            let modal = new ConfirmModal(this.app, `Are you sure you want to delete "${templateTitle}"?`, "Yes", "No");
 
                             modal.onClose = async () => {
                                 if (modal.saved) {
                                     for (let i = 0; i < this.plugin.settings.templates.length; i++) {
-                                        if (this.plugin.settings.templates[i].title === templateTitle) {
+                                        if (this.plugin.settings.templates[i].title == templateTitle) {
                                             this.plugin.settings.templates.splice(i, 1);
                                             await this.plugin.saveSettings();
-                                            new Notice(`MathLinks: Template '${templateTitle}' deleted`);
+                                            new Notice(`MathLinks: Template "${templateTitle}" deleted`);
                                             break;
                                         }
                                     }
@@ -133,7 +133,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                             modal.open();
                             this.display();
                         } else {
-                            new Notice('MathLinks: Please select a template');
+                            new Notice("MathLinks: Please select a template");
                         }
                     });
                 return b;
@@ -141,12 +141,12 @@ export class MathLinksSettingTab extends PluginSettingTab {
 
         // Add an excluded file
         new Setting(containerEl)
-            .setName('Add an excluded file')
-            .setDesc('MathLinks will ignore those files.')
+            .setName("Add an excluded file")
+            .setDesc("MathLinks will ignore those files.")
             .addButton((button: ButtonComponent): ButtonComponent => {
                 let b = button
-                    .setTooltip('Add')
-                    .setIcon('plus')
+                    .setTooltip("Add")
+                    .setIcon("plus")
                     .onClick(async () => {
                         let modal = new AddExcludedModal(this.app, this.plugin.settings.excludedFilePaths);
 
@@ -161,9 +161,9 @@ export class MathLinksSettingTab extends PluginSettingTab {
                                 await this.plugin.saveSettings();
 
                                 if (modal.isFile)
-                                    new Notice('MathLinks: File excluded');
+                                    new Notice("MathLinks: File excluded");
                                 else
-                                    new Notice('MathLinks: Path exclcuded');
+                                    new Notice("MathLinks: Path exclcuded");
                             }
                         };
 
@@ -176,15 +176,15 @@ export class MathLinksSettingTab extends PluginSettingTab {
         // Remove from excluded files
         let excludedFilePath: string | null;
         new Setting(containerEl)
-            .setName('Remove from excluded files')
-            .setDesc('Remove a file from the list of excluded files.')
+            .setName("Remove from excluded files")
+            .setDesc("Remove a file from the list of excluded files.")
             .addDropdown(async (dropdown: DropdownComponent) => {
-                dropdown.addOption('__select', 'Select');
+                dropdown.addOption("__select", "Select");
                 this.plugin.settings.excludedFilePaths.forEach((excludedFilePath) => {
                     dropdown.addOption(excludedFilePath.path, excludedFilePath.path);
                 })
                 dropdown.onChange(async (current) => {
-                    if (current != '__select')
+                    if (current != "__select")
                         excludedFilePath = current;
                     else
                         excludedFilePath = null;
@@ -192,19 +192,19 @@ export class MathLinksSettingTab extends PluginSettingTab {
             })
             .addExtraButton((button: ButtonComponent): ButtonComponent => {
                 let b = button
-                    .setTooltip('Remove')
-                    .setIcon('trash')
+                    .setTooltip("Remove")
+                    .setIcon("trash")
                     .onClick(async () => {
                         if (excludedFilePath) {
-                            let modal = new ConfirmModal(this.app, `Are you sure you want to remove '${excludedFilePath}' from the list of excluded files/paths?`, 'Yes', 'No');
+                            let modal = new ConfirmModal(this.app, `Are you sure you want to remove "${excludedFilePath}" from the list of excluded files/paths?`, "Yes", "No");
 
                             modal.onClose = async () => {
                                 if (modal.saved) {
                                     for (let i = 0; i < this.plugin.settings.excludedFilePaths.length; i++) {
-                                        if (this.plugin.settings.excludedFilePaths[i].path === excludedFilePath) {
+                                        if (this.plugin.settings.excludedFilePaths[i].path == excludedFilePath) {
                                             this.plugin.settings.excludedFilePaths.splice(i, 1);
                                             await this.plugin.saveSettings();
-                                            new Notice(`MathLinks: '${excludedFilePath}' removed from excluded files`);
+                                            new Notice(`MathLinks: "${excludedFilePath}" removed from excluded files`);
                                             break;
                                         }
                                     }
@@ -214,7 +214,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                             modal.open();
                             this.display();
                         } else {
-                            new Notice('MathLinks: Please select a file');
+                            new Notice("MathLinks: Please select a file");
                         }
                     });
                 return b;
@@ -224,11 +224,11 @@ export class MathLinksSettingTab extends PluginSettingTab {
 
 class AddTemplatesModal extends Modal {
     saved: boolean = false;
-    error: string[] = ['MathLinks: Please enter a title', 'MathLinks: Please enter a non-empty string to be replaced'];
+    error: string[] = ["MathLinks: Please enter a title", "MathLinks: Please enter a non-empty string to be replaced"];
 
-    title: string = '';
-    replaced: string = '';
-    replacement: string = '';
+    title: string = "";
+    replaced: string = "";
+    replacement: string = "";
     globalMatch: boolean = true;
     sensitive: boolean = true;
     word: boolean = true
@@ -244,14 +244,14 @@ class AddTemplatesModal extends Modal {
         const { contentEl } = this;
         contentEl.empty();
 
-        loadTemplateSettings(contentEl, this, this, 'add');
-        loadButtonsToClose(this, this.contentEl.createDiv(), 'Add', 'Cancel');
+        loadTemplateSettings(contentEl, this, this, "add");
+        loadButtonsToClose(this, this.contentEl.createDiv(), "Add", "Cancel");
     }
 }
 
 class EditTemplatesModal extends Modal {
     saved: boolean = false;
-    error: string[] = ['', ''];
+    error: string[] = ["", ""];
 
     templateTitle: string;
     templates: string[];
@@ -268,19 +268,19 @@ class EditTemplatesModal extends Modal {
 
         this.templates.every((template) => {
             if (this.templateTitle != undefined && template.title == this.templateTitle) {
-                loadTemplateSettings(contentEl, template, this, 'edit');
+                loadTemplateSettings(contentEl, template, this, "edit");
                 return false;
             }
             return true;
         });
 
-        loadButtonsToClose(this, this.contentEl.createDiv(), 'Save', 'Cancel');
+        loadButtonsToClose(this, this.contentEl.createDiv(), "Save", "Cancel");
     }
 }
 
 class AddExcludedModal extends Modal {
     saved: boolean = false;
-    error: string[] = ['MathLinks: Please enter a valid file/path', ''];
+    error: string[] = ["MathLinks: Please enter a valid file/path", ""];
 
     excludedFilePath: string;
     isFile: boolean;
@@ -298,42 +298,42 @@ class AddExcludedModal extends Modal {
 
         let excludedFilePathText: TextComponent;
         new Setting(contentEl)
-            .setName('File name/path of folder')
+            .setName("File name/path of folder")
             .setDesc(
                 createFragment((e) => {
-                    e.createSpan({text: 'Enter a file as'});
-                    e.createEl('code', {text: 'path/name.md'});
-                    e.createSpan({text: ' and a folder as '});
-                    e.createEl('code', {text: 'path'});
-                    e.createSpan({text: '.'});
+                    e.createSpan({text: "Enter a file as"});
+                    e.createEl("code", {text: "path/name.md"});
+                    e.createSpan({text: " and a folder as "});
+                    e.createEl("code", {text: "path"});
+                    e.createSpan({text: "."});
                 })
             )
             .addText((text) => {
                 excludedFilePathText = text;
                 let footerEl = this.contentEl.createDiv();
-                loadButtonsToClose(this, footerEl, 'Add', 'Cancel');
+                loadButtonsToClose(this, footerEl, "Add", "Cancel");
                 excludedFilePathText
                     .onChange((current) => {
                         let file = app.vault.getAbstractFileByPath(current);
                         if (file != null) {
                             this.excludedFilePath = file.path;
                             this.isFile = file instanceof TFile;
-                            this.error[0] = '';
+                            this.error[0] = "";
                         } else {
-                            this.error[0] = 'MathLinks: Please enter a valid file/path';
+                            this.error[0] = "MathLinks: Please enter a valid file/path";
                         }
 
-                        this.error[1] = '';
+                        this.error[1] = "";
                         this.excludedFilePaths.every((path) => {
                             if (path.path == current) {
-                                this.error[1] = 'MathLinks: Duplicate file/path';
+                                this.error[1] = "MathLinks: Duplicate file/path";
                                 return false;
                             }
                             return true;
                         });
 
                         footerEl.empty();
-                        loadButtonsToClose(this, footerEl, 'Add', 'Cancel');
+                        loadButtonsToClose(this, footerEl, "Add", "Cancel");
                     });
             });
     }
@@ -358,7 +358,7 @@ class ConfirmModal extends Modal {
         const { contentEl } = this;
         contentEl.empty();
 
-        contentEl.createEl('h3', {text: this.areYouSure});
+        contentEl.createEl("h3", {text: this.areYouSure});
         loadButtonsToClose(this, this.contentEl.createDiv(), this.proceed, this.noProceed);
     }
 }
@@ -366,47 +366,47 @@ class ConfirmModal extends Modal {
 function loadTemplateSettings(contentEl: HTMLElement, template: string, modal: Modal, modalType: string) {
     let titleText: TextComponent;
     new Setting(contentEl)
-        .setName('Title')
-        .setDesc('Name of the template.')
+        .setName("Title")
+        .setDesc("Name of the template.")
         .addText((text) => {
             titleText = text;
             titleText.setValue(template.title).onChange((current) => {
                 template.title = current;
-                modal.error[0] = '';
-                if (modalType === 'add') {
+                modal.error[0] = "";
+                if (modalType == "add") {
                     template.templates.every((t) => {
-                        if (template.title != '' && template.title == t.title) {
-                            modal.error[0] = 'MathLinks: Duplicate title';
+                        if (template.title != "" && template.title == t.title) {
+                            modal.error[0] = "MathLinks: Duplicate title";
                             return false;
                         }
                         return true;
                     });
                 }
-                if (template.title === '') {
-                    modal.error[0] = 'MathLinks: Please enter a title';
+                if (template.title == "") {
+                    modal.error[0] = "MathLinks: Please enter a title";
                 }
             });
         });
 
     let replacedText: TextComponent;
     new Setting(contentEl)
-        .setName('Match for...')
-        .setDesc('String to be matched and replaced. Do not include regex.')
+        .setName("Match for...")
+        .setDesc("String to be matched and replaced. Do not include regex.")
         .addText((text) => {
             replacedText = text;
             replacedText.setValue(template.replaced).onChange((current) => {
                 template.replaced = current;
-                modal.error[1] = '';
-                if (template.replaced == '') {
-                    modal.error[1] = 'MathLinks: Please enter a non-empty string to be replaced'
+                modal.error[1] = "";
+                if (template.replaced == "") {
+                    modal.error[1] = "MathLinks: Please enter a non-empty string to be replaced"
                 }
             });
         });
 
     let replacementText: TextComponent;
     new Setting(contentEl)
-        .setName('Replace with...')
-        .setDesc('String to replace matches. Do not escape backslashes.')
+        .setName("Replace with...")
+        .setDesc("String to replace matches. Do not escape backslashes.")
         .addText((text) => {
             replacementText = text;
             replacementText.setValue(template.replacement).onChange((current) => {
@@ -415,22 +415,22 @@ function loadTemplateSettings(contentEl: HTMLElement, template: string, modal: M
         });
 
     new Setting(contentEl)
-        .setName('Global match')
-        .setDesc('Match all instances (instead of just the first).')
+        .setName("Global match")
+        .setDesc("Match all instances (instead of just the first).")
         .addToggle((toggle) => {
             toggle.setValue(template.globalMatch).onChange((current) => (template.globalMatch = current));
         });
 
     new Setting(contentEl)
-        .setName('Case sensitive')
-        .setDesc('Matches will be case sensitive.')
+        .setName("Case sensitive")
+        .setDesc("Matches will be case sensitive.")
         .addToggle((toggle) => {
             toggle.setValue(template.sensitive).onChange((current) => (template.sensitive = current));
         });
 
     new Setting(contentEl)
-        .setName('Match whole words')
-        .setDesc('Only match whole words.')
+        .setName("Match whole words")
+        .setDesc("Only match whole words.")
         .addToggle((toggle) => {
             toggle.setValue(template.word).onChange((current) => (template.word = current));
         });
@@ -440,10 +440,10 @@ function loadButtonsToClose(modal: Modal, element: HTMLElement, trueToolTip: str
     let footerButtons = new Setting(element);
     footerButtons.addButton((b) => {
         b.setTooltip(trueToolTip)
-            .setIcon('checkmark')
+            .setIcon("checkmark")
             .onClick(async () => {
                 let proceed = modal.error.every((error) => {
-                    if (error != '') {
+                    if (error != "") {
                         return false;
                     }
                     return true;
@@ -451,7 +451,7 @@ function loadButtonsToClose(modal: Modal, element: HTMLElement, trueToolTip: str
 
                 if (!proceed) {
                     modal.error.forEach((error) => {
-                        if (error != '') {
+                        if (error != "") {
                             new Notice(error);
                         }
                     })
@@ -463,7 +463,7 @@ function loadButtonsToClose(modal: Modal, element: HTMLElement, trueToolTip: str
     });
     footerButtons.addExtraButton((b) => {
         b.setTooltip(falseToolTip)
-            .setIcon('cross')
+            .setIcon("cross")
             .onClick(async () => {
                 modal.saved = false;
                 modal.close();

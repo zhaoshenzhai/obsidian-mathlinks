@@ -1,4 +1,26 @@
-import { TFile, renderMath, finishRenderMath } from 'obsidian';
+import { TFile, renderMath, finishRenderMath } from "obsidian";
+
+    export function generateMathLinks(plugin: MathLinks, element: HTMLElement): Promise<void> {
+        for (let outLinkEl of element.querySelectorAll(".internal-link")) {
+            let outLinkText = outLinkEl.textContent.trim();
+            let outLinkHTML = outLinkEl.innerHTML;
+            let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, "")).replace(/\.md$/, "");
+
+            if (outLinkText != outLinkFileName && outLinkText != "" && outLinkHTML == outLinkText) {
+                outLinkEl = replaceWithMathLink(outLinkEl, outLinkText);
+            } else {
+                let outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
+                let outLinkMathLink = getMathLink(plugin, outLinkFile);
+                if (outLinkMathLink) {
+                    if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename) {
+                        outLinkEl = replaceWithMathLink(outLinkEl, outLinkMathLink);
+                    }
+                }
+            }
+        }
+
+        return new Promise ((resolve) => {resolve()});
+    }
 
 export function getMathLink(plugin: MathLinks, file: TFile): string {
     if (!file)
@@ -6,7 +28,7 @@ export function getMathLink(plugin: MathLinks, file: TFile): string {
 
     let mathLink = plugin.app.metadataCache.getFileCache(file)?.frontmatter?.mathLink;
 
-    if (mathLink === 'auto')
+    if (mathLink == "auto")
         mathLink = generateMathLinkFromAuto(plugin, plugin.settings, file);
 
     return mathLink;
@@ -15,26 +37,26 @@ export function getMathLink(plugin: MathLinks, file: TFile): string {
 export function replaceWithMathLink(element: HTMLElement, mathLink: string): HTMLElement {
     let splits: [string, boolean][] = [];
 
-    let split = '';
+    let split = "";
     let isMath = false;
     for (let i = 0; i < mathLink.length; i++) {
         let character = mathLink[i];
-        if (character === '$') {
-            if (split != '') {
+        if (character == "$") {
+            if (split != "") {
                 splits.push([split, isMath]);
-                split = '';
+                split = "";
             }
             isMath = !isMath;
         } else {
             split += character;
         }
 
-        if (i == mathLink.length - 1 && split != '') {
+        if (i == mathLink.length - 1 && split != "") {
             splits.push([split, isMath]);
         }
     }
 
-    element.innerText = '';
+    element.innerText = "";
     for (let i = 0; i < splits.length; i++) {
         let word = splits[i][0];
         if (splits[i][1]) {
@@ -51,39 +73,40 @@ export function replaceWithMathLink(element: HTMLElement, mathLink: string): HTM
     return element;
 }
 
-export function isValid(app, context, settings): boolean {
-    let element = context.containerEl;
-    while(element.parentNode && element.parentNode.nodeName.toLowerCase() != 'body') {
+export function isValid(plugin: MathLinks, settings: MathLinksSettings, element: HTMLElement, fileName: string): boolean {
+    while(element.parentNode && element.parentNode.nodeName.toLowerCase() != "body") {
         element = element.parentNode;
         if (element.className.toLowerCase().includes("canvas")) {
             return true;
         }
     }
 
-    let file = app.vault.getAbstractFileByPath(context.sourcePath);
-    if (!(file instanceof TFile))
+    let file = plugin.app.vault.getAbstractFileByPath(fileName);
+    if (!(file instanceof TFile)) {
         return false;
-    else if (isExcluded(file, settings.excludedFilePaths))
+    }
+    else if (isExcluded(file, settings.excludedFilePaths)) {
         return false;
+    }
 
     return true;
 }
 
 function generateMathLinkFromAuto(plugin: MathLinks, settings: MathLinksSettings, file: Tfile): string {
     let templates = plugin.settings.templates;
-    let mathLink = file.name.replace('\.md', '');
+    let mathLink = file.name.replace("\.md", "");
     for (let i = 0; i < templates.length; i++) {
         let replaced = new RegExp(templates[i].replaced);
         let replacement = templates[i].replacement;
 
-        let flags = '';
+        let flags = "";
         if (templates[i].globalMatch)
-            flags += 'g';
+            flags += "g";
         if (!templates[i].sensitive)
-            flags += 'i';
+            flags += "i";
 
         if (templates[i].word)
-            replaced = RegExp(replaced.source.replace(/^/, '\\b').replace(/$/, '\\b'), flags);
+            replaced = RegExp(replaced.source.replace(/^/, "\\b").replace(/$/, "\\b"), flags);
         else
             replaced = RegExp(replaced.source, flags);
 
@@ -96,12 +119,11 @@ function generateMathLinkFromAuto(plugin: MathLinks, settings: MathLinksSettings
 function isExcluded(file: TFile, excludedFilePaths: string[]): boolean {
     for (let i = 0; i < excludedFilePaths.length; i++) {
         let path = excludedFilePaths[i];
-        if (path.isFile && file.path === path.path) {
+        if (path.isFile && file.path == path.path) {
             return true;
         } else if (!path.isFile) {
             let pathRegex = new RegExp(`\\b${path.path}/`);
-            if (pathRegex.test(file.path))
-                return true;
+            if (pathRegex.test(file.path)) return true;
         }
     }
     return false;
