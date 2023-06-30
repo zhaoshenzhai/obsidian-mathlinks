@@ -48,6 +48,7 @@ MathLinks will ignore those files. If `path` is entered, all files under `path` 
 
 ## Changelog
 ### 0.3.x: _Merged with [obsidian-mathjax-wikilinks](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks)._
+* 0.3.1: [#13](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/13), [#14](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/14): Render `mathLinks` in Dataview inline fields.
 * 0.3.0: [#9](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/9): Merged with [obsidian-mathjax-wikilinks](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks), with credits to [aaron-jack-manning](https://github.com/aaron-jack-manning). Extended its functionality to include live-preview for both Wikilinks and Markdown Links.
 ### 0.2.x: _No longer edit the links themselves._
 * 0.2.9: [#10](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/10), [#11](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/11): Fixed hanging and 'creating new notes' on `layout-changed` for pinned notes.
