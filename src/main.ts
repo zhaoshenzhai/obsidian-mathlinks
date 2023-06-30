@@ -11,34 +11,25 @@ export default class MathLinks extends Plugin {
         const settings = this.settings;
 
         this.registerMarkdownPostProcessor((element, context) => {
-            if (!isValid(this.app, context, settings)) return null;
-
-            element.querySelectorAll('.internal-link').forEach((outLinkEl) => {
-                let outLinkText = outLinkEl.textContent.trim();
-                let outLinkHTML = outLinkEl.innerHTML
-                let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, '')).replace(/\.md$/, '');
-
-                if (outLinkText != outLinkFileName && outLinkText != '' && outLinkHTML == outLinkText) {
-                    outLinkEl = replaceWithMathLink(outLinkEl, outLinkText);
-                } else {
-                    let outLinkFile = this.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
-                    let outLinkMathLink = getMathLink(this, outLinkFile);
-                    if (outLinkMathLink) {
-                        if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename) {
-                            outLinkEl = replaceWithMathLink(outLinkEl, outLinkMathLink);
-                        }
-                    }
-                }
-            })
+            if (isValid(this, settings, context.containerEl, context.sourcePath)) {
+                // this.generateMathLinks(this, context.containerEl);
+                this.generateMathLinks(this, context.containerEl);
+            }
         });
 
         this.app.workspace.on("active-leaf-change", (leaf: WorkspaceLeaf) => {
-            let view = leaf.getViewState();
-            if ((view.state.mode == "source" && view.state.source == false) || view.type == "canvas") {
-                let livePreview = buildLivePreview(this, this.app, leaf);
-                this.registerEditorExtension(livePreview);
+            if (isValid(this, settings, leaf.containerEl, leaf.getViewState().state.file)) {
+                this.generateMathLinks(this, leaf.containerEl);
             }
         });
+
+        // this.app.workspace.on("active-leaf-change", (leaf: WorkspaceLeaf) => {
+        //     let view = leaf.getViewState();
+        //     if ((view.state.mode == "source" && view.state.source == false) || view.type == "canvas") {
+        //         let livePreview = buildLivePreview(this, this.app, leaf);
+        //         this.registerEditorExtension(livePreview);
+        //     }
+        // });
     }
 
     async loadSettings() {
@@ -47,5 +38,25 @@ export default class MathLinks extends Plugin {
 
     async saveSettings() {
         await this.saveData(this.settings);
+    }
+
+    generateMathLinks(plugin: MathLinks, element: HTMLElement) {
+        element.querySelectorAll('.internal-link').forEach((outLinkEl) => {
+            let outLinkText = outLinkEl.textContent.trim();
+            let outLinkHTML = outLinkEl.innerHTML;
+            let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, '')).replace(/\.md$/, '');
+
+            if (outLinkText != outLinkFileName && outLinkText != '' && outLinkHTML == outLinkText) {
+                replaceWithMathLink(outLinkEl, outLinkText);
+            } else {
+                let outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
+                let outLinkMathLink = getMathLink(plugin, outLinkFile);
+                if (outLinkMathLink) {
+                    if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename) {
+                        replaceWithMathLink(outLinkEl, outLinkMathLink);
+                    }
+                }
+            }
+        });
     }
 }

@@ -1,0 +1,9 @@
+{
+  "templates": [],
+  "excludedFilePaths": [
+    {
+      "path": "Notes/Note 1.md",
+      "isFile": true
+    }
+  ]
+}

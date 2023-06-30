@@ -1,5 +1,5 @@
 ---
-mathLink: $\int$
+mathLink: $\sigma$
 ---
 
 [[Note 1]]
