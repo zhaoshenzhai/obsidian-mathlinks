@@ -1,8 +1,8 @@
-import { App, Plugin } from 'obsidian';
-import { syntaxTree } from '@codemirror/language';
-import { RangeSetBuilder } from '@codemirror/state';
-import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType } from '@codemirror/view';
-import { getMathLink, replaceWithMathLink } from './tools'
+import { App, Plugin } from "obsidian";
+import { syntaxTree } from "@codemirror/language";
+import { RangeSetBuilder } from "@codemirror/state";
+import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType } from "@codemirror/view";
+import { getMathLink, replaceWithMathLink } from "./tools"
 
 export function buildLivePreview(plugin: Plugin, app: App, leaf: WorkspaceLeaf)
 {
@@ -54,7 +54,7 @@ export function buildLivePreview(plugin: Plugin, app: App, leaf: WorkspaceLeaf)
                 const builder = new RangeSetBuilder<Decoration>();
 
                 for (let { from, to } of view.visibleRanges) {
-                    let start = -1, end = -1, outLinkFileName = '', outLinkMathLink = '';
+                    let start = -1, end = -1, outLinkFileName = "", outLinkMathLink = "";
 
                     syntaxTree(view.state).iterate({
                         from,
@@ -108,15 +108,15 @@ export function buildLivePreview(plugin: Plugin, app: App, leaf: WorkspaceLeaf)
                                                     start,
                                                     end,
                                                     Decoration.widget({
-                                                        widget: new MathWidget(outLinkFileName, outLinkMathLink.replace(/\\\$/, '$')),
+                                                        widget: new MathWidget(outLinkFileName, outLinkMathLink.replace(/\\\$/, "$")),
                                                     })
                                                 );
                                             }
                                         }
                                         start = -1;
                                         end = -1;
-                                        outLinkFileName = '';
-                                        outLinkMathLink = '';
+                                        outLinkFileName = "";
+                                        outLinkMathLink = "";
                                     }
                                     break;
                             }

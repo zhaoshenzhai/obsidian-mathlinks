@@ -1,5 +1,6 @@
 {
   "vimMode": true,
   "promptDelete": false,
-  "useMarkdownLinks": false
+  "useMarkdownLinks": false,
+  "alwaysUpdateLinks": true
 }

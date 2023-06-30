@@ -1,6 +1,8 @@
 {
 	"nodes":[
-		{"type":"text","text":"[[Note 2|$hi$]]\n[$\\int$](Note%202.md)\n[[Note 2|$hey$]]","id":"92618941b3112fda","x":-146,"y":-143,"width":250,"height":123}
+		{"id":"72af7f7e6ad41a84","x":-60,"y":-81,"width":220,"height":186,"type":"file","file":"Notes/Standard.md"},
+		{"id":"c044907c53c1e23e","x":180,"y":-81,"width":220,"height":186,"type":"file","file":"Dataview.md"},
+		{"id":"764b6fe364dd2a1b","x":420,"y":-81,"width":140,"height":186,"type":"file","file":"Lists.md"}
 	],
 	"edges":[]
 }

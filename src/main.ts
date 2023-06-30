@@ -1,7 +1,7 @@
-import { App, Plugin, TFile, loadMathJax } from 'obsidian';
-import { getMathLink, replaceWithMathLink, isValid } from './tools';
-import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from './settings';
-import { buildLivePreview } from './preview';
+import { App, Plugin, TFile, loadMathJax } from "obsidian";
+import { generateMathLinks, isValid } from "./tools";
+import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from "./settings";
+import { buildLivePreview } from "./preview";
 
 export default class MathLinks extends Plugin {
     async onload() {
@@ -10,16 +10,11 @@ export default class MathLinks extends Plugin {
         this.addSettingTab(new MathLinksSettingTab(this.app, this));
         const settings = this.settings;
 
-        this.registerMarkdownPostProcessor((element, context) => {
+        this.registerMarkdownPostProcessor(async (element, context) => {
             if (isValid(this, settings, context.containerEl, context.sourcePath)) {
-                // this.generateMathLinks(this, context.containerEl);
-                this.generateMathLinks(this, context.containerEl);
-            }
-        });
-
-        this.app.workspace.on("active-leaf-change", (leaf: WorkspaceLeaf) => {
-            if (isValid(this, settings, leaf.containerEl, leaf.getViewState().state.file)) {
-                this.generateMathLinks(this, leaf.containerEl);
+                generateMathLinks(this, context.containerEl).then((result) => {
+                    generateMathLinks(this, element);
+                });
             }
         });
 
@@ -38,25 +33,5 @@ export default class MathLinks extends Plugin {
 
     async saveSettings() {
         await this.saveData(this.settings);
-    }
-
-    generateMathLinks(plugin: MathLinks, element: HTMLElement) {
-        element.querySelectorAll('.internal-link').forEach((outLinkEl) => {
-            let outLinkText = outLinkEl.textContent.trim();
-            let outLinkHTML = outLinkEl.innerHTML;
-            let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, '')).replace(/\.md$/, '');
-
-            if (outLinkText != outLinkFileName && outLinkText != '' && outLinkHTML == outLinkText) {
-                replaceWithMathLink(outLinkEl, outLinkText);
-            } else {
-                let outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
-                let outLinkMathLink = getMathLink(plugin, outLinkFile);
-                if (outLinkMathLink) {
-                    if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename) {
-                        replaceWithMathLink(outLinkEl, outLinkMathLink);
-                    }
-                }
-            }
-        });
     }
 }
