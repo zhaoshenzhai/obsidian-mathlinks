@@ -8,6 +8,7 @@ export function buildLivePreview(plugin: Plugin, leaf: WorkspaceLeaf): Promise<V
     class MathWidget extends WidgetType {
         outLinkFileName: string;
         outLinkMathLink: string;
+        ctrlKeyDown: boolean = false;
 
         constructor(outLinkFileName: string, outLinkMathLink: string) {
             super();
@@ -24,8 +25,20 @@ export function buildLivePreview(plugin: Plugin, leaf: WorkspaceLeaf): Promise<V
             spanOuter.classList.add("cm-hmd-internal-link");
             spanOuter.appendChild(mathLink);
 
+            plugin.registerDomEvent(leaf.containerEl, "keydown", (evt: KeyboardEvent) => {
+                if (evt.key == "Control") {
+                    this.ctrlKeyDown = true;
+                }
+            });
+
+            plugin.registerDomEvent(leaf.containerEl, "keyup", (evt: KeyboardEvent) => {
+                if (evt.key == "Control") {
+                    this.ctrlKeyDown = false;
+                }
+            });
+
             spanOuter.onclick = (() => {
-                plugin.app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName);
+                plugin.app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName, this.ctrlKeyDown);
             });
 
             return spanOuter;
@@ -151,7 +164,6 @@ export function buildLivePreview(plugin: Plugin, leaf: WorkspaceLeaf): Promise<V
 
                 return builder.finish();
             }
-
         }, {decorations: v => v.decorations}
     );
 
