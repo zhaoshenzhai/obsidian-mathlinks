@@ -18,12 +18,18 @@ export default class MathLinks extends Plugin {
             }
         });
 
+        this.app.workspace.onLayoutReady(()=> {
+            this.app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
+                buildLivePreview(this, leaf).then((livePreview) => {
+                    this.registerEditorExtension(livePreview);
+                });
+            });
+        });
+
         this.app.workspace.on("active-leaf-change", (leaf: WorkspaceLeaf) => {
-            let view = leaf.getViewState();
-            if ((view.state.mode == "source" && view.state.source == false) || view.type == "canvas") {
-                let livePreview = buildLivePreview(this, this.app, leaf);
+            buildLivePreview(this, leaf).then((livePreview) => {
                 this.registerEditorExtension(livePreview);
-            }
+            });
         });
     }
 

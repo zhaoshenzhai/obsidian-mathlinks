@@ -1,10 +1,9 @@
-import { App, Plugin } from "obsidian";
 import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType } from "@codemirror/view";
 import { getMathLink, replaceWithMathLink } from "./tools"
 
-export function buildLivePreview(plugin: Plugin, app: App, leaf: WorkspaceLeaf)
+export function buildLivePreview(plugin: Plugin, leaf: WorkspaceLeaf): Promise<ViewPlugin>
 {
     class MathWidget extends WidgetType {
         outLinkFileName: string;
@@ -26,123 +25,125 @@ export function buildLivePreview(plugin: Plugin, app: App, leaf: WorkspaceLeaf)
             spanOuter.appendChild(mathLink);
 
             spanOuter.onclick = (() => {
-                app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName);
+                plugin.app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName);
             });
 
             return spanOuter;
         }
     }
 
-    const viewPlugin = ViewPlugin.fromClass(
+    let viewPlugin = ViewPlugin.fromClass(
         class {
             decorations: DecorationSet;
 
             constructor(view: EditorView) {
-                this.decorations = this.buildDecorations(view);
+                this.tryBuildingDecorations(view);
             }
 
             update(update: ViewUpdate) {
-                let view = leaf.getViewState();
-                if ((view.state.mode == "source" && view.state.source == false) || view.type == "canvas") {
-                    this.decorations = this.buildDecorations(update.view);
+                this.tryBuildingDecorations(update.view);
+            }
+
+            tryBuildingDecorations(view: EditorView) {
+                let editorView = leaf.getViewState();
+
+                if (leaf.view.editor) {
+                    let curView = leaf.view.editor.cm as EditorView;
+                    if (curView == view && editorView.state.mode == "source" && !editorView.state.source) {
+                        this.decorations = this.buildDecorations(view);
+                    } else {
+                        this.decorations = this.destroyDecorations(view);
+                    }
                 } else {
-                    this.decorations = this.destroyDecorations(update.view);
+                    this.decorations = this.buildDecorations(view);
+
+                    plugin.app.workspace.iterateAllLeaves((otherLeaf: WorkspaceLeaf) => {
+                        if (otherLeaf.view.editor) {
+                            let otherView = otherLeaf.view.editor.cm as EditorView;
+                            if (otherView == view) {
+                                this.decorations = this.destroyDecorations(view);
+                            }
+                        }
+                    });
                 }
             }
 
             buildDecorations(view: EditorView) {
-                const builder = new RangeSetBuilder<Decoration>();
+                let builder = new RangeSetBuilder<Decoration>();
 
                 for (let { from, to } of view.visibleRanges) {
                     let start = -1, end = -1, outLinkFileName = "", outLinkMathLink = "";
 
-                    console.log("==== START ====");
                     syntaxTree(view.state).iterate({
                         from,
                         to,
                         enter(node) {
                             let name = node.type.name;
-                            console.log(name + " | " + view.state.doc.sliceString(node.from, node.to));
-                            switch (name) {
-                                // Start
-                                case "formatting-link_formatting-link-start":
-                                case "formatting-link_formatting-link-start_list-1":
-                                    start = node.from;
-                                    break;
-                                case "formatting_formatting-link_link":
-                                case "formatting_formatting-link_link_list-1":
-                                    if (start == -1)
-                                        start = node.from;
-                                    break;
+                            // Start
+                            if (name.contains("formatting-link_formatting-link-start")) {
+                                start = node.from;
+                            }
 
-                                // No alias: Get outLinkFileName with its outLinkMathLink
-                                case "hmd-internal-link":
-                                case "hmd-internal-link_list-1":
-                                    outLinkFileName = view.state.doc.sliceString(node.from, node.to);
-                                    outLinkMathLink = getMathLink(plugin, app.metadataCache.getFirstLinkpathDest(outLinkFileName, ""));
-                                    break;
+                            // Start (check that it is not end)
+                            else if (name.contains("formatting_formatting-link_link")) {
+                                if (start == -1) start = node.from;
+                            }
 
-                                // Alias: Add to outLinkFileName
-                                case "hmd-internal-link_link-has-alias":
-                                case "hmd-internal-link_link-has-alias_list-1":
-                                    outLinkFileName = view.state.doc.sliceString(node.from, node.to);
-                                    break;
-                                case "string_url":
-                                case "list-1_string_url":
-                                    outLinkFileName = decodeURI(view.state.doc.sliceString(node.from, node.to));
-                                    break;
+                            // Alias: File name
+                            else if (name.contains("has-alias")) {
+                                outLinkFileName = view.state.doc.sliceString(node.from, node.to);
+                            }
 
-                                // Alias: Get its outLinkMathLink
-                                case "hmd-internal-link_link-alias":
-                                case "hmd-internal-link_link-alias_list-1":
-                                case "formatting-escape_hmd-internal-link_link-alias":
-                                case "link":
-                                case "link_list-1":
-                                case "formatting-escape_hmd-escape-backslash_link":
-                                case "formatting-escape_hmd-escape-backslash_link_list-1":
-                                case "escape_hmd-escape-char_link":
-                                case "escape_hmd-escape-char_link_list-1":
-                                    outLinkMathLink += view.state.doc.sliceString(node.from, node.to);
-                                    break;
+                            // Alias: File name (with decoding)
+                            else if (/string_url$/.test(name) && !name.contains("format")) {
+                                outLinkFileName = decodeURI(view.state.doc.sliceString(node.from, node.to));
+                            }
 
-                                // End
-                                case "formatting_formatting-link-string_string_url":
-                                case "formatting_formatting-link-string_list-1_string_url":
-                                case "formatting-link_formatting-link-end":
-                                case "formatting-link_formatting-link-end_list-1":
-                                    if (!name.contains("end") && end == -1) {
-                                        end = -2;
-                                    } else {
-                                        end = node.to;
-                                        let cursorRange = view.state.selection.ranges[0];
-                                        if (start > cursorRange.to || end < cursorRange.from) {
-                                            if (outLinkFileName && outLinkMathLink) {
-                                                builder.add(
-                                                    start,
-                                                    end,
-                                                    Decoration.widget({
-                                                        widget: new MathWidget(outLinkFileName, outLinkMathLink.replace(/\\\$/, "$")),
-                                                    })
-                                                );
-                                            }
+                            // No alias
+                            else if (name.contains("hmd-internal-link") && !name.contains("alias")) {
+                                outLinkFileName = view.state.doc.sliceString(node.from, node.to);
+                                outLinkMathLink = getMathLink(plugin, plugin.app.metadataCache.getFirstLinkpathDest(outLinkFileName, ""));
+                            }
+
+                            // End
+                            else if (name.contains("formatting-link-end") || name.contains("formatting-link-string")) {
+                                if (!name.contains("end") && end == -1) {
+                                    end = -2;
+                                } else {
+                                    end = node.to;
+
+                                    let cursorRange = view.state.selection.ranges[0];
+                                    if (start > cursorRange.to || end < cursorRange.from) {
+                                        if (outLinkFileName && outLinkMathLink) {
+                                            builder.add(
+                                                start,
+                                                end,
+                                                Decoration.widget({
+                                                    widget: new MathWidget(outLinkFileName, outLinkMathLink.replace(/\\\$/, "$")),
+                                                })
+                                            );
                                         }
-                                        start = -1;
-                                        end = -1;
-                                        outLinkFileName = "";
-                                        outLinkMathLink = "";
                                     }
-                                    break;
+                                    start = -1;
+                                    end = -1;
+                                    outLinkFileName = "";
+                                    outLinkMathLink = "";
+                                }
+                            }
+
+                            // Alias: MathLink
+                            else if (!name.contains("pipe") && ((name.contains("hmd-internal-link") && name.contains("alias")) || name.contains("hmd-escape") || /^link/.test(name))) {
+                                outLinkMathLink += view.state.doc.sliceString(node.from, node.to);
                             }
                         }
                     });
                 }
-                console.log("====  END  ====\n\n\n\n");
 
                 return builder.finish();
             }
 
             destroyDecorations(view: EditorView) {
-                const builder = new RangeSetBuilder<Decoration>();
+                let builder = new RangeSetBuilder<Decoration>();
 
                 for (let { from, to } of view.visibleRanges) {
                     syntaxTree(view.state).iterate({from, to, enter(node) {}});
@@ -154,5 +155,5 @@ export function buildLivePreview(plugin: Plugin, app: App, leaf: WorkspaceLeaf)
         }, {decorations: v => v.decorations}
     );
 
-    return viewPlugin;
+    return new Promise<ViewPlugin> ((resolve) => {resolve(viewPlugin)});
 }

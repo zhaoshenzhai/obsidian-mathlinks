@@ -1,7 +1,7 @@
 (text::[[Main]])
-(text::[[Main|$\int$]])
+(text::[[Main|$\alpha$]])
 [text::[[Main]]]
-[text::[[Main|$\int$]]]
+[text::[[Main|$\alpha$]]]
 
 ```dataview
 LIST WITHOUT ID link(file.path, "test") FROM "Notes"
