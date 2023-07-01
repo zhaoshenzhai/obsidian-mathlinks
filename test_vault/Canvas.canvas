@@ -1,8 +1,8 @@
 {
 	"nodes":[
-		{"id":"72af7f7e6ad41a84","x":-60,"y":-81,"width":220,"height":186,"type":"file","file":"Notes/Standard.md"},
-		{"id":"c044907c53c1e23e","x":180,"y":-81,"width":220,"height":186,"type":"file","file":"Dataview.md"},
-		{"id":"764b6fe364dd2a1b","x":420,"y":-81,"width":140,"height":186,"type":"file","file":"Lists.md"}
+		{"type":"file","file":"Notes/Dataview.md","id":"c044907c53c1e23e","x":180,"y":-81,"width":260,"height":186},
+		{"type":"file","file":"Notes/Normal Links.md","id":"72af7f7e6ad41a84","x":180,"y":-300,"width":260,"height":186},
+		{"type":"file","file":"Notes/Formats.md","id":"764b6fe364dd2a1b","x":180,"y":140,"width":260,"height":186}
 	],
 	"edges":[]
 }
