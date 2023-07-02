@@ -1,37 +1,46 @@
 import { TFile, renderMath, finishRenderMath } from "obsidian";
 
-    export function generateMathLinks(plugin: MathLinks, element: HTMLElement): Promise<void> {
-        for (let outLinkEl of element.querySelectorAll(".internal-link")) {
-            let outLinkText = outLinkEl.textContent.trim();
-            let outLinkHTML = outLinkEl.innerHTML;
-            let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, "")).replace(/\.md$/, "");
+export function generateMathLinks(plugin: MathLinks, element: HTMLElement): Promise<void> {
+    for (let outLinkEl of element.querySelectorAll(".internal-link")) {
+        let outLinkText = outLinkEl.textContent.trim();
+        let outLinkHTML = outLinkEl.innerHTML;
+        let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, "")).replace(/\.md$/, "");
 
-            if (outLinkText != outLinkFileName && outLinkText != "" && outLinkHTML == outLinkText) {
-                outLinkEl = replaceWithMathLink(outLinkEl, outLinkText);
-            } else {
-                let outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
-                let outLinkMathLink = getMathLink(plugin, outLinkFile);
-                if (outLinkMathLink) {
-                    if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename) {
-                        outLinkEl = replaceWithMathLink(outLinkEl, outLinkMathLink);
-                    }
+        if (outLinkText != outLinkFileName && outLinkText != "" && outLinkHTML == outLinkText) {
+            outLinkEl = replaceWithMathLink(outLinkEl, outLinkText);
+        } else {
+            let outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
+            let outLinkMathLink = getMathLink(plugin, outLinkFile);
+            if (outLinkMathLink) {
+                if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename) {
+                    outLinkEl = replaceWithMathLink(outLinkEl, outLinkMathLink);
                 }
             }
         }
-
-        return new Promise ((resolve) => {resolve()});
     }
 
-export function getMathLink(plugin: MathLinks, file: TFile): string {
-    if (!file)
-        return undefined;
+    return new Promise ((resolve) => {resolve()});
+}
 
-    let mathLink = plugin.app.metadataCache.getFileCache(file)?.frontmatter?.mathLink;
+export function isValid(plugin: MathLinks, element: HTMLElement, fileName: string): boolean {
+    while(element.parentNode && element.parentNode.nodeName.toLowerCase() != "body") {
+        element = element.parentNode;
+        if (element.className.toLowerCase().includes("canvas")) {
+            return true;
+        }
+    }
 
-    if (mathLink == "auto")
-        mathLink = generateMathLinkFromAuto(plugin, plugin.settings, file);
+    for (let i = 0; i < plugin.settings.excludedFilePaths.length; i++) {
+        let path = plugin.settings.excludedFilePaths[i];
+        if (path.isFile && fileName == path.path) {
+            return false;
+        } else if (!path.isFile) {
+            let pathRegex = new RegExp(`\\b${path.path}/`);
+            if (pathRegex.test(fileName)) return false;
+        }
+    }
 
-    return mathLink;
+    return true;
 }
 
 export function replaceWithMathLink(element: HTMLElement, mathLink: string): HTMLElement {
@@ -73,23 +82,16 @@ export function replaceWithMathLink(element: HTMLElement, mathLink: string): HTM
     return element;
 }
 
-export function isValid(plugin: MathLinks, settings: MathLinksSettings, element: HTMLElement, fileName: string): boolean {
-    while(element.parentNode && element.parentNode.nodeName.toLowerCase() != "body") {
-        element = element.parentNode;
-        if (element.className.toLowerCase().includes("canvas")) {
-            return true;
-        }
-    }
+export function getMathLink(plugin: MathLinks, file: TFile): string {
+    if (!file)
+        return undefined;
 
-    let file = plugin.app.vault.getAbstractFileByPath(fileName);
-    if (!(file instanceof TFile)) {
-        return false;
-    }
-    else if (isExcluded(file, settings.excludedFilePaths)) {
-        return false;
-    }
+    let mathLink = plugin.app.metadataCache.getFileCache(file)?.frontmatter?.mathLink;
 
-    return true;
+    if (mathLink == "auto")
+        mathLink = generateMathLinkFromAuto(plugin, plugin.settings, file);
+
+    return mathLink;
 }
 
 function generateMathLinkFromAuto(plugin: MathLinks, settings: MathLinksSettings, file: Tfile): string {
@@ -114,17 +116,4 @@ function generateMathLinkFromAuto(plugin: MathLinks, settings: MathLinksSettings
     }
 
     return mathLink;
-}
-
-function isExcluded(file: TFile, excludedFilePaths: string[]): boolean {
-    for (let i = 0; i < excludedFilePaths.length; i++) {
-        let path = excludedFilePaths[i];
-        if (path.isFile && file.path == path.path) {
-            return true;
-        } else if (!path.isFile) {
-            let pathRegex = new RegExp(`\\b${path.path}/`);
-            if (pathRegex.test(file.path)) return true;
-        }
-    }
-    return false;
 }

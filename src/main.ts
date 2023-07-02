@@ -2,16 +2,16 @@ import { App, Plugin, TFile, loadMathJax } from "obsidian";
 import { generateMathLinks, isValid } from "./tools";
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { buildLivePreview } from "./preview";
+import { Input } from "./input"
 
 export default class MathLinks extends Plugin {
     async onload() {
-        await this.loadSettings();
         await loadMathJax();
-        this.addSettingTab(new MathLinksSettingTab(this.app, this));
-        const settings = this.settings;
+        await Input.init();
+        await this.loadSettings();
 
         this.registerMarkdownPostProcessor(async (element, context) => {
-            if (isValid(this, settings, context.containerEl, context.sourcePath)) {
+            if (isValid(this, context.containerEl, context.sourcePath)) {
                 generateMathLinks(this, context.containerEl).then((result) => {
                     generateMathLinks(this, element);
                 });
@@ -19,22 +19,27 @@ export default class MathLinks extends Plugin {
         });
 
         this.app.workspace.onLayoutReady(()=> {
-            this.app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
-                buildLivePreview(this, leaf).then((livePreview) => {
-                    this.registerEditorExtension(livePreview);
-                });
+            this.app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
+                if (leaf.view.file && isValid(this, leaf.containerEl, leaf.view.file.path)) {
+                    buildLivePreview(this, leaf).then((livePreview) => {
+                        this.registerEditorExtension(livePreview);
+                    });
+                }
             });
         });
 
         this.app.workspace.on("active-leaf-change", (leaf: WorkspaceLeaf) => {
-            buildLivePreview(this, leaf).then((livePreview) => {
-                this.registerEditorExtension(livePreview);
-            });
+            if (leaf.view.file && isValid(this, leaf.containerEl, leaf.view.file.path)) {
+                buildLivePreview(this, leaf).then((livePreview) => {
+                    this.registerEditorExtension(livePreview);
+                });
+            }
         });
     }
 
     async loadSettings() {
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+        this.addSettingTab(new MathLinksSettingTab(this.app, this));
     }
 
     async saveSettings() {

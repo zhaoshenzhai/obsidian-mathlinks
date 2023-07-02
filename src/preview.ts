@@ -2,13 +2,13 @@ import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType } from "@codemirror/view";
 import { getMathLink, replaceWithMathLink } from "./tools"
+import { Input } from "./input"
 
-export function buildLivePreview(plugin: Plugin, leaf: WorkspaceLeaf): Promise<ViewPlugin>
+export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin>
 {
     class MathWidget extends WidgetType {
         outLinkFileName: string;
         outLinkMathLink: string;
-        ctrlKeyDown: boolean = false;
 
         constructor(outLinkFileName: string, outLinkMathLink: string) {
             super();
@@ -25,20 +25,8 @@ export function buildLivePreview(plugin: Plugin, leaf: WorkspaceLeaf): Promise<V
             spanOuter.classList.add("cm-hmd-internal-link");
             spanOuter.appendChild(mathLink);
 
-            plugin.registerDomEvent(leaf.containerEl, "keydown", (evt: KeyboardEvent) => {
-                if (evt.key == "Control") {
-                    this.ctrlKeyDown = true;
-                }
-            });
-
-            plugin.registerDomEvent(leaf.containerEl, "keyup", (evt: KeyboardEvent) => {
-                if (evt.key == "Control") {
-                    this.ctrlKeyDown = false;
-                }
-            });
-
             spanOuter.onclick = (() => {
-                plugin.app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName, this.ctrlKeyDown);
+                plugin.app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName, Input.ctrlKey);
             });
 
             return spanOuter;
@@ -58,6 +46,7 @@ export function buildLivePreview(plugin: Plugin, leaf: WorkspaceLeaf): Promise<V
             }
 
             tryBuildingDecorations(view: EditorView) {
+                this.decorations = this.buildDecorations(view);
                 let editorView = leaf.getViewState();
 
                 if (leaf.view.editor) {
@@ -67,10 +56,23 @@ export function buildLivePreview(plugin: Plugin, leaf: WorkspaceLeaf): Promise<V
                     } else {
                         this.decorations = this.destroyDecorations(view);
                     }
-                } else {
+                } else if (leaf.view.canvas) {
                     this.decorations = this.buildDecorations(view);
 
-                    plugin.app.workspace.iterateAllLeaves((otherLeaf: WorkspaceLeaf) => {
+                    let nodes = [...(leaf.view.canvas.nodes).values()];
+                    for (let i = 0; i < nodes.length; i++) {
+                        let canvasFrame = nodes[i].nodeEl.querySelector(".embed-iframe");
+                        if (canvasFrame && canvasFrame.contentDocument.querySelector(".cm-editor")) {
+                            let element = canvasFrame.contentDocument.querySelector(".cm-editor");
+                            if (!element.getAttribute("ctrlListener")) {
+                                element.setAttribute("ctrlListener", true);
+                                Input.addCtrlListener(element);
+                                break;
+                            }
+                        }
+                    }
+
+                    plugin.app.workspace.iterateRootLeaves((otherLeaf: WorkspaceLeaf) => {
                         if (otherLeaf.view.editor) {
                             let otherView = otherLeaf.view.editor.cm as EditorView;
                             if (otherView == view) {
