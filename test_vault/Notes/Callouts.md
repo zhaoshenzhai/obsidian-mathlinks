@@ -5,3 +5,4 @@
 > [$\beta$](Main.md)
 > (text::[[Main]])
 > (text::[[Main|$\alpha$]])
+> [text::[[Main|$\alpha$]]]

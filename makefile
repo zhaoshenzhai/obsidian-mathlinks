@@ -5,4 +5,5 @@ mathlinks: main.js manifest.json
 	cp manifest.json test_vault/.obsidian/plugins/mathlinks/manifest.json
 
 main.js: src
+	cd src
 	npm run dev

@@ -26,7 +26,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
             spanOuter.appendChild(mathLink);
 
             spanOuter.onclick = (() => {
-                plugin.app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName, Input.ctrlKey || Input.mouseMiddle);
+                plugin.app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName, Input.ctrlKey);
             });
 
             return spanOuter;
@@ -67,11 +67,6 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                             if (!element.getAttribute("ctrlListener")) {
                                 element.setAttribute("ctrlListener", true);
                                 Input.addCtrlListener(element);
-                                break;
-                            }
-                            if (!element.getAttribute("mouseMiddleListener")) {
-                                element.setAttribute("mouseMiddleListener", true);
-                                Input.addMouseMiddleListener(element);
                                 break;
                             }
                         }
