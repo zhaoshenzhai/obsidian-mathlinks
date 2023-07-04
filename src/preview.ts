@@ -26,7 +26,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
 
             spanOuter.onclick = ((evt: MouseEvent) => {
                 evt.preventDefault();
-                plugin.app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName, evt.ctrlKey);
+                plugin.app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName, evt.ctrlKey || evt.metaKey);
             });
 
             spanOuter.onauxclick = ((evt: MouseEvent) => {
