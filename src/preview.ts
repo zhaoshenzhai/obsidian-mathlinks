@@ -29,8 +29,13 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                 plugin.app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName, evt.ctrlKey || evt.metaKey);
             });
 
+            spanOuter.onmousedown = ((evt: MouseEvent) => {
+                if (evt.button == 1) {
+                    evt.preventDefault();
+                }
+            });
+
             spanOuter.onauxclick = ((evt: MouseEvent) => {
-                evt.preventDefault();
                 if (evt.button == 1) {
                     plugin.app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName, true);
                 }
