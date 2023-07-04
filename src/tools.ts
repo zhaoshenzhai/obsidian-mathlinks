@@ -2,18 +2,27 @@ import { TFile, renderMath, finishRenderMath } from "obsidian";
 
 export function generateMathLinks(plugin: MathLinks, element: HTMLElement): Promise<void> {
     for (let outLinkEl of element.querySelectorAll(".internal-link")) {
+        if (outLinkEl.classList.contains("mathLink-internal-link")) {
+            outLinkEl.remove();
+            outLinkEl = element.querySelector(".original-internal-link");
+            outLinkEl.classList.remove("original-internal-link");
+            outLinkEl.style.display = "";
+        }
+
         let outLinkText = outLinkEl.textContent.trim();
         let outLinkHTML = outLinkEl.innerHTML;
         let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, "")).replace(/\.md$/, "");
+        let outLinkBaseName = outLinkFileName.replace(/^.*[\\\/]/, '');
 
-        if (outLinkText != outLinkFileName && outLinkText != "" && outLinkHTML == outLinkText) {
-            outLinkEl = replaceWithMathLink(outLinkEl, outLinkText);
+        let mathLinkEl;
+        if (outLinkText != outLinkFileName && outLinkText != outLinkBaseName && outLinkText != "" && outLinkHTML == outLinkText) {
+            addMathLink(outLinkEl, outLinkText, true);
         } else {
             let outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
             let outLinkMathLink = getMathLink(plugin, outLinkFile);
             if (outLinkMathLink) {
                 if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename) {
-                    outLinkEl = replaceWithMathLink(outLinkEl, outLinkMathLink);
+                    addMathLink(outLinkEl, outLinkMathLink, true);
                 }
             }
         }
@@ -43,7 +52,7 @@ export function isValid(plugin: MathLinks, element: HTMLElement, fileName: strin
     return true;
 }
 
-export function replaceWithMathLink(element: HTMLElement, mathLink: string): HTMLElement {
+export function addMathLink(outLinkEl: HTMLElement, mathLink: string, newElement: boolean): HTMLElement {
     let splits: [string, boolean][] = [];
 
     let split = "";
@@ -65,21 +74,29 @@ export function replaceWithMathLink(element: HTMLElement, mathLink: string): HTM
         }
     }
 
-    element.innerText = "";
+    let mathLinkEl = outLinkEl.cloneNode(newElement);
+    mathLinkEl.innerText = "";
     for (let i = 0; i < splits.length; i++) {
         let word = splits[i][0];
         if (splits[i][1]) {
             let wordMath = renderMath(word, false);
-            let mathEl = element.createSpan();
+            let mathEl = mathLinkEl.createSpan();
             mathEl.replaceWith(wordMath);
         } else {
-            let wordEl = element.createSpan();
+            let wordEl = mathLinkEl.createSpan();
             wordEl.innerText += word;
         }
     }
 
     finishRenderMath();
-    return element;
+    if (newElement) {
+        outLinkEl.parentNode.insertBefore(mathLinkEl, outLinkEl.nextSibling);
+        mathLinkEl.classList.add("mathLink-internal-link");
+        outLinkEl.classList.add("original-internal-link");
+        outLinkEl.style.display = "none";
+    }
+
+    return mathLinkEl;
 }
 
 export function getMathLink(plugin: MathLinks, file: TFile): string {
