@@ -58,7 +58,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
             }
 
             tryBuildingDecorations(view: EditorView) {
-                this.decorations = this.buildDecorations(view);
+                this.decorations = this.destroyDecorations(view);
                 let editorView = leaf.getViewState();
 
                 if (leaf.view.editor) {
