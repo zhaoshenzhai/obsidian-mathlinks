@@ -100,36 +100,30 @@ export function addMathLink(outLinkEl: HTMLElement, mathLink: string, newElement
 }
 
 export function getMathLink(plugin: MathLinks, file: TFile): string {
-    if (!file)
-        return undefined;
+    if (!file) return undefined;
 
     let mathLink = plugin.app.metadataCache.getFileCache(file)?.frontmatter?.mathLink;
 
-    if (mathLink == "auto")
-        mathLink = generateMathLinkFromAuto(plugin, plugin.settings, file);
+    if (mathLink == "auto") {
+        let templates = plugin.settings.templates;
+        mathLink = file.name.replace("\.md", "");
+        for (let i = 0; i < templates.length; i++) {
+            let replaced = new RegExp(templates[i].replaced);
+            let replacement = templates[i].replacement;
 
-    return mathLink;
-}
+            let flags = "";
+            if (templates[i].globalMatch)
+                flags += "g";
+            if (!templates[i].sensitive)
+                flags += "i";
 
-function generateMathLinkFromAuto(plugin: MathLinks, settings: MathLinksSettings, file: Tfile): string {
-    let templates = plugin.settings.templates;
-    let mathLink = file.name.replace("\.md", "");
-    for (let i = 0; i < templates.length; i++) {
-        let replaced = new RegExp(templates[i].replaced);
-        let replacement = templates[i].replacement;
+            if (templates[i].word)
+                replaced = RegExp(replaced.source.replace(/^/, "\\b").replace(/$/, "\\b"), flags);
+            else
+                replaced = RegExp(replaced.source, flags);
 
-        let flags = "";
-        if (templates[i].globalMatch)
-            flags += "g";
-        if (!templates[i].sensitive)
-            flags += "i";
-
-        if (templates[i].word)
-            replaced = RegExp(replaced.source.replace(/^/, "\\b").replace(/$/, "\\b"), flags);
-        else
-            replaced = RegExp(replaced.source, flags);
-
-        mathLink = mathLink.replace(replaced, replacement);
+            mathLink = mathLink.replace(replaced, replacement);
+        }
     }
 
     return mathLink;

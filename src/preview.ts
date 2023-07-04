@@ -2,7 +2,6 @@ import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType } from "@codemirror/view";
 import { getMathLink, addMathLink } from "./tools"
-import { Input } from "./input"
 
 export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin>
 {
@@ -25,8 +24,16 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
             spanOuter.classList.add("cm-hmd-internal-link");
             spanOuter.appendChild(mathLink);
 
-            spanOuter.onclick = (() => {
-                plugin.app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName, Input.ctrlKey);
+            spanOuter.onclick = ((evt: MouseEvent) => {
+                evt.preventDefault();
+                plugin.app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName, evt.ctrlKey || evt.metaKey);
+            });
+
+            spanOuter.onauxclick = ((evt: MouseEvent) => {
+                evt.preventDefault();
+                if (evt.button == 1) {
+                    plugin.app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName, true);
+                }
             });
 
             return spanOuter;
@@ -58,19 +65,6 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                     }
                 } else if (leaf.view.canvas) {
                     this.decorations = this.buildDecorations(view);
-
-                    let nodes = [...(leaf.view.canvas.nodes).values()];
-                    for (let i = 0; i < nodes.length; i++) {
-                        let canvasFrame = nodes[i].nodeEl.querySelector(".embed-iframe");
-                        if (canvasFrame && canvasFrame.contentDocument.querySelector(".cm-editor")) {
-                            let element = canvasFrame.contentDocument.querySelector(".cm-editor");
-                            if (!element.getAttribute("ctrlListener")) {
-                                element.setAttribute("ctrlListener", true);
-                                Input.addCtrlListener(element);
-                                break;
-                            }
-                        }
-                    }
 
                     plugin.app.workspace.iterateRootLeaves((otherLeaf: WorkspaceLeaf) => {
                         if (otherLeaf.view.editor) {

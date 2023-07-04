@@ -2,12 +2,10 @@ import { App, Plugin, TFile, loadMathJax } from "obsidian";
 import { generateMathLinks, isValid } from "./tools";
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { buildLivePreview } from "./preview";
-import { Input } from "./input"
 
 export default class MathLinks extends Plugin {
     async onload() {
         await loadMathJax();
-        await Input.init();
         await this.loadSettings();
 
         this.registerMarkdownPostProcessor(async (element, context) => {
