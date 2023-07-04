@@ -1,7 +1,7 @@
 import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType } from "@codemirror/view";
-import { getMathLink, replaceWithMathLink } from "./tools"
+import { getMathLink, addMathLink } from "./tools"
 
 export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin>
 {
@@ -16,7 +16,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
         }
 
         toDOM() {
-            let mathLink = replaceWithMathLink(document.createElement("span"), this.outLinkMathLink);
+            let mathLink = addMathLink(document.createElement("span"), this.outLinkMathLink, false);
             mathLink.classList.add("cm-underline");
             mathLink.setAttribute("draggable", true);
 
