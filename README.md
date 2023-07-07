@@ -44,7 +44,8 @@ Each template has the following options, which can be configured when the templa
 
 ### Excluded Files
 MathLinks will ignore those files. If `path` is entered, all files under `path` will be ignored.
-* Note that `path` must be relative to the vault directory.
+> **Note**:
+> `path` must be relative to the vault directory.
 
 ## Changelog
 ### 0.3.x: _Merged with [obsidian-mathjax-wikilinks](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks)._
