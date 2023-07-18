@@ -49,6 +49,7 @@ MathLinks will ignore those files. If `path` is entered, all files under `path` 
 
 ## Changelog
 ### 0.3.x: _Merged with [obsidian-mathjax-wikilinks](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks)._
+* 0.3.5: [#24](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/24): Fixed creating new notes when anchor links are pressed.
 * 0.3.4: [#17](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/17), [#18](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/18), [#19](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/19), [#20](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/20): Fixed opening notes in new tab (`cmd` key and mouse); proper Dataview rendering in callouts.
 * 0.3.3: [#16](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/16): Open links in new tab when `ctrl` is held.
 * 0.3.2: [#12](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/12), [#15](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/15): Fixed `mathLinks` in live-preview, which should now render in most markdown elements. Made the `ViewPlugin` operate independently from each leaf, which now allows for multiple instances of the same file to be opened and rendered differently (live-preview vs. source).
