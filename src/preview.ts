@@ -6,12 +6,12 @@ import { getMathLink, addMathLink } from "./tools"
 export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin>
 {
     class MathWidget extends WidgetType {
-        outLinkFileName: string;
+        outLinkText: string;
         outLinkMathLink: string;
 
-        constructor(outLinkFileName: string, outLinkMathLink: string) {
+        constructor(outLinkText: string, outLinkMathLink: string) {
             super();
-            this.outLinkFileName = outLinkFileName;
+            this.outLinkText = outLinkText;
             this.outLinkMathLink = outLinkMathLink;
         }
 
@@ -24,9 +24,20 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
             spanOuter.classList.add("cm-hmd-internal-link");
             spanOuter.appendChild(mathLink);
 
+            let outLinkFileName = this.outLinkText.replace(/#.*$/, "");
+            if (!outLinkFileName) {
+                outLinkFileName = leaf.view.file.path;
+                if (outLinkFileName == "Canvas.canvas") {
+                    for (let node of leaf.view.canvas.selection.values()) {
+                        outLinkFileName = node.filePath;
+                        break;
+                    }
+                }
+            }
+
             spanOuter.onclick = ((evt: MouseEvent) => {
                 evt.preventDefault();
-                plugin.app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName, evt.ctrlKey || evt.metaKey);
+                plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, evt.ctrlKey || evt.metaKey);
             });
 
             spanOuter.onmousedown = ((evt: MouseEvent) => {
@@ -37,7 +48,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
 
             spanOuter.onauxclick = ((evt: MouseEvent) => {
                 if (evt.button == 1) {
-                    plugin.app.workspace.openLinkText(this.outLinkFileName, this.outLinkFileName, true);
+                    plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, true);
                 }
             });
 
@@ -86,7 +97,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                 let builder = new RangeSetBuilder<Decoration>();
 
                 for (let { from, to } of view.visibleRanges) {
-                    let start = -1, end = -1, outLinkFileName = "", outLinkMathLink = "";
+                    let start = -1, end = -1, outLinkText = "", outLinkMathLink = "";
 
                     syntaxTree(view.state).iterate({
                         from,
@@ -105,18 +116,18 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
 
                             // Alias: File name
                             else if (name.contains("has-alias")) {
-                                outLinkFileName = view.state.doc.sliceString(node.from, node.to);
+                                outLinkText = view.state.doc.sliceString(node.from, node.to);
                             }
 
                             // Alias: File name (with decoding)
                             else if (/string_url$/.test(name) && !name.contains("format")) {
-                                outLinkFileName = decodeURI(view.state.doc.sliceString(node.from, node.to));
+                                outLinkText = decodeURI(view.state.doc.sliceString(node.from, node.to));
                             }
 
                             // No alias
                             else if (name.contains("hmd-internal-link") && !name.contains("alias")) {
-                                outLinkFileName = view.state.doc.sliceString(node.from, node.to);
-                                outLinkMathLink = getMathLink(plugin, plugin.app.metadataCache.getFirstLinkpathDest(outLinkFileName, ""));
+                                outLinkText = view.state.doc.sliceString(node.from, node.to);
+                                outLinkMathLink = getMathLink(plugin, plugin.app.metadataCache.getFirstLinkpathDest(outLinkText, ""));
                             }
 
                             // End
@@ -128,19 +139,19 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
 
                                     let cursorRange = view.state.selection.ranges[0];
                                     if (start > cursorRange.to || end < cursorRange.from) {
-                                        if (outLinkFileName && outLinkMathLink) {
+                                        if (outLinkText && outLinkMathLink) {
                                             builder.add(
                                                 start,
                                                 end,
                                                 Decoration.widget({
-                                                    widget: new MathWidget(outLinkFileName, outLinkMathLink.replace(/\\\$/, "$")),
+                                                    widget: new MathWidget(outLinkText, outLinkMathLink.replace(/\\\$/, "$")),
                                                 })
                                             );
                                         }
                                     }
                                     start = -1;
                                     end = -1;
-                                    outLinkFileName = "";
+                                    outLinkText = "";
                                     outLinkMathLink = "";
                                 }
                             }

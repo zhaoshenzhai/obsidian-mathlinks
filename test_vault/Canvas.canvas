@@ -2,7 +2,8 @@
 	"nodes":[
 		{"type":"file","file":"Notes/Dataview.md","id":"c044907c53c1e23e","x":180,"y":-81,"width":260,"height":186},
 		{"type":"file","file":"Notes/Normal Links.md","id":"72af7f7e6ad41a84","x":180,"y":-300,"width":260,"height":186},
-		{"type":"file","file":"Notes/Formats.md","id":"764b6fe364dd2a1b","x":180,"y":140,"width":260,"height":186}
+		{"type":"file","file":"Notes/Formats.md","id":"764b6fe364dd2a1b","x":180,"y":140,"width":260,"height":186},
+		{"type":"file","file":"Notes/Sections.md","id":"65048c12dd12e209","x":180,"y":360,"width":260,"height":360}
 	],
 	"edges":[]
 }
