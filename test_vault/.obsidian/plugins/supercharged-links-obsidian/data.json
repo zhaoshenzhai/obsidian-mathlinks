@@ -1,0 +1,64 @@
+{
+  "targetAttributes": [
+    "supercharged"
+  ],
+  "targetTags": true,
+  "getFromInlineField": true,
+  "enableTabHeader": true,
+  "activateSnippet": true,
+  "enableEditor": true,
+  "enableFileList": true,
+  "enableBacklinks": true,
+  "enableQuickSwitcher": true,
+  "enableSuggestor": true,
+  "selectors": [
+    {
+      "type": "attribute",
+      "name": "supercharged",
+      "value": "test",
+      "matchCaseSensitive": false,
+      "match": "exact",
+      "uid": "37e5-0ad0",
+      "selectText": true,
+      "selectAppend": true,
+      "selectPrepend": true,
+      "selectBackground": true
+    },
+    {
+      "type": "path",
+      "name": "supercharged",
+      "value": "Notes/Main.md",
+      "matchCaseSensitive": false,
+      "match": "exact",
+      "uid": "da0c-9f34",
+      "selectText": true,
+      "selectAppend": true,
+      "selectPrepend": true,
+      "selectBackground": true
+    },
+    {
+      "type": "tag",
+      "name": "supercharged",
+      "value": "supercharged",
+      "matchCaseSensitive": false,
+      "match": "exact",
+      "uid": "6379-38da",
+      "selectText": true,
+      "selectAppend": true,
+      "selectPrepend": true,
+      "selectBackground": true
+    },
+    {
+      "type": "tag",
+      "name": "supercharged",
+      "value": "supercharged2",
+      "matchCaseSensitive": false,
+      "match": "exact",
+      "uid": "8fec-4259",
+      "selectText": true,
+      "selectAppend": true,
+      "selectPrepend": true,
+      "selectBackground": true
+    }
+  ]
+}

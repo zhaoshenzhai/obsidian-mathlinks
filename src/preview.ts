@@ -7,11 +7,15 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
 {
     class MathWidget extends WidgetType {
         outLinkText: string;
+        outLinkFile: TFile;
+        outLinkFileName: string;
         outLinkMathLink: string;
 
-        constructor(outLinkText: string, outLinkMathLink: string) {
+        constructor(outLinkText: string, outLinkFile: TFile, outLinkFileName: string, outLinkMathLink: string) {
             super();
             this.outLinkText = outLinkText;
+            this.outLinkFile = outLinkFile,
+            this.outLinkFileName = outLinkFileName;
             this.outLinkMathLink = outLinkMathLink;
         }
 
@@ -20,16 +24,30 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
             mathLink.classList.add("cm-underline");
             mathLink.setAttribute("draggable", true);
 
+            let spanInner = document.createElement("span");
+            spanInner.setAttribute("data-link-supercharged", "test");
+            spanInner.setAttribute("data-link-tags", "supercharged supercharged2");
+            spanInner.setAttribute("data-link-path", this.outLinkFileName);
+            spanInner.classList.add("data-link-icon");
+            spanInner.appendChild(mathLink);
+
             let spanOuter = document.createElement("span");
             spanOuter.classList.add("cm-hmd-internal-link");
-            spanOuter.appendChild(mathLink);
+            spanOuter.appendChild(spanInner);
 
-            let outLinkFileName = this.outLinkText.replace(/#.*$/, "");
-            if (!outLinkFileName) {
-                outLinkFileName = leaf.view.file.path;
-                if (outLinkFileName == "Canvas.canvas") {
+            console.log("==== START ====");
+            console.log(this.outLinkText);
+            console.log(this.outLinkFile);
+            console.log(this.outLinkFileName);
+            console.log(this.outLinkMathLink);
+            console.log(spanOuter);
+            console.log("====  END  ====\n\n\n\n");
+
+            if (!this.outLinkText.replace(/#.*$/, "")) {
+                this.outLinkFileName = leaf.view.file.path;
+                if (this.outLinkFileName == "Canvas.canvas") {
                     for (let node of leaf.view.canvas.selection.values()) {
-                        outLinkFileName = node.filePath;
+                        this.outLinkFileName = node.filePath;
                         break;
                     }
                 }
@@ -37,7 +55,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
 
             spanOuter.onclick = ((evt: MouseEvent) => {
                 evt.preventDefault();
-                plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, evt.ctrlKey || evt.metaKey);
+                plugin.app.workspace.openLinkText(this.outLinkText, this.outLinkFileName, evt.ctrlKey || evt.metaKey);
             });
 
             spanOuter.onmousedown = ((evt: MouseEvent) => {
@@ -48,7 +66,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
 
             spanOuter.onauxclick = ((evt: MouseEvent) => {
                 if (evt.button == 1) {
-                    plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, true);
+                    plugin.app.workspace.openLinkText(this.outLinkText, this.outLinkFileName, true);
                 }
             });
 
@@ -97,7 +115,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                 let builder = new RangeSetBuilder<Decoration>();
 
                 for (let { from, to } of view.visibleRanges) {
-                    let start = -1, end = -1, outLinkText = "", outLinkMathLink = "";
+                    let start = -1, end = -1, outLinkText = "", outLinkFile = null, outLinkMathLink = "";
 
                     syntaxTree(view.state).iterate({
                         from,
@@ -117,17 +135,23 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                             // Alias: File name
                             else if (name.contains("has-alias")) {
                                 outLinkText = view.state.doc.sliceString(node.from, node.to);
+                                outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(outLinkText.replace(/#.*$/, ""), "");
                             }
 
                             // Alias: File name (with decoding)
                             else if (/string_url$/.test(name) && !name.contains("format")) {
                                 outLinkText = decodeURI(view.state.doc.sliceString(node.from, node.to));
+                                outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(outLinkText.replace(/#.*$/, ""), "");
                             }
 
                             // No alias
                             else if (name.contains("hmd-internal-link") && !name.contains("alias")) {
                                 outLinkText = view.state.doc.sliceString(node.from, node.to);
-                                outLinkMathLink = getMathLink(plugin, plugin.app.metadataCache.getFirstLinkpathDest(outLinkText, ""));
+                                outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(outLinkText.replace(/#.*$/, ""), "");
+                                outLinkMathLink = getMathLink(plugin, outLinkFile);
+                                if (outLinkText.replace(/#.*$/, "") != outLinkText) {
+                                    outLinkMathLink += outLinkText.replace(/^.*#/, "#")
+                                }
                             }
 
                             // End
@@ -144,7 +168,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                                                 start,
                                                 end,
                                                 Decoration.widget({
-                                                    widget: new MathWidget(outLinkText, outLinkMathLink.replace(/\\\$/, "$")),
+                                                    widget: new MathWidget(outLinkText, outLinkFile, outLinkFile.path, outLinkMathLink.replace(/\\\$/, "$")),
                                                 })
                                             );
                                         }
@@ -152,6 +176,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                                     start = -1;
                                     end = -1;
                                     outLinkText = "";
+                                    outLinkFile = null;
                                     outLinkMathLink = "";
                                 }
                             }
