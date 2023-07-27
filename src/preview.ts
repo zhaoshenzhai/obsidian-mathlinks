@@ -18,7 +18,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
         }
 
         toDOM() {
-            let mathLink = addMathLink(document.createElement("span"), this.outLinkMathLink, false);
+            let mathLink = addMathLink(document.createElement("span"), this.outLinkMathLink, false, "");
             mathLink.classList.add("cm-underline");
             mathLink.setAttribute("draggable", true);
 

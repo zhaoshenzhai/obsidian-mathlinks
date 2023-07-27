@@ -10,19 +10,30 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement): Prom
         }
 
         let outLinkText = outLinkEl.textContent.trim();
-        let outLinkHTML = outLinkEl.innerHTML;
+        let outLinkHTML = outLinkEl.innerHTML.replace(/ &gt; /, " > ");
         let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, "")).replace(/\.md$/, "");
         let outLinkBaseName = outLinkFileName.replace(/^.*[\\\/]/, '');
+        let outLinkInnerText = outLinkEl.innerText;
+        let outLinkAppend = "";
+
+        if (outLinkText.includes(" > ") && outLinkFileName.includes("#")) {
+            outLinkAppend = outLinkText.substring(outLinkText.lastIndexOf(" > "), outLinkText.length);
+            outLinkText = outLinkText.substring(0, outLinkText.lastIndexOf(" > "));
+            outLinkHTML = outLinkHTML.substring(0, outLinkHTML.lastIndexOf(" > "));
+            outLinkFileName = outLinkFileName.replace(/#.*$/, "");
+            outLinkBaseName = outLinkBaseName.replace(/#.*$/, "");
+            outLinkInnerText = outLinkInnerText.substring(0, outLinkInnerText.lastIndexOf(" > "));
+        }
 
         let mathLinkEl;
         if (outLinkText != outLinkFileName && outLinkText != outLinkBaseName && outLinkText != "" && outLinkHTML == outLinkText) {
-            addMathLink(outLinkEl, outLinkText, true);
+            addMathLink(outLinkEl, outLinkText, true, outLinkAppend);
         } else {
             let outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
             let outLinkMathLink = getMathLink(plugin, outLinkFile);
             if (outLinkMathLink) {
-                if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename) {
-                    addMathLink(outLinkEl, outLinkMathLink, true);
+                if (outLinkInnerText == outLinkFileName || outLinkInnerText == outLinkFile.basename) {
+                    addMathLink(outLinkEl, outLinkMathLink, true, outLinkAppend);
                 }
             }
         }
@@ -52,7 +63,7 @@ export function isValid(plugin: MathLinks, element: HTMLElement, fileName: strin
     return true;
 }
 
-export function addMathLink(outLinkEl: HTMLElement, mathLink: string, newElement: boolean): HTMLElement {
+export function addMathLink(outLinkEl: HTMLElement, mathLink: string, newElement: boolean, append: string): HTMLElement {
     let splits: [string, boolean][] = [];
 
     let split = "";
@@ -86,6 +97,11 @@ export function addMathLink(outLinkEl: HTMLElement, mathLink: string, newElement
             let wordEl = mathLinkEl.createSpan();
             wordEl.innerText += word;
         }
+    }
+
+    if (append) {
+        let appendEl = mathLinkEl.createSpan();
+        appendEl.innerText = append;
     }
 
     finishRenderMath();
@@ -134,9 +150,11 @@ export function getSuperCharged(plugin: MathLinks, file: TFile): [string, [strin
 
     let tagArr = plugin.app.metadataCache.getFileCache(file).tags;
     let tags: string = "";
-    for (let i = 0; i < tagArr.length; i++)
-        tags += tagArr[i].tag.replace(/#/, "") + " ";
-    tags = tags.trimEnd();
+    if (tagArr) {
+        for (let i = 0; i < tagArr.length; i++)
+            tags += tagArr[i].tag.replace(/#/, "") + " ";
+        tags = tags.trimEnd();
+    }
 
     let frontmatter = plugin.app.metadataCache.getFileCache(file).frontmatter;
     let attributes: [string, string][] = [];
