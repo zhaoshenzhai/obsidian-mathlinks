@@ -128,3 +128,27 @@ export function getMathLink(plugin: MathLinks, file: TFile): string {
 
     return mathLink;
 }
+
+export function getSuperCharged(plugin: MathLinks, file: TFile): [string, [string, string][]] {
+    const data = app.plugins.getPlugin("supercharged-links-obsidian").settings;
+
+    let tagArr = plugin.app.metadataCache.getFileCache(file).tags;
+    let tags: string = "";
+    for (let i = 0; i < tagArr.length; i++)
+        tags += tagArr[i].tag.replace(/#/, "") + " ";
+    tags = tags.trimEnd();
+
+    let frontmatter = plugin.app.metadataCache.getFileCache(file).frontmatter;
+    let attributes: [string, string][] = [];
+    for (let attr in frontmatter) {
+        if (attr != "mathLink" && attr != "position") {
+            for (let i = 0; i < data.selectors.length; i++) {
+                if (data.selectors[i].name == attr && data.selectors[i].value == frontmatter[attr]) {
+                    attributes.push([attr, frontmatter[attr]]);
+                }
+            }
+        }
+    }
+
+    return [tags, attributes];
+}

@@ -1,6 +1,7 @@
 ---
 mathLink: $\sigma$
-supercharged: test
+attr: test
+attr2: test2
 ---
 
 #supercharged #supercharged2

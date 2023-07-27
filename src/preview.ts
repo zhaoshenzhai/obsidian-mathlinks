@@ -1,21 +1,19 @@
 import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType } from "@codemirror/view";
-import { getMathLink, addMathLink } from "./tools"
+import { getMathLink, addMathLink, getSuperCharged } from "./tools"
 
 export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin>
 {
     class MathWidget extends WidgetType {
         outLinkText: string;
         outLinkFile: TFile;
-        outLinkFileName: string;
         outLinkMathLink: string;
 
-        constructor(outLinkText: string, outLinkFile: TFile, outLinkFileName: string, outLinkMathLink: string) {
+        constructor(outLinkText: string, outLinkFile: TFile, outLinkMathLink: string) {
             super();
             this.outLinkText = outLinkText;
             this.outLinkFile = outLinkFile,
-            this.outLinkFileName = outLinkFileName;
             this.outLinkMathLink = outLinkMathLink;
         }
 
@@ -25,29 +23,26 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
             mathLink.setAttribute("draggable", true);
 
             let spanInner = document.createElement("span");
-            spanInner.setAttribute("data-link-supercharged", "test");
-            spanInner.setAttribute("data-link-tags", "supercharged supercharged2");
-            spanInner.setAttribute("data-link-path", this.outLinkFileName);
-            spanInner.classList.add("data-link-icon");
             spanInner.appendChild(mathLink);
+            if (this.outLinkFile) {
+                let superCharged = getSuperCharged(plugin, this.outLinkFile);
+                spanInner.classList.add("data-link-icon");
+                spanInner.setAttribute("data-link-path", this.outLinkFile.path);
+                spanInner.setAttribute("data-link-tags", superCharged[0]);
+                for (let i = 0; i < superCharged[1].length; i++)
+                    spanInner.setAttribute("data-link-" + superCharged[1][i][0], superCharged[1][i][1]);
+            }
 
             let spanOuter = document.createElement("span");
             spanOuter.classList.add("cm-hmd-internal-link");
             spanOuter.appendChild(spanInner);
 
-            console.log("==== START ====");
-            console.log(this.outLinkText);
-            console.log(this.outLinkFile);
-            console.log(this.outLinkFileName);
-            console.log(this.outLinkMathLink);
-            console.log(spanOuter);
-            console.log("====  END  ====\n\n\n\n");
-
-            if (!this.outLinkText.replace(/#.*$/, "")) {
-                this.outLinkFileName = leaf.view.file.path;
-                if (this.outLinkFileName == "Canvas.canvas") {
+            let outLinkFileName = this.outLinkText.replace(/#.*$/, "");
+            if (!outLinkFileName) {
+                outLinkFileName = leaf.view.file.path;
+                if (outLinkFileName == "Canvas.canvas") {
                     for (let node of leaf.view.canvas.selection.values()) {
-                        this.outLinkFileName = node.filePath;
+                        outLinkFileName = node.filePath;
                         break;
                     }
                 }
@@ -55,7 +50,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
 
             spanOuter.onclick = ((evt: MouseEvent) => {
                 evt.preventDefault();
-                plugin.app.workspace.openLinkText(this.outLinkText, this.outLinkFileName, evt.ctrlKey || evt.metaKey);
+                plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, evt.ctrlKey || evt.metaKey);
             });
 
             spanOuter.onmousedown = ((evt: MouseEvent) => {
@@ -66,7 +61,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
 
             spanOuter.onauxclick = ((evt: MouseEvent) => {
                 if (evt.button == 1) {
-                    plugin.app.workspace.openLinkText(this.outLinkText, this.outLinkFileName, true);
+                    plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, true);
                 }
             });
 
@@ -150,7 +145,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                                 outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(outLinkText.replace(/#.*$/, ""), "");
                                 outLinkMathLink = getMathLink(plugin, outLinkFile);
                                 if (outLinkText.replace(/#.*$/, "") != outLinkText) {
-                                    outLinkMathLink += outLinkText.replace(/^.*#/, "#")
+                                    outLinkMathLink += outLinkText.replace(/^.*#/, " > ")
                                 }
                             }
 
@@ -168,7 +163,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                                                 start,
                                                 end,
                                                 Decoration.widget({
-                                                    widget: new MathWidget(outLinkText, outLinkFile, outLinkFile.path, outLinkMathLink.replace(/\\\$/, "$")),
+                                                    widget: new MathWidget(outLinkText, outLinkFile, outLinkMathLink.replace(/\\\$/, "$")),
                                                 })
                                             );
                                         }

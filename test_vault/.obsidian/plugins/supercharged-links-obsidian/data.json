@@ -1,6 +1,7 @@
 {
   "targetAttributes": [
-    "supercharged"
+    "attr",
+    "attr2"
   ],
   "targetTags": true,
   "getFromInlineField": true,
@@ -13,12 +14,36 @@
   "enableSuggestor": true,
   "selectors": [
     {
+      "type": "tag",
+      "name": "attr",
+      "value": "supercharged2",
+      "matchCaseSensitive": false,
+      "match": "exact",
+      "uid": "ec8d-de85",
+      "selectText": true,
+      "selectAppend": true,
+      "selectPrepend": true,
+      "selectBackground": true
+    },
+    {
+      "type": "tag",
+      "name": "attr",
+      "value": "supercharged",
+      "matchCaseSensitive": false,
+      "match": "exact",
+      "uid": "bad9-dd66",
+      "selectText": true,
+      "selectAppend": true,
+      "selectPrepend": true,
+      "selectBackground": true
+    },
+    {
       "type": "attribute",
-      "name": "supercharged",
+      "name": "attr",
       "value": "test",
       "matchCaseSensitive": false,
       "match": "exact",
-      "uid": "37e5-0ad0",
+      "uid": "a532-1556",
       "selectText": true,
       "selectAppend": true,
       "selectPrepend": true,
@@ -26,35 +51,23 @@
     },
     {
       "type": "path",
-      "name": "supercharged",
+      "name": "attr",
       "value": "Notes/Main.md",
       "matchCaseSensitive": false,
       "match": "exact",
-      "uid": "da0c-9f34",
+      "uid": "9933-f934",
       "selectText": true,
       "selectAppend": true,
       "selectPrepend": true,
       "selectBackground": true
     },
     {
-      "type": "tag",
-      "name": "supercharged",
-      "value": "supercharged",
+      "type": "attribute",
+      "name": "attr2",
+      "value": "test2",
       "matchCaseSensitive": false,
       "match": "exact",
-      "uid": "6379-38da",
-      "selectText": true,
-      "selectAppend": true,
-      "selectPrepend": true,
-      "selectBackground": true
-    },
-    {
-      "type": "tag",
-      "name": "supercharged",
-      "value": "supercharged2",
-      "matchCaseSensitive": false,
-      "match": "exact",
-      "uid": "8fec-4259",
+      "uid": "0274-5b29",
       "selectText": true,
       "selectAppend": true,
       "selectPrepend": true,
