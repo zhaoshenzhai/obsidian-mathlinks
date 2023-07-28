@@ -19,20 +19,6 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement, sourc
 
         let linktext = outLinkEl.getAttribute("data-href");
 
-        console.log("-------------------------------------");
-        console.log(`outLinkText = ${outLinkText}`);
-        console.log(`outLinkHTML = ${outLinkHTML}`);
-        console.log(`outLinkEl.href = ${outLinkEl.href}`);
-        console.log(`outLinkFileName = ${outLinkFileName}`);
-        console.log(`outLinkBaseName = ${outLinkBaseName}`);
-        console.log(`linktext = ${linktext}`);
-        console.log(`outLinkText != outLinkFileName = ${outLinkText != outLinkFileName}`);
-        console.log(`outLinkText != outLinkBaseName = ${outLinkText != outLinkBaseName}`);
-        console.log(`outLinkText != "" = ${outLinkText != ""}`);
-        console.log(`outLinkHTML == outLinkText = ${outLinkHTML == outLinkText}`);    
-        console.log(`!linktext.startsWith("#") = ${!linktext.startsWith("#")}`);    
-        
-
         let mathLinkEl;
         if (outLinkText != outLinkFileName && outLinkText != outLinkBaseName && outLinkText != "" && outLinkHTML == outLinkText && !linktext.startsWith("#")) {
             addMathLink(outLinkEl, outLinkText, true);
@@ -43,12 +29,9 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement, sourc
                 if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename || outLinkEl.innerText == translateLink(linktext)) {
                     addMathLink(outLinkEl, outLinkMathLink, true);
                 }
-                console.log(`outLinkMathLink = ${outLinkMathLink}`);
             }
         }
     }
-
-    console.log("-------------------------------------");
 
     return new Promise((resolve) => { resolve() });
 }
@@ -137,10 +120,10 @@ export function getMathLink(plugin: MathLinks, linktext: string, sourcePath: str
             if (subpathResult.type == 'heading') { 
                 subMathLink = subpathResult.current.heading;
             } else if (subpathResult.type == 'block' && cache.frontmatter["mathLinks-block"]) {
-                subMathLink = cache.frontmatter["mathLinks-block"][subpathResult.block.id];
+                subMathLink = '^' + cache.frontmatter["mathLinks-block"][subpathResult.block.id];
             }
             if (path) { // [[note title#heading]] -> "note title > heading"
-                mathLink = (cache.frontmatter.mathLink ?? path) + ' > ' + subMathLink;
+                mathLink = (cache.frontmatter.mathLink ?? path) + '#' + subMathLink;
             } else { // [[#heading]] -> "heading"
                 mathLink = subMathLink;
             }            
