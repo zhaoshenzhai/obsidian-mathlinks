@@ -1,1 +1,1 @@
-[[Main#Section]]
+[[Main]]

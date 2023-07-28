@@ -1,8 +1,5 @@
 {
-  "targetAttributes": [
-    "attr",
-    "attr2"
-  ],
+  "targetAttributes": [],
   "targetTags": true,
   "getFromInlineField": true,
   "enableTabHeader": true,
@@ -15,59 +12,11 @@
   "selectors": [
     {
       "type": "tag",
-      "name": "attr",
-      "value": "supercharged2",
-      "matchCaseSensitive": false,
-      "match": "exact",
-      "uid": "ec8d-de85",
-      "selectText": true,
-      "selectAppend": true,
-      "selectPrepend": true,
-      "selectBackground": true
-    },
-    {
-      "type": "tag",
-      "name": "attr",
+      "name": "",
       "value": "supercharged",
       "matchCaseSensitive": false,
       "match": "exact",
-      "uid": "bad9-dd66",
-      "selectText": true,
-      "selectAppend": true,
-      "selectPrepend": true,
-      "selectBackground": true
-    },
-    {
-      "type": "attribute",
-      "name": "attr",
-      "value": "test",
-      "matchCaseSensitive": false,
-      "match": "exact",
-      "uid": "a532-1556",
-      "selectText": true,
-      "selectAppend": true,
-      "selectPrepend": true,
-      "selectBackground": true
-    },
-    {
-      "type": "path",
-      "name": "attr",
-      "value": "Notes/Main.md",
-      "matchCaseSensitive": false,
-      "match": "exact",
-      "uid": "9933-f934",
-      "selectText": true,
-      "selectAppend": true,
-      "selectPrepend": true,
-      "selectBackground": true
-    },
-    {
-      "type": "attribute",
-      "name": "attr2",
-      "value": "test2",
-      "matchCaseSensitive": false,
-      "match": "exact",
-      "uid": "0274-5b29",
+      "uid": "60dd-1158",
       "selectText": true,
       "selectAppend": true,
       "selectPrepend": true,
