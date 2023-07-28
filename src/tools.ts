@@ -113,7 +113,7 @@ export function getMathLink(plugin: MathLinks, linktext: string): string {
     if (cache.frontmatter) {
         if (subpathResult) {
             if (subpathResult.type == 'heading') { 
-                mathLink = cache.frontmatter.mathLink + ' > ' + subpathResult.current.heading;
+                mathLink = (cache.frontmatter.mathLink ?? path) + ' > ' + subpathResult.current.heading;
             } else if (subpathResult.type == 'block' && cache.frontmatter["mathLinks-block"]) {
                 mathLink = cache.frontmatter["mathLinks-block"][subpathResult.block.id];
             }
