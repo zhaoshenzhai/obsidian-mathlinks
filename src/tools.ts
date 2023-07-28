@@ -111,10 +111,12 @@ export function getMathLink(plugin: MathLinks, linktext: string): string {
     if (!cache) return undefined;
     let subpathResult = resolveSubpath(cache, subpath);
     if (cache.frontmatter) {
-        if (subpathResult.type == 'heading') { 
-            mathLink = subpathResult.current.heading;
-        } else if (subpathResult.type == 'block' && cache.frontmatter["mathLinks-block"]) {
-            mathLink = cache.frontmatter["mathLinks-block"][subpathResult.block.id];
+        if (subpathResult) {
+            if (subpathResult.type == 'heading') { 
+                mathLink = subpathResult.current.heading;
+            } else if (subpathResult.type == 'block' && cache.frontmatter["mathLinks-block"]) {
+                mathLink = cache.frontmatter["mathLinks-block"][subpathResult.block.id];
+            }
         } else {
             mathLink = cache.frontmatter.mathLink;
         }
