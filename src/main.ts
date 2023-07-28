@@ -10,7 +10,7 @@ export default class MathLinks extends Plugin {
 
         this.registerMarkdownPostProcessor(async (element, context) => {
             if (isValid(this, context.containerEl, context.sourcePath)) {
-                generateMathLinks(this, element);
+                generateMathLinks(this, element, context.sourcePath);
             }
         });
 

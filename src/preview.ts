@@ -127,7 +127,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                             // No alias
                             else if (name.contains("hmd-internal-link") && !name.contains("alias")) {
                                 outLinkText = view.state.doc.sliceString(node.from, node.to);
-                                outLinkMathLink = getMathLink(plugin, outLinkText);
+                                outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
                             }
 
                             // End
@@ -140,7 +140,6 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                                     let cursorRange = view.state.selection.ranges[0];
                                     if (start > cursorRange.to || end < cursorRange.from) {
                                         if (outLinkText && outLinkMathLink) {
-                                            // console.log("outLinkMathLink: ", outLinkMathLink);
                                             builder.add(
                                                 start,
                                                 end,

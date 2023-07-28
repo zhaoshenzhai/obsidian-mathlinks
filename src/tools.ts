@@ -1,8 +1,9 @@
-import { TFile, renderMath, finishRenderMath, Editor, Vault, parseLinktext, resolveSubpath, getLinkpath } from "obsidian";
+import { syntaxTree } from '@codemirror/language';
+import { TFile, renderMath, finishRenderMath, Editor, Vault, parseLinktext, resolveSubpath, getLinkpath, EditorSuggestContext, MarkdownRenderer, Component } from "obsidian";
 import MathLinks from "./main";
 import { useDebugValue } from "react";
 
-export function generateMathLinks(plugin: MathLinks, element: HTMLElement): Promise<void> {
+export function generateMathLinks(plugin: MathLinks, element: HTMLElement, sourcePath: string): Promise<void> {
     for (let outLinkEl of element.querySelectorAll(".internal-link")) {
         if (outLinkEl.classList.contains("mathLink-internal-link")) {
             outLinkEl.remove();
@@ -16,19 +17,38 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement): Prom
         let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, "")).replace(/\.md$/, "");
         let outLinkBaseName = outLinkFileName.replace(/^.*[\\\/]/, '');
 
+        let linktext = outLinkEl.getAttribute("data-href");
+
+        console.log("-------------------------------------");
+        console.log(`outLinkText = ${outLinkText}`);
+        console.log(`outLinkHTML = ${outLinkHTML}`);
+        console.log(`outLinkEl.href = ${outLinkEl.href}`);
+        console.log(`outLinkFileName = ${outLinkFileName}`);
+        console.log(`outLinkBaseName = ${outLinkBaseName}`);
+        console.log(`linktext = ${linktext}`);
+        console.log(`outLinkText != outLinkFileName = ${outLinkText != outLinkFileName}`);
+        console.log(`outLinkText != outLinkBaseName = ${outLinkText != outLinkBaseName}`);
+        console.log(`outLinkText != "" = ${outLinkText != ""}`);
+        console.log(`outLinkHTML == outLinkText = ${outLinkHTML == outLinkText}`);    
+        console.log(`!linktext.startsWith("#") = ${!linktext.startsWith("#")}`);    
+        
+
         let mathLinkEl;
-        if (outLinkText != outLinkFileName && outLinkText != outLinkBaseName && outLinkText != "" && outLinkHTML == outLinkText) {
+        if (outLinkText != outLinkFileName && outLinkText != outLinkBaseName && outLinkText != "" && outLinkHTML == outLinkText && !linktext.startsWith("#")) {
             addMathLink(outLinkEl, outLinkText, true);
         } else {
-            let outLinkMathLink = getMathLink(plugin, outLinkFileName);
+            let outLinkMathLink = getMathLink(plugin, linktext, sourcePath);
             if (outLinkMathLink) {
-                let outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(outLinkFileName), "");
-                if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename || outLinkEl.innerText == translateLink(outLinkFileName)) {
+                let outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(linktext), sourcePath);
+                if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename || outLinkEl.innerText == translateLink(linktext)) {
                     addMathLink(outLinkEl, outLinkMathLink, true);
                 }
+                console.log(`outLinkMathLink = ${outLinkMathLink}`);
             }
         }
     }
+
+    console.log("-------------------------------------");
 
     return new Promise((resolve) => { resolve() });
 }
@@ -101,26 +121,34 @@ export function addMathLink(outLinkEl: HTMLElement, mathLink: string, newElement
     return mathLinkEl;
 }
 
-export function getMathLink(plugin: MathLinks, linktext: string): string {
+export function getMathLink(plugin: MathLinks, linktext: string, sourcePath: string): string {
+    sourcePath = sourcePath ?? ""; // used to identity note title even when linktext has no linkpath (e.g. [[#heading]] or [[#^blockID]])
     let mathLink = "";
-
     let { path, subpath } = parseLinktext(linktext);
-    let file = plugin.app.metadataCache.getFirstLinkpathDest(path, "");
-    if (!file) return undefined;
+    let file = plugin.app.metadataCache.getFirstLinkpathDest(path, sourcePath);
+    if (!file) return "";
     let cache = plugin.app.metadataCache.getFileCache(file);
-    if (!cache) return undefined;
+    if (!cache) return "";
+
     let subpathResult = resolveSubpath(cache, subpath);
     if (cache.frontmatter) {
         if (subpathResult) {
+            let subMathLink = '';
             if (subpathResult.type == 'heading') { 
-                mathLink = (cache.frontmatter.mathLink ?? path) + ' > ' + subpathResult.current.heading;
+                subMathLink = subpathResult.current.heading;
             } else if (subpathResult.type == 'block' && cache.frontmatter["mathLinks-block"]) {
-                mathLink = cache.frontmatter["mathLinks-block"][subpathResult.block.id];
+                subMathLink = cache.frontmatter["mathLinks-block"][subpathResult.block.id];
             }
+            if (path) { // [[note title#heading]] -> "note title > heading"
+                mathLink = (cache.frontmatter.mathLink ?? path) + ' > ' + subMathLink;
+            } else { // [[#heading]] -> "heading"
+                mathLink = subMathLink;
+            }            
         } else {
             mathLink = cache.frontmatter.mathLink;
         }
     }
+
 
     if (mathLink == "auto") {
         let templates = plugin.settings.templates;
@@ -150,7 +178,7 @@ export function getMathLink(plugin: MathLinks, linktext: string): string {
 function translateLinkImpl(linktext: string, pattern: RegExp): string | undefined {
     const result = pattern.exec(linktext);
     if (result) {
-        return `${result[1]} > ${result[2]}`
+        return (result[1] ? `${result[1]} > ` : "") + `${result[2]}`
     }
 }  
 
