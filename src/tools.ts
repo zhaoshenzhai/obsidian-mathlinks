@@ -1,4 +1,6 @@
-import { TFile, renderMath, finishRenderMath } from "obsidian";
+import { TFile, renderMath, finishRenderMath, Editor, Vault, parseLinktext, resolveSubpath, getLinkpath } from "obsidian";
+import MathLinks from "./main";
+import { useDebugValue } from "react";
 
 export function generateMathLinks(plugin: MathLinks, element: HTMLElement): Promise<void> {
     for (let outLinkEl of element.querySelectorAll(".internal-link")) {
@@ -18,21 +20,21 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement): Prom
         if (outLinkText != outLinkFileName && outLinkText != outLinkBaseName && outLinkText != "" && outLinkHTML == outLinkText) {
             addMathLink(outLinkEl, outLinkText, true);
         } else {
-            let outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
-            let outLinkMathLink = getMathLink(plugin, outLinkFile);
+            let outLinkMathLink = getMathLink(plugin, outLinkFileName);
             if (outLinkMathLink) {
-                if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename) {
+                let outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(outLinkFileName), "");
+                if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename || outLinkEl.innerText == translateLink(outLinkFileName)) {
                     addMathLink(outLinkEl, outLinkMathLink, true);
                 }
             }
         }
     }
 
-    return new Promise ((resolve) => {resolve()});
+    return new Promise((resolve) => { resolve() });
 }
 
 export function isValid(plugin: MathLinks, element: HTMLElement, fileName: string): boolean {
-    while(element.parentNode && element.parentNode.nodeName.toLowerCase() != "body") {
+    while (element.parentNode && element.parentNode.nodeName.toLowerCase() != "body") {
         element = element.parentNode;
         if (element.className.toLowerCase().includes("canvas")) {
             return true;
@@ -99,10 +101,24 @@ export function addMathLink(outLinkEl: HTMLElement, mathLink: string, newElement
     return mathLinkEl;
 }
 
-export function getMathLink(plugin: MathLinks, file: TFile): string {
-    if (!file) return undefined;
+export function getMathLink(plugin: MathLinks, linktext: string): string {
+    let mathLink = "";
 
-    let mathLink = plugin.app.metadataCache.getFileCache(file)?.frontmatter?.mathLink;
+    let { path, subpath } = parseLinktext(linktext);
+    let file = plugin.app.metadataCache.getFirstLinkpathDest(path, "");
+    if (!file) return undefined;
+    let cache = plugin.app.metadataCache.getFileCache(file);
+    if (!cache) return undefined;
+    let subpathResult = resolveSubpath(cache, subpath);
+    if (cache.frontmatter) {
+        if (subpathResult.type == 'heading') { 
+            mathLink = subpathResult.current.heading;
+        } else if (subpathResult.type == 'block' && cache.frontmatter["mathLinks-block"]) {
+            mathLink = cache.frontmatter["mathLinks-block"][subpathResult.block.id];
+        } else {
+            mathLink = cache.frontmatter.mathLink;
+        }
+    }
 
     if (mathLink == "auto") {
         let templates = plugin.settings.templates;
@@ -128,3 +144,18 @@ export function getMathLink(plugin: MathLinks, file: TFile): string {
 
     return mathLink;
 }
+
+function translateLinkImpl(linktext: string, pattern: RegExp): string | undefined {
+    const result = pattern.exec(linktext);
+    if (result) {
+        return `${result[1]} > ${result[2]}`
+    }
+}  
+
+function translateLink(linktext: string): string | undefined {
+    const headingPattern = /(^.*)#([^\^].*)/;
+    const blockPattern = /(^.*)#(\^[a-zA-Z0-9\-]+)/;    
+    const translatedAsHeading = translateLinkImpl(linktext, headingPattern);
+    const translatedAsBlock = translateLinkImpl(linktext, blockPattern);
+    return translatedAsHeading ?? translatedAsBlock
+}  
