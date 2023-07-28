@@ -127,7 +127,6 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                             // No alias
                             else if (name.contains("hmd-internal-link") && !name.contains("alias")) {
                                 outLinkText = view.state.doc.sliceString(node.from, node.to);
-                                // outLinkMathLink = getMathLink(plugin, plugin.app.metadataCache.getFirstLinkpathDest(outLinkText, ""));
                                 outLinkMathLink = getMathLink(plugin, outLinkText);
                             }
 
