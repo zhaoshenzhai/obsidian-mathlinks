@@ -122,9 +122,13 @@ export function getMathLink(plugin: MathLinks, linktext: string, sourcePath: str
             } else if (subpathResult.type == 'block' && cache.frontmatter["mathLinks-block"]) {
                 subMathLink = '^' + cache.frontmatter["mathLinks-block"][subpathResult.block.id];
             }
-            if (path) { // [[note title#heading]] -> "note title > heading"
+            if (path) { 
+                // [[note title#heading]] -> "note title#heading"
+                // [[note title#blockID]] -> "note title#^blockID"
                 mathLink = (cache.frontmatter.mathLink ?? path) + '#' + subMathLink;
-            } else { // [[#heading]] -> "heading"
+            } else { 
+                // [[#heading]] -> "heading"
+                // [[#^blockID]] -> "^blockID"
                 mathLink = subMathLink;
             }            
         } else {
