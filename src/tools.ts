@@ -113,7 +113,7 @@ export function getMathLink(plugin: MathLinks, linktext: string): string {
     if (cache.frontmatter) {
         if (subpathResult) {
             if (subpathResult.type == 'heading') { 
-                mathLink = subpathResult.current.heading;
+                mathLink = getMathLink(plugin, path) + ' > ' + subpathResult.current.heading;
             } else if (subpathResult.type == 'block' && cache.frontmatter["mathLinks-block"]) {
                 mathLink = cache.frontmatter["mathLinks-block"][subpathResult.block.id];
             }
@@ -154,10 +154,12 @@ function translateLinkImpl(linktext: string, pattern: RegExp): string | undefine
     }
 }  
 
-function translateLink(linktext: string): string | undefined {
+function translateLink(linktext: string): string {
+    // convert "filename#heading" to "filename > heading" 
+    // and "filename#^blockID" to "filename > ^blockID"
     const headingPattern = /(^.*)#([^\^].*)/;
     const blockPattern = /(^.*)#(\^[a-zA-Z0-9\-]+)/;    
     const translatedAsHeading = translateLinkImpl(linktext, headingPattern);
     const translatedAsBlock = translateLinkImpl(linktext, blockPattern);
-    return translatedAsHeading ?? translatedAsBlock
+    return translatedAsHeading ?? translatedAsBlock ?? '';
 }  
