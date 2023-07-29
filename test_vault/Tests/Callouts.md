@@ -2,7 +2,5 @@
 > [!info]
 > [[Main]]
 > [[Main|$\alpha$]]
+> [Main](Main.md)
 > [$\beta$](Main.md)
-> (text::[[Main]])
-> (text::[[Main|$\alpha$]])
-> [text::[[Main|$\alpha$]]]

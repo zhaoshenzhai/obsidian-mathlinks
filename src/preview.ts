@@ -97,7 +97,6 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                 let builder = new RangeSetBuilder<Decoration>();
 
 
-                console.log("==== START ====");
                 for (let { from, to } of view.visibleRanges) {
                     let start = -1, end = -1, outLinkText = "", outLinkMathLink = "";
 
@@ -106,7 +105,6 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                         to,
                         enter(node) {
                             let name = node.type.name;
-                            console.log(name + " | " + from + " | " + to + view.state.doc.sliceString(node.from, node.to));
                             // Start
                             if (name.contains("formatting-link_formatting-link-start")) {
                                 start = node.from;
@@ -120,11 +118,17 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                             // Alias: File name
                             else if (name.contains("has-alias")) {
                                 outLinkText = view.state.doc.sliceString(node.from, node.to);
+                                if (outLinkMathLink == outLinkText.replace(/\.md/, "")) {
+                                    outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
+                                }
                             }
 
                             // Alias: File name (with decoding)
                             else if (/string_url$/.test(name) && !name.contains("format")) {
                                 outLinkText = decodeURI(view.state.doc.sliceString(node.from, node.to));
+                                if (outLinkMathLink == outLinkText.replace(/\.md/, "")) {
+                                    outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
+                                }
                             }
 
                             // No alias
@@ -162,11 +166,13 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                             // Alias: MathLink
                             else if (!name.contains("pipe") && ((name.contains("hmd-internal-link") && name.contains("alias")) || name.contains("hmd-escape") || /^link/.test(name))) {
                                 outLinkMathLink += view.state.doc.sliceString(node.from, node.to);
+                                if (outLinkMathLink == outLinkText.replace(/\.md/, "")) {
+                                    outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
+                                }
                             }
                         }
                     });
                 }
-                console.log("====  END  ====\n\n\n\n");
 
                 return builder.finish();
             }
