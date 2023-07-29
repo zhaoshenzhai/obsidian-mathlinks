@@ -96,6 +96,8 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
             buildDecorations(view: EditorView) {
                 let builder = new RangeSetBuilder<Decoration>();
 
+
+                console.log("==== START ====");
                 for (let { from, to } of view.visibleRanges) {
                     let start = -1, end = -1, outLinkText = "", outLinkMathLink = "";
 
@@ -104,6 +106,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                         to,
                         enter(node) {
                             let name = node.type.name;
+                            console.log(name + " | " + from + " | " + to + view.state.doc.sliceString(node.from, node.to));
                             // Start
                             if (name.contains("formatting-link_formatting-link-start")) {
                                 start = node.from;
@@ -163,6 +166,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                         }
                     });
                 }
+                console.log("====  END  ====\n\n\n\n");
 
                 return builder.finish();
             }

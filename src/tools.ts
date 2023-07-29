@@ -1,39 +1,37 @@
 import { syntaxTree } from '@codemirror/language';
-import { TFile, renderMath, finishRenderMath, Editor, Vault, parseLinktext, resolveSubpath, getLinkpath, EditorSuggestContext, MarkdownRenderer, Component } from "obsidian";
-import MathLinks from "./main";
 import { useDebugValue } from "react";
+import { TFile, renderMath, finishRenderMath, Editor, Vault, parseLinktext, resolveSubpath, getLinkpath, EditorSuggestContext, MarkdownRenderer, Component } from "obsidian";
 
-export function generateMathLinks(plugin: MathLinks, element: HTMLElement, sourcePath: string): Promise<void> {
-    for (let outLinkEl of element.querySelectorAll(".internal-link")) {
-        if (outLinkEl.classList.contains("mathLink-internal-link")) {
-            outLinkEl.remove();
-            outLinkEl = element.querySelector(".original-internal-link");
-            outLinkEl.classList.remove("original-internal-link");
-            outLinkEl.style.display = "";
-        }
+// Generate all mathLinks in element to be added in the MarkdownPostProcessor in reading view
+export function generateMathLinks(plugin: MathLinks, element: HTMLElement, sourcePath: string): void {
+    for (let targetEl of element.querySelectorAll(".internal-link")) {
+        // if (targetEl.classList.contains("mathLink-internal-link")) {
+        //     targetEl.remove();
+        //     targetEl = element.querySelector(".original-internal-link");
+        //     targetEl.classList.remove("original-internal-link");
+        //     targetEl.style.display = "";
+        // }
 
-        let outLinkText = outLinkEl.textContent.trim();
-        let outLinkHTML = outLinkEl.innerHTML;
-        let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, "")).replace(/\.md$/, "");
-        let outLinkBaseName = outLinkFileName.replace(/^.*[\\\/]/, '');
+        let targetText = targetEl.textContent.trim();
+        let targetHTML = targetEl.innerHTML;
+        let targetFileName = decodeURI(targetEl.href.replace(/app\:\/\/obsidian\.md\//g, "")).replace(/\.md$/, "");
+        let targetBaseName = targetFileName.replace(/^.*[\\\/]/, '');
 
-        let linktext = outLinkEl.getAttribute("data-href");
+        let linktext = targetEl.getAttribute("data-href");
 
         let mathLinkEl;
-        if (outLinkText != outLinkFileName && outLinkText != outLinkBaseName && outLinkText != "" && outLinkHTML == outLinkText && !linktext.startsWith("#")) {
-            addMathLink(outLinkEl, outLinkText, true);
+        if (targetText != targetFileName && targetText != targetBaseName && targetText != "" && targetHTML == targetText && !linktext.startsWith("#")) {
+            addMathLink(targetEl, targetText, true);
         } else {
-            let outLinkMathLink = getMathLink(plugin, linktext, sourcePath);
-            if (outLinkMathLink) {
-                let outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(linktext), sourcePath);
-                if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename || outLinkEl.innerText == translateLink(linktext)) {
-                    addMathLink(outLinkEl, outLinkMathLink, true);
+            let targetMathLink = getMathLink(plugin, linktext, sourcePath);
+            if (targetMathLink) {
+                let targetFile = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(linktext), sourcePath);
+                if (targetEl.innerText == targetFileName || targetEl.innerText == targetFile.basename || targetEl.innerText == translateLink(linktext)) {
+                    addMathLink(targetEl, targetMathLink, true);
                 }
             }
         }
     }
-
-    return new Promise((resolve) => { resolve() });
 }
 
 export function isValid(plugin: MathLinks, element: HTMLElement, fileName: string): boolean {
@@ -57,7 +55,7 @@ export function isValid(plugin: MathLinks, element: HTMLElement, fileName: strin
     return true;
 }
 
-export function addMathLink(outLinkEl: HTMLElement, mathLink: string, newElement: boolean): HTMLElement {
+export function addMathLink(targetEl: HTMLElement, mathLink: string, newElement: boolean): HTMLElement {
     let splits: [string, boolean][] = [];
 
     let split = "";
@@ -79,29 +77,44 @@ export function addMathLink(outLinkEl: HTMLElement, mathLink: string, newElement
         }
     }
 
-    let mathLinkEl = outLinkEl.cloneNode(newElement);
-    mathLinkEl.innerText = "";
+    // let mathLinkEl = targetEl.cloneNode(newElement);
+    // mathLinkEl.innerText = "";
+    // for (let i = 0; i < splits.length; i++) {
+    //     let word = splits[i][0];
+    //     if (splits[i][1]) {
+    //         let wordMath = renderMath(word, false);
+    //         let mathEl = mathLinkEl.createSpan();
+    //         mathEl.replaceWith(wordMath);
+    //     } else {
+    //         let wordEl = mathLinkEl.createSpan();
+    //         wordEl.innerText += word;
+    //     }
+    // }
+
+    // finishRenderMath();
+    // if (newElement) {
+    //      targetEl.parentNode.insertBefore(mathLinkEl, targetEl.nextSibling);
+    //      mathLinkEl.classList.add("mathLink-internal-link");
+    //      targetEl.classList.add("original-internal-link");
+    //      targetEl.style.display = "none";
+    // }
+
+    targetEl.innerText = "";
     for (let i = 0; i < splits.length; i++) {
         let word = splits[i][0];
         if (splits[i][1]) {
             let wordMath = renderMath(word, false);
-            let mathEl = mathLinkEl.createSpan();
+            let mathEl = targetEl.createSpan();
             mathEl.replaceWith(wordMath);
         } else {
-            let wordEl = mathLinkEl.createSpan();
+            let wordEl = targetEl.createSpan();
             wordEl.innerText += word;
         }
     }
 
     finishRenderMath();
-    if (newElement) {
-        outLinkEl.parentNode.insertBefore(mathLinkEl, outLinkEl.nextSibling);
-        mathLinkEl.classList.add("mathLink-internal-link");
-        outLinkEl.classList.add("original-internal-link");
-        outLinkEl.style.display = "none";
-    }
 
-    return mathLinkEl;
+    return targetEl;
 }
 
 export function getMathLink(plugin: MathLinks, linktext: string, sourcePath: string): string {
