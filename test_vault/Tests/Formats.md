@@ -1,7 +1,7 @@
 * [[Main]]
 * [[Main|$\alpha$]]
 * [Main](Main.md)
-* [$\beta$ hi](Main.md)
+* [$\beta$](Main.md)
 
 1. [[Main]]
 2. [[Main|$\alpha$]]

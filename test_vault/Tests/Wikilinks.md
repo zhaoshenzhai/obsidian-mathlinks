@@ -1,2 +1,2 @@
 Wikilinks: [[Main]]
-Wikilinks alias: [[Main|$\alpha$]]
+Wikilinks alias: [[Main|$\alpha$ $\beta$ hi]]
