@@ -14,7 +14,7 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement, sourc
         if (targetDisplay != "" && !/math-inline is-loaded/.test(targetEl.innerHTML)) {
             let targetLink = targetEl.getAttribute("data-href").replace(/\.md/, "");
             if (targetDisplay != targetLink && targetDisplay != translateLink(targetLink)) {
-                addMathLink(targetEl, targetDisplay, !/math-inline is-loaded/.test(targetEl.innerHTML));
+                addMathLink(targetEl, targetDisplay, true);
             } else {
                 let targetMathLink = getMathLink(plugin, targetLink, sourcePath);
                 if (targetMathLink) {
