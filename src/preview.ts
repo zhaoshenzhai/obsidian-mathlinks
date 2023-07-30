@@ -96,7 +96,6 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
             buildDecorations(view: EditorView) {
                 let builder = new RangeSetBuilder<Decoration>();
 
-
                 for (let { from, to } of view.visibleRanges) {
                     let start = -1, end = -1, outLinkText = "", outLinkMathLink = "";
 
@@ -117,7 +116,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
 
                             // Alias: File name
                             else if (name.contains("has-alias")) {
-                                outLinkText = view.state.doc.sliceString(node.from, node.to);
+                                outLinkText += view.state.doc.sliceString(node.from, node.to);
                                 if (outLinkMathLink == outLinkText.replace(/\.md/, "")) {
                                     outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
                                 }
@@ -125,7 +124,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
 
                             // Alias: File name (with decoding)
                             else if (/string_url$/.test(name) && !name.contains("format")) {
-                                outLinkText = decodeURI(view.state.doc.sliceString(node.from, node.to));
+                                outLinkText += decodeURI(view.state.doc.sliceString(node.from, node.to));
                                 if (outLinkMathLink == outLinkText.replace(/\.md/, "")) {
                                     outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
                                 }
@@ -133,7 +132,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
 
                             // No alias
                             else if (name.contains("hmd-internal-link") && !name.contains("alias")) {
-                                outLinkText = view.state.doc.sliceString(node.from, node.to);
+                                outLinkText += view.state.doc.sliceString(node.from, node.to);
                                 outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
                             }
 

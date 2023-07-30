@@ -1,6 +1,4 @@
-import { syntaxTree } from '@codemirror/language';
-import { useDebugValue } from "react";
-import { TFile, renderMath, finishRenderMath, Editor, Vault, parseLinktext, resolveSubpath, getLinkpath, EditorSuggestContext, MarkdownRenderer, Component } from "obsidian";
+import { TFile, renderMath, finishRenderMath, parseLinktext, resolveSubpath, getLinkpath } from "obsidian";
 
 // Generate all mathLinks in element to be added in the MarkdownPostProcessor in reading view
 export function generateMathLinks(plugin: MathLinks, element: HTMLElement, sourcePath: string): void {
@@ -13,11 +11,10 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement, sourc
         }
 
         let targetDisplay = targetEl.textContent.trim();
-
-        if (targetDisplay != "") {
+        if (targetDisplay != "" && !/math-inline is-loaded/.test(targetEl.innerHTML)) {
             let targetLink = targetEl.getAttribute("data-href").replace(/\.md/, "");
-            if (targetDisplay != targetLink) {
-                addMathLink(targetEl, targetDisplay, true);
+            if (targetDisplay != targetLink && targetDisplay != translateLink(targetLink)) {
+                addMathLink(targetEl, targetDisplay, !/math-inline is-loaded/.test(targetEl.innerHTML));
             } else {
                 let targetMathLink = getMathLink(plugin, targetLink, sourcePath);
                 if (targetMathLink) {
@@ -31,6 +28,7 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement, sourc
     }
 }
 
+// Add a mathLink to targetEl. If newElement, then targetEl will be duplicated.
 export function addMathLink(targetEl: HTMLElement, mathLink: string, newElement: boolean): HTMLElement {
     let splits: [string, boolean][] = [];
 
@@ -78,64 +76,62 @@ export function addMathLink(targetEl: HTMLElement, mathLink: string, newElement:
     return mathLinkEl;
 }
 
-export function getMathLink(plugin: MathLinks, linktext: string, sourcePath: string): string {
-    sourcePath = sourcePath ?? ""; // used to identity note title even when linktext has no linkpath (e.g. [[#heading]] or [[#^blockID]])
-    let mathLink = "";
-    let { path, subpath } = parseLinktext(linktext);
+// Get mathLink from cached metadata
+export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: string): string {
+    let { path, subpath } = parseLinktext(targetLink);
+
     let file = plugin.app.metadataCache.getFirstLinkpathDest(path, sourcePath);
     if (!file) return "";
+
     let cache = plugin.app.metadataCache.getFileCache(file);
     if (!cache) return "";
 
-    let subpathResult = resolveSubpath(cache, subpath);
+    let mathLink = "";
     if (cache.frontmatter) {
+        let subpathResult = resolveSubpath(cache, subpath);
         if (subpathResult) {
-            let subMathLink = '';
-            if (subpathResult.type == 'heading') { 
+            let subMathLink = "";
+            if (subpathResult.type == "heading") {
                 subMathLink = subpathResult.current.heading;
-            } else if (subpathResult.type == 'block' && cache.frontmatter["mathLinks-block"]) {
-                subMathLink = '^' + cache.frontmatter["mathLinks-block"][subpathResult.block.id];
+            } else if (subpathResult.type == "block" && cache.frontmatter["mathLinks-block"]) {
+                subMathLink = "^" + cache.frontmatter["mathLinks-block"][subpathResult.block.id];
             }
+
             if (path) { 
-                // [[note title#heading]] -> "note title#heading"
-                // [[note title#blockID]] -> "note title#^blockID"
-                mathLink = (cache.frontmatter.mathLink ?? path) + '#' + subMathLink;
+                mathLink = (cache.frontmatter.mathLink ?? path) + " > " + subMathLink;
             } else { 
-                // [[#heading]] -> "heading"
-                // [[#^blockID]] -> "^blockID"
                 mathLink = subMathLink;
             }            
         } else {
             mathLink = cache.frontmatter.mathLink;
-        }
-    }
+            if (mathLink == "auto") {
+                let templates = plugin.settings.templates;
+                mathLink = file.name.replace("\.md", "");
+                for (let i = 0; i < templates.length; i++) {
+                    let replaced = new RegExp(templates[i].replaced);
+                    let replacement = templates[i].replacement;
 
+                    let flags = "";
+                    if (templates[i].globalMatch)
+                        flags += "g";
+                    if (!templates[i].sensitive)
+                        flags += "i";
 
-    if (mathLink == "auto") {
-        let templates = plugin.settings.templates;
-        mathLink = file.name.replace("\.md", "");
-        for (let i = 0; i < templates.length; i++) {
-            let replaced = new RegExp(templates[i].replaced);
-            let replacement = templates[i].replacement;
+                    if (templates[i].word)
+                        replaced = RegExp(replaced.source.replace(/^/, "\\b").replace(/$/, "\\b"), flags);
+                    else
+                        replaced = RegExp(replaced.source, flags);
 
-            let flags = "";
-            if (templates[i].globalMatch)
-                flags += "g";
-            if (!templates[i].sensitive)
-                flags += "i";
-
-            if (templates[i].word)
-                replaced = RegExp(replaced.source.replace(/^/, "\\b").replace(/$/, "\\b"), flags);
-            else
-                replaced = RegExp(replaced.source, flags);
-
-            mathLink = mathLink.replace(replaced, replacement);
+                    mathLink = mathLink.replace(replaced, replacement);
+                }
+            }
         }
     }
 
     return mathLink;
 }
 
+// Exclude files; include all canvases
 export function isValid(plugin: MathLinks, element: HTMLElement, fileName: string): boolean {
     while (element.parentNode && element.parentNode.nodeName.toLowerCase() != "body") {
         element = element.parentNode;
@@ -158,16 +154,16 @@ export function isValid(plugin: MathLinks, element: HTMLElement, fileName: strin
 }  
 
 // Convert "filename#heading" to "filename > heading" and "filename#^blockID" to "filename > ^blockID"
-function translateLink(linktext: string): string {
+function translateLink(targetLink: string): string {
+    function translateLinkImpl(targetLink: string, pattern: RegExp): string | undefined {
+        let result = pattern.exec(targetLink);
+        if (result)
+            return (result[1] ? `${result[1]} > ` : "") + `${result[2]}`
+    }
+
     let headingPattern = /(^.*)#([^\^].*)/;
     let blockPattern = /(^.*)#(\^[a-zA-Z0-9\-]+)/;
-    let translatedAsHeading = translateLinkImpl(linktext, headingPattern);
-    let translatedAsBlock = translateLinkImpl(linktext, blockPattern);
-    return translatedAsHeading ?? translatedAsBlock ?? '';
+    let translatedAsHeading = translateLinkImpl(targetLink, headingPattern);
+    let translatedAsBlock = translateLinkImpl(targetLink, blockPattern);
+    return translatedAsHeading ?? translatedAsBlock ?? "";
 }  
-
-function translateLinkImpl(linktext: string, pattern: RegExp): string | undefined {
-    let result = pattern.exec(linktext);
-    if (result)
-        return (result[1] ? `${result[1]} > ` : "") + `${result[2]}`
-}
