@@ -18,7 +18,7 @@
       "match": "exact",
       "uid": "ebb6-7451",
       "selectText": true,
-      "selectAppend": true,
+      "selectAppend": false,
       "selectPrepend": true,
       "selectBackground": true
     }
