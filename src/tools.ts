@@ -93,8 +93,8 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
             let subMathLink = "";
             if (subpathResult.type == "heading") {
                 subMathLink = subpathResult.current.heading;
-            } else if (subpathResult.type == "block" && cache.frontmatter["mathLinks-block"]) {
-                subMathLink = "^" + cache.frontmatter["mathLinks-block"][subpathResult.block.id];
+            } else if (subpathResult.type == "block" && cache.frontmatter["mathLink-blocks"]) {
+                subMathLink = "^" + cache.frontmatter["mathLink-blocks"][subpathResult.block.id];
             }
 
             if (path) { 
