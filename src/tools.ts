@@ -10,30 +10,19 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement): Prom
         }
 
         let outLinkText = outLinkEl.textContent.trim();
-        let outLinkHTML = outLinkEl.innerHTML.replace(/ &gt; /, " > ");
+        let outLinkHTML = outLinkEl.innerHTML;
         let outLinkFileName = decodeURI(outLinkEl.href.replace(/app\:\/\/obsidian\.md\//g, "")).replace(/\.md$/, "");
         let outLinkBaseName = outLinkFileName.replace(/^.*[\\\/]/, '');
-        let outLinkInnerText = outLinkEl.innerText;
-        let outLinkAppend = "";
-
-        if (outLinkText.includes(" > ") && outLinkFileName.includes("#")) {
-            outLinkAppend = outLinkText.substring(outLinkText.lastIndexOf(" > "), outLinkText.length);
-            outLinkText = outLinkText.substring(0, outLinkText.lastIndexOf(" > "));
-            outLinkHTML = outLinkHTML.substring(0, outLinkHTML.lastIndexOf(" > "));
-            outLinkFileName = outLinkFileName.replace(/#.*$/, "");
-            outLinkBaseName = outLinkBaseName.replace(/#.*$/, "");
-            outLinkInnerText = outLinkInnerText.substring(0, outLinkInnerText.lastIndexOf(" > "));
-        }
 
         let mathLinkEl;
         if (outLinkText != outLinkFileName && outLinkText != outLinkBaseName && outLinkText != "" && outLinkHTML == outLinkText) {
-            addMathLink(outLinkEl, outLinkText, true, outLinkAppend);
+            addMathLink(outLinkEl, outLinkText, true);
         } else {
             let outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(outLinkFileName, "");
             let outLinkMathLink = getMathLink(plugin, outLinkFile);
             if (outLinkMathLink) {
-                if (outLinkInnerText == outLinkFileName || outLinkInnerText == outLinkFile.basename) {
-                    addMathLink(outLinkEl, outLinkMathLink, true, outLinkAppend);
+                if (outLinkEl.innerText == outLinkFileName || outLinkEl.innerText == outLinkFile.basename) {
+                    addMathLink(outLinkEl, outLinkMathLink, true);
                 }
             }
         }
