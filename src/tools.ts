@@ -52,7 +52,7 @@ export function isValid(plugin: MathLinks, element: HTMLElement, fileName: strin
     return true;
 }
 
-export function addMathLink(outLinkEl: HTMLElement, mathLink: string, newElement: boolean, append: string): HTMLElement {
+export function addMathLink(outLinkEl: HTMLElement, mathLink: string, newElement: boolean): HTMLElement {
     let splits: [string, boolean][] = [];
 
     let split = "";
@@ -86,11 +86,6 @@ export function addMathLink(outLinkEl: HTMLElement, mathLink: string, newElement
             let wordEl = mathLinkEl.createSpan();
             wordEl.innerText += word;
         }
-    }
-
-    if (append) {
-        let appendEl = mathLinkEl.createSpan();
-        appendEl.innerText = append;
     }
 
     finishRenderMath();
@@ -145,8 +140,8 @@ export function getSuperCharged(plugin: MathLinks, file: TFile): [string, [strin
         tags = tags.trimEnd();
     }
 
-    let frontmatter = plugin.app.metadataCache.getFileCache(file).frontmatter;
     let attributes: [string, string][] = [];
+    let frontmatter = plugin.app.metadataCache.getFileCache(file).frontmatter;
     for (let attr in frontmatter) {
         if (attr != "mathLink" && attr != "position") {
             for (let i = 0; i < data.selectors.length; i++) {

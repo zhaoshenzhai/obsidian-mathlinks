@@ -18,7 +18,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
         }
 
         toDOM() {
-            let mathLink = addMathLink(document.createElement("span"), this.outLinkMathLink, false, "");
+            let mathLink = addMathLink(document.createElement("span"), this.outLinkMathLink, false);
             mathLink.classList.add("cm-underline");
             mathLink.setAttribute("draggable", true);
 
@@ -26,7 +26,10 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
             spanInner.appendChild(mathLink);
             if (this.outLinkFile && app.plugins.getPlugin("supercharged-links-obsidian") != null) {
                 let superCharged = getSuperCharged(plugin, this.outLinkFile);
+                console.log(superCharged);
                 spanInner.classList.add("data-link-icon");
+                spanInner.classList.add("data-link-icon-after");
+                spanInner.classList.add("data-link-text");
                 spanInner.setAttribute("data-link-path", this.outLinkFile.path);
                 spanInner.setAttribute("data-link-tags", superCharged[0]);
                 for (let i = 0; i < superCharged[1].length; i++)

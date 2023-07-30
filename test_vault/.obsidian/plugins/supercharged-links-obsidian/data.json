@@ -13,10 +13,10 @@
     {
       "type": "tag",
       "name": "",
-      "value": "supercharged",
+      "value": "tagTest",
       "matchCaseSensitive": false,
       "match": "exact",
-      "uid": "60dd-1158",
+      "uid": "ebb6-7451",
       "selectText": true,
       "selectAppend": true,
       "selectPrepend": true,
