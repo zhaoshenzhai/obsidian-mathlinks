@@ -26,7 +26,6 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
             spanInner.appendChild(mathLink);
             if (this.outLinkFile && app.plugins.getPlugin("supercharged-links-obsidian") != null) {
                 let superCharged = getSuperCharged(plugin, this.outLinkFile);
-                console.log(superCharged);
                 spanInner.classList.add("data-link-icon");
                 spanInner.classList.add("data-link-icon-after");
                 spanInner.classList.add("data-link-text");

@@ -147,6 +147,8 @@ export function getSuperCharged(plugin: MathLinks, file: TFile): [string, [strin
             for (let i = 0; i < data.selectors.length; i++) {
                 if (data.selectors[i].name == attr && data.selectors[i].value == frontmatter[attr]) {
                     attributes.push([attr, frontmatter[attr]]);
+                } else if (data.selectors[i].type == "tag" && data.selectors[i].value == frontmatter[attr]) {
+                    attributes.push([attr, frontmatter[attr]]);
                 }
             }
         }
