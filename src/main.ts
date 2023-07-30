@@ -5,12 +5,12 @@ import { buildLivePreview } from "./preview";
 
 export default class MathLinks extends Plugin {
     async onload() {
-        await loadMathJax();
         await this.loadSettings();
+        await loadMathJax();
 
-        this.registerMarkdownPostProcessor(async (element, context) => {
+        this.registerMarkdownPostProcessor((element, context) => {
             if (isValid(this, context.containerEl, context.sourcePath)) {
-                generateMathLinks(this, element);
+                generateMathLinks(this, element, context.sourcePath);
             }
         });
 
