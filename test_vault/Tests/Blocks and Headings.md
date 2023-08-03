@@ -1,6 +1,6 @@
 ---
 mathLink: $\sigma$
-mathLinks-block:
+mathLink-blocks:
     my-id: $\beta$
 ---
 
