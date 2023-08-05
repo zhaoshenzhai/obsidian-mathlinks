@@ -1,4 +1,5 @@
 import { TFile, renderMath, finishRenderMath, parseLinktext, resolveSubpath, getLinkpath } from "obsidian";
+import MathLinks from "./main";
 
 // Generate all mathLinks in element to be added in the MarkdownPostProcessor in reading view
 export function generateMathLinks(plugin: MathLinks, element: HTMLElement, sourcePath: string): void {
@@ -93,15 +94,18 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
             let subMathLink = "";
             if (subpathResult.type == "heading") {
                 subMathLink = subpathResult.current.heading;
-            } else if (subpathResult.type == "block" && cache.frontmatter["mathLink-blocks"]) {
+            } else if (subpathResult.type == "block" && cache.frontmatter["mathLink-blocks"] && cache.frontmatter["mathLink-blocks"][subpathResult.block.id]) {
                 subMathLink = "^" + cache.frontmatter["mathLink-blocks"][subpathResult.block.id];
             }
-
-            if (path) { 
-                mathLink = (cache.frontmatter.mathLink ?? path) + " > " + subMathLink;
-            } else { 
-                mathLink = subMathLink;
-            }            
+            if (subMathLink) { // cache.frontmatter["mathLink-blocks"][subpathResult.block.id] can be undefined, in which case subMathLink == ""
+                if (path) { 
+                    mathLink = (cache.frontmatter.mathLink ?? path) + " > " + subMathLink;
+                } else { 
+                    mathLink = subMathLink;
+                }    
+            } else {
+                mathLink = ""
+            }
         } else {
             mathLink = cache.frontmatter.mathLink;
             if (mathLink == "auto") {
