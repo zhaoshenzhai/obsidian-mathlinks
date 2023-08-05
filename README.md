@@ -49,20 +49,20 @@ MathLinks will ignore those files. If `path` is entered, all files under `path` 
 
 ## Changelog
 ### 0.3.x: _Merged with [obsidian-mathjax-wikilinks](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks)._
-* 0.3.5: [#24](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/24): Fixed creating new notes when anchor links are pressed.
-* 0.3.4: [#17](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/17), [#18](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/18), [#19](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/19), [#20](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/20): Fixed opening notes in new tab (`cmd` key and mouse); proper Dataview rendering in callouts.
-* 0.3.3: [#16](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/16): Open links in new tab when `ctrl` is held.
-* 0.3.2: [#12](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/12), [#15](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/15): Fixed `mathLinks` in live-preview, which should now render in most markdown elements. Made the `ViewPlugin` operate independently from each leaf, which now allows for multiple instances of the same file to be opened and rendered differently (live-preview vs. source).
-* 0.3.1: [#13](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/13), [#14](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/14): Render `mathLinks` in Dataview inline fields.
-* 0.3.0: [#9](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/9): Merged with [obsidian-mathjax-wikilinks](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks), with credits to [aaron-jack-manning](https://github.com/aaron-jack-manning). Extended its functionality to include live-preview for both Wikilinks and Markdown Links.
+* 0.3.5: Fixed creating new notes when anchor links are pressed ([#24](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/24)).
+* 0.3.4: Fixed opening notes in new tab (`cmd` key and mouse); proper Dataview rendering in callouts ([#17](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/17), [#18](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/18), [#19](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/19), [#20](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/20)).
+* 0.3.3: Open links in new tab when `ctrl` is held ([#16](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/16)).
+* 0.3.2: Fixed `mathLinks` in live-preview, which should now render in most markdown elements. Made the `ViewPlugin` operate independently from each leaf, which now allows for multiple instances of the same file to be opened and rendered differently in live-preview and source ([#12](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/12), [#15](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/15)).
+* 0.3.1: Render `mathLinks` in Dataview inline fields ([#13](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/13), [#14](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/14)).
+* 0.3.0: Merged with [obsidian-mathjax-wikilinks](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks), with credits to [aaron-jack-manning](https://github.com/aaron-jack-manning). Extended its functionality to include live-preview for both Wikilinks and Markdown Links ([#9](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/9)).
 ### 0.2.x: _No longer edit the links themselves._
-* 0.2.9: [#10](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/10), [#11](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/11): Fixed hanging and 'creating new notes' on `layout-changed` for pinned notes.
-* 0.2.8: [#7](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/7): Render `mathLinks` in live-preview.
-* 0.2.7: [#6](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/6): Render `mathLinks` in canvas.
-* 0.2.6: [#4](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/4), [#5](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/5): Added Dataview support.
-* 0.2.5: [#3](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/3): Fixed decoding `UTf-8` characters in `fileName`.
-* 0.2.4: [#2](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/2): Fixed not respecting custom link names.
-* 0.2.3: [#1](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/1): Fixed only checking for files in `fileManager.getNewFileParent()`.
+* 0.2.9: Fixed hanging and 'creating new notes' on `layout-changed` for pinned notes ([#10](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/10), [#11](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/11)).
+* 0.2.8: Render `mathLinks` in live-preview ([#7](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/7)).
+* 0.2.7: Render `mathLinks` in canvas ([#6](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/6)).
+* 0.2.6: Added Dataview support ([#4](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/4), [#5](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/5)).
+* 0.2.5: Fixed decoding `UTf-8` characters in `fileName` ([#3](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/3)).
+* 0.2.4: Fixed not respecting custom link names ([#2](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/2)).
+* 0.2.3: Fixed only checking for files in `fileManager.getNewFileParent()` ([#1](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/1)).
 * 0.2.2: Simplified `getMathLink()`.
 * 0.2.1: Fixed duplicate title.
 * 0.2.0: No longer edit the links themselves. Instead, a markdown post-processor is registered which renders individual inline MathJax equations (like `$...$`) and patches them back together.
