@@ -1,4 +1,4 @@
-import { Setting, PluginSettingTab, Modal, TextComponent, DropdownComponent, Notice, TFile, ToggleComponent, ButtonComponent, ExtraButtonComponent } from "obsidian";
+import { Setting, PluginSettingTab, Modal, TextComponent, DropdownComponent, Notice, TFile, ToggleComponent, ButtonComponent, ExtraButtonComponent, App } from "obsidian";
 import MathLinks from "./main";
 
 export interface MathLinksSettings {
@@ -223,7 +223,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                 return b;
             });
 
-        // 
+        // Enable API
         new Setting(containerEl)
             .setName("Enable MathLinks API")
             .setDesc("Allow other community plugins to use MathLinks.")
@@ -233,7 +233,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                         this.plugin.settings.enableAPI = value;
                         await this.plugin.saveSettings();
                     })
-            })
+            });
     }
 }
 

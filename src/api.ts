@@ -1,40 +1,55 @@
 import { App, TFile } from 'obsidian';
 
-import MathLinks, { MathLinksMetadata } from './main';
+import MathLinks, { MathLinksMetadata, MathLinksMetadataSet } from './main';
 
 export class MathLinksAPI {
-    constructor(public plugin: MathLinks) { }
+    metadataSet: MathLinksMetadataSet;
 
-    checkIfEnabled() {
-        if (!this.plugin.settings.enableAPI) {
-            throw Error("MathLinks: MathLinks API is disabled");
+    constructor(public plugin: MathLinks, public userID: string, public blockPrefix: string) {
+        if (this.plugin.mathLinksFromAPI[userID] !== undefined) {
+            throw Error(`MathLinks API: user ID ${userID} is already taken`);
         }
+        this.plugin.mathLinksFromAPI[userID] = {};
+        this.metadataSet = this.plugin.mathLinksFromAPI[userID];
     }
 
     update(path: string, newMetadata: MathLinksMetadata) {
-        this.checkIfEnabled();
         let file = this.plugin.app.vault.getAbstractFileByPath(path);
         if (file instanceof TFile && file.extension == "md") {
-            this.plugin.externalMathLinks[path] = Object.assign(
-                {}, 
-                this.plugin.externalMathLinks[path],
+            this.metadataSet[path] = Object.assign(
+                {},
+                this.metadataSet[path],
                 newMetadata
-            );    
+            );
         } else {
             throw Error(`MathLinks API: Invalid path: ${path}`);
         }
     }
 
+    get(path: string, blockID?: string) {
+        // If blockID === undefined, return mathLink
+        // If blockID is given, return the corresponding item of mathLink-blocks
+        let metadata = this.metadataSet[path];
+        if (metadata) {
+            if (blockID === undefined) {
+                return metadata["mathLink"];
+            }
+            let blocks = metadata["mathLink-blocks"];
+            if (blocks) {
+                return blocks[blockID];
+            }
+        }
+    }
+
     delete(path: string, which?: string) {
-        // `which === undefined`: remove all the external mathLinks associated with `path`
+        // `which === undefined`: remove all the mathLinks associated with `path`
         // `which == "mathLink": remove `mathLink`
         // `which == "mathLink-blocks": remove `mathLink-blocks`
         // `which == <blockID>`: remove `mathLink-blocks[<blockID>]`
-        this.checkIfEnabled();
-        let metadata = this.plugin.externalMathLinks[path]
+        let metadata = this.metadataSet[path];
         if (metadata) {
             if (which === undefined) {
-                delete this.plugin.externalMathLinks[path];
+                delete this.metadataSet[path];
             } else if (which == "mathLink" || which == "mathLink-blocks") {
                 if (metadata[which] !== undefined) {
                     delete metadata[which];
@@ -52,5 +67,9 @@ export class MathLinksAPI {
         } else {
             throw Error(`MathLinks API: Path ${path} does not exist in MathLinks.externalMathLinks`);
         }
+    }
+
+    deleteUser() {
+        delete this.plugin.mathLinksFromAPI[this.userID];
     }
 }

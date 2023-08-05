@@ -9,10 +9,12 @@ export interface MathLinksMetadata {
     "mathLink-blocks"?: Record<string, string>
 }
 
+export type MathLinksMetadataSet = Record<string, MathLinksMetadata>; // {[path]: [metadata for the file], ...}
+
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
-    externalMathLinks: Record<string, MathLinksMetadata> = {};
-    api: MathLinksAPI;
+    mathLinksFromAPI: Record<string, MathLinksMetadataSet>; // {[userID]: [metadata set for the user], ...}
+    APIUserPrecedence: {userID: string, blockPrefix: string}[];
 
     async onload() {
         await this.loadSettings();
@@ -42,7 +44,8 @@ export default class MathLinks extends Plugin {
             }
         });
 
-        this.api = new MathLinksAPI(this);
+        this.mathLinksFromAPI = {};
+        this.APIUserPrecedence = [];
     }
 
     async loadSettings() {
@@ -52,5 +55,11 @@ export default class MathLinks extends Plugin {
 
     async saveSettings() {
         await this.saveData(this.settings);
+    }
+
+    getAPI(userID: string, blockPrefix: string = "^") {
+        this.APIUserPrecedence.push({userID, blockPrefix});
+        let api = new MathLinksAPI(this, userID, blockPrefix);
+        return api;
     }
 }

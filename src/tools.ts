@@ -1,4 +1,4 @@
-import { TFile, renderMath, finishRenderMath, parseLinktext, resolveSubpath, getLinkpath, BlockSubpathResult, HeadingSubpathResult, CachedMetadata } from "obsidian";
+import { TFile, renderMath, finishRenderMath, parseLinktext, resolveSubpath, getLinkpath, BlockSubpathResult, HeadingSubpathResult } from "obsidian";
 import MathLinks from "./main";
 
 // Generate all mathLinks in element to be added in the MarkdownPostProcessor in reading view
@@ -92,7 +92,7 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
     let mathLink = "";
     if (cache.frontmatter) {
         if (subpathResult) {
-            mathLink = getMathLinkFromSubpath(path, subpathResult, cache.frontmatter);
+            mathLink = getMathLinkFromSubpath(path, subpathResult, cache.frontmatter, "^");
         } else {
             mathLink = cache.frontmatter.mathLink;
             if (mathLink == "auto") {
@@ -121,23 +121,36 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
 
     // Read mathLink registered via API
     if (!mathLink && plugin.settings.enableAPI) {
-        let metadata = plugin.externalMathLinks[file.path];
-        if (subpathResult) {
-            mathLink = getMathLinkFromSubpath(path, subpathResult, metadata);
-        } else {
-            mathLink = metadata["mathLink"] ?? "";
+        for (let { userID, blockPrefix } of plugin.APIUserPrecedence) {
+            let metadataSet = plugin.mathLinksFromAPI[userID];
+            if (metadataSet && metadataSet[file.path]) {
+                let metadata = metadataSet[file.path];
+                if (subpathResult) {
+                    mathLink = getMathLinkFromSubpath(path, subpathResult, metadata, blockPrefix);
+                } else {
+                    mathLink = metadata["mathLink"] ?? "";
+                }
+            }
+            if (mathLink) {
+                break;
+            }
         }
     }
 
     return mathLink;
 }
 
-function getMathLinkFromSubpath(linkpath: string, subpathResult: HeadingSubpathResult | BlockSubpathResult, metadata: Object): string {
+function getMathLinkFromSubpath(
+    linkpath: string, 
+    subpathResult: HeadingSubpathResult | BlockSubpathResult, 
+    metadata: Object, 
+    blockPrefix: string, // originally "^"
+): string {
     let subMathLink = ""
     if (subpathResult.type == "heading") {
         subMathLink = subpathResult.current.heading;
     } else if (subpathResult.type == "block" && metadata["mathLink-blocks"] && metadata["mathLink-blocks"][subpathResult.block.id]) {
-        subMathLink = "^" + metadata["mathLink-blocks"][subpathResult.block.id];
+        subMathLink = blockPrefix + metadata["mathLink-blocks"][subpathResult.block.id];
     }
     if (subMathLink) {
         if (linkpath) { 
