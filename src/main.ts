@@ -2,8 +2,18 @@ import { App, Plugin, TFile, loadMathJax } from "obsidian";
 import { generateMathLinks, isValid } from "./tools";
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { buildLivePreview } from "./preview";
+import { MathLinksAPI } from "./api";
+
+export interface MathLinksMetadata {
+    "mathLink"?: string;
+    "mathLink-blocks"?: Record<string, string>
+}
 
 export default class MathLinks extends Plugin {
+    settings: MathLinksSettings;
+    externalMathLinks: Record<string, MathLinksMetadata> = {};
+    api: MathLinksAPI;
+
     async onload() {
         await this.loadSettings();
         await loadMathJax();
@@ -31,6 +41,8 @@ export default class MathLinks extends Plugin {
                 });
             }
         });
+
+        this.api = new MathLinksAPI(this);
     }
 
     async loadSettings() {

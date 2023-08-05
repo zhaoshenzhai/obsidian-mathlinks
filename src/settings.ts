@@ -1,13 +1,16 @@
-import { Setting, PluginSettingTab, Modal, TextComponent, DropdownComponent, Notice, TFile } from "obsidian";
+import { Setting, PluginSettingTab, Modal, TextComponent, DropdownComponent, Notice, TFile, ToggleComponent, ButtonComponent, ExtraButtonComponent } from "obsidian";
+import MathLinks from "./main";
 
 export interface MathLinksSettings {
     templates: string[];
     excludedFilePaths: string[];
+    enableAPI: boolean;
 }
 
 export const DEFAULT_SETTINGS: MathLinksSettings = {
     templates: [],
     excludedFilePaths: [],
+    enableAPI: true,
 }
 
 export class MathLinksSettingTab extends PluginSettingTab {
@@ -18,7 +21,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
         this.plugin = plugin;
     }
 
-    async display(): void {
+    async display(): Promise<void> {
         const { containerEl } = this;
 
         containerEl.empty();
@@ -82,7 +85,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                         templateTitle = null;
                 });
             })
-            .addExtraButton((button: ButtonComponent): ButtonComponent => {
+            .addExtraButton((button: ExtraButtonComponent): ExtraButtonComponent => {
                 let b = button
                     .setTooltip("Edit")
                     .setIcon("edit")
@@ -109,7 +112,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                     });
                 return b;
             })
-            .addExtraButton((button: ButtonComponent): ButtonComponent => {
+            .addExtraButton((button: ExtraButtonComponent): ExtraButtonComponent => {
                 let b = button
                     .setTooltip("Delete")
                     .setIcon("trash")
@@ -219,6 +222,18 @@ export class MathLinksSettingTab extends PluginSettingTab {
                     });
                 return b;
             });
+
+        // 
+        new Setting(containerEl)
+            .setName("Enable MathLinks API")
+            .setDesc("Allow other community plugins to use MathLinks.")
+            .addToggle((toggle: ToggleComponent) => {
+                toggle.setValue(this.plugin.settings.enableAPI)
+                    .onChange(async (value: boolean) => {
+                        this.plugin.settings.enableAPI = value;
+                        await this.plugin.saveSettings();
+                    })
+            })
     }
 }
 

@@ -1,4 +1,4 @@
-import { TFile, renderMath, finishRenderMath, parseLinktext, resolveSubpath, getLinkpath } from "obsidian";
+import { TFile, renderMath, finishRenderMath, parseLinktext, resolveSubpath, getLinkpath, BlockSubpathResult, HeadingSubpathResult, CachedMetadata } from "obsidian";
 import MathLinks from "./main";
 
 // Generate all mathLinks in element to be added in the MarkdownPostProcessor in reading view
@@ -87,25 +87,12 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
     let cache = plugin.app.metadataCache.getFileCache(file);
     if (!cache) return "";
 
+    let subpathResult = resolveSubpath(cache, subpath);
+
     let mathLink = "";
     if (cache.frontmatter) {
-        let subpathResult = resolveSubpath(cache, subpath);
         if (subpathResult) {
-            let subMathLink = "";
-            if (subpathResult.type == "heading") {
-                subMathLink = subpathResult.current.heading;
-            } else if (subpathResult.type == "block" && cache.frontmatter["mathLink-blocks"] && cache.frontmatter["mathLink-blocks"][subpathResult.block.id]) {
-                subMathLink = "^" + cache.frontmatter["mathLink-blocks"][subpathResult.block.id];
-            }
-            if (subMathLink) { // cache.frontmatter["mathLink-blocks"][subpathResult.block.id] can be undefined, in which case subMathLink == ""
-                if (path) { 
-                    mathLink = (cache.frontmatter.mathLink ?? path) + " > " + subMathLink;
-                } else { 
-                    mathLink = subMathLink;
-                }    
-            } else {
-                mathLink = ""
-            }
+            mathLink = getMathLinkFromSubpath(path, subpathResult, cache.frontmatter);
         } else {
             mathLink = cache.frontmatter.mathLink;
             if (mathLink == "auto") {
@@ -132,7 +119,35 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
         }
     }
 
+    // Read mathLink registered via API
+    if (!mathLink && plugin.settings.enableAPI) {
+        let metadata = plugin.externalMathLinks[file.path];
+        if (subpathResult) {
+            mathLink = getMathLinkFromSubpath(path, subpathResult, metadata);
+        } else {
+            mathLink = metadata["mathLink"] ?? "";
+        }
+    }
+
     return mathLink;
+}
+
+function getMathLinkFromSubpath(linkpath: string, subpathResult: HeadingSubpathResult | BlockSubpathResult, metadata: Object): string {
+    let subMathLink = ""
+    if (subpathResult.type == "heading") {
+        subMathLink = subpathResult.current.heading;
+    } else if (subpathResult.type == "block" && metadata["mathLink-blocks"] && metadata["mathLink-blocks"][subpathResult.block.id]) {
+        subMathLink = "^" + metadata["mathLink-blocks"][subpathResult.block.id];
+    }
+    if (subMathLink) {
+        if (linkpath) { 
+            return (metadata["mathLink"] ?? linkpath) + " > " + subMathLink;
+        } else { 
+            return subMathLink;
+        }    
+    } else {
+        return "";
+    }
 }
 
 export function getSuperCharged(plugin: MathLinks, file: TFile): [string, [string, string][]] {
