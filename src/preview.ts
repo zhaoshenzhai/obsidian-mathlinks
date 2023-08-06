@@ -1,20 +1,19 @@
 import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType } from "@codemirror/view";
-import { getMathLink, addMathLink, getSuperCharged } from "./tools"
+import { getMathLink, addMathLink } from "./links"
+import { addSuperCharged } from "./supercharged.ts"
 import MathLinks from "./main";
 
 export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin>
 {
     class MathWidget extends WidgetType {
         outLinkText: string;
-        outLinkFile: TFile;
         outLinkMathLink: string;
 
-        constructor(outLinkText: string, outLinkFile: TFile, outLinkMathLink: string) {
+        constructor(outLinkText: string, outLinkMathLink: string) {
             super();
             this.outLinkText = outLinkText;
-            this.outLinkFile = outLinkFile,
             this.outLinkMathLink = outLinkMathLink;
         }
 
@@ -25,16 +24,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
 
             let spanInner = document.createElement("span");
             spanInner.appendChild(mathLink);
-            if (this.outLinkFile && app.plugins.getPlugin("supercharged-links-obsidian") != null) {
-                let superCharged = getSuperCharged(plugin, this.outLinkFile);
-                spanInner.classList.add("data-link-icon");
-                spanInner.classList.add("data-link-icon-after");
-                spanInner.classList.add("data-link-text");
-                spanInner.setAttribute("data-link-path", this.outLinkFile.path);
-                spanInner.setAttribute("data-link-tags", superCharged[0]);
-                for (let i = 0; i < superCharged[1].length; i++)
-                    spanInner.setAttribute("data-link-" + superCharged[1][i][0], superCharged[1][i][1]);
-            }
+            addSuperCharged(plugin, spanInner, plugin.app.metadataCache.getFirstLinkpathDest(this.outLinkText.replace(/#.*$/, ""), ""));
 
             let spanOuter = document.createElement("span");
             spanOuter.classList.add("cm-hmd-internal-link");
@@ -113,7 +103,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                 let builder = new RangeSetBuilder<Decoration>();
 
                 for (let { from, to } of view.visibleRanges) {
-                    let start = -1, end = -1, outLinkText = "", outLinkFile = null, outLinkMathLink = "";
+                    let start = -1, end = -1, outLinkText = "", outLinkMathLink = "";
 
                     syntaxTree(view.state).iterate({
                         from,
@@ -136,7 +126,6 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                                 if (outLinkMathLink == outLinkText.replace(/\.md/, "")) {
                                     outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
                                 }
-                                outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(outLinkText.replace(/#.*$/, ""), "");
                             }
 
                             // Alias: File name (with decoding)
@@ -145,14 +134,12 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                                 if (outLinkMathLink == outLinkText.replace(/\.md/, "")) {
                                     outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
                                 }
-                                outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(outLinkText.replace(/#.*$/, ""), "");
                             }
 
                             // No alias
                             else if (name.contains("hmd-internal-link") && !name.contains("alias")) {
                                 outLinkText += view.state.doc.sliceString(node.from, node.to);
                                 outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
-                                outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(outLinkText.replace(/#.*$/, ""), "");
                             }
 
                             // End
@@ -169,7 +156,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                                                 start,
                                                 end,
                                                 Decoration.widget({
-                                                    widget: new MathWidget(outLinkText, outLinkFile, outLinkMathLink.replace(/\\\$/, "$")),
+                                                    widget: new MathWidget(outLinkText, outLinkMathLink.replace(/\\\$/, "$")),
                                                 })
                                             );
                                         }
@@ -177,7 +164,6 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                                     start = -1;
                                     end = -1;
                                     outLinkText = "";
-                                    outLinkFile = null;
                                     outLinkMathLink = "";
                                 }
                             }

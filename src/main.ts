@@ -1,8 +1,9 @@
 import { App, Plugin, TFile, loadMathJax } from "obsidian";
-import { generateMathLinks, isValid } from "./tools";
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from "./settings";
-import { buildLivePreview } from "./preview";
 import { MathLinksAPIAccount } from "./api";
+import { generateMathLinks } from "./links";
+import { buildLivePreview } from "./preview";
+import { isValid } from "./utils"
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
@@ -49,13 +50,9 @@ export default class MathLinks extends Plugin {
     }
 
     getAPIAccount(userPlugin: Plugin, blockPrefix: string = "^") {
-        // register `userPlugin` as a user of MathLinks API and return the account
-
-        // If the account already exists, return it
         let account = this.apiAccounts.find((account) => account.manifest.id == userPlugin.manifest.id);
         if (account) return account;
 
-        // If not, create a new one
         account = new MathLinksAPIAccount(this, userPlugin.manifest, blockPrefix);
         this.apiAccounts.push(account);
         return account;

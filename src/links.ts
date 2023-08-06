@@ -1,7 +1,7 @@
 import { TFile, renderMath, finishRenderMath, parseLinktext, resolveSubpath, getLinkpath, BlockSubpathResult, HeadingSubpathResult } from "obsidian";
+import { translateLink } from "./utils"
 import MathLinks from "./main";
 
-// Generate all mathLinks in element to be added in the MarkdownPostProcessor in reading view
 export function generateMathLinks(plugin: MathLinks, element: HTMLElement, sourcePath: string): void {
     for (let targetEl of element.querySelectorAll(".internal-link")) {
         if (targetEl.classList.contains("mathLink-internal-link")) {
@@ -29,7 +29,6 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement, sourc
     }
 }
 
-// Add a mathLink to targetEl. If newElement, then targetEl will be duplicated.
 export function addMathLink(targetEl: HTMLElement, mathLink: string, newElement: boolean): HTMLElement {
     let splits: [string, boolean][] = [];
 
@@ -77,7 +76,6 @@ export function addMathLink(targetEl: HTMLElement, mathLink: string, newElement:
     return mathLinkEl;
 }
 
-// Get mathLink from cached metadata
 export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: string): string {
     let { path, subpath } = parseLinktext(targetLink);
 
@@ -121,12 +119,7 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
     return mathLink;
 }
 
-function getMathLinkFromSubpath(
-    linkpath: string, 
-    subpathResult: HeadingSubpathResult | BlockSubpathResult, 
-    metadata: Object, 
-    blockPrefix: string, // originally "^"
-): string {
+function getMathLinkFromSubpath(linkpath: string, subpathResult: HeadingSubpathResult | BlockSubpathResult, metadata: Object, blockPrefix: string): string {
     let subMathLink = ""
     if (subpathResult.type == "heading") {
         subMathLink = subpathResult.current.heading;
@@ -165,68 +158,3 @@ function getMathLinkFromTemplates(plugin: MathLinks, file: TFile): string {
 
     return mathLink;
 }
-
-export function getSuperCharged(plugin: MathLinks, file: TFile): [string, [string, string][]] {
-    const data = app.plugins.getPlugin("supercharged-links-obsidian").settings;
-
-    let tagArr = plugin.app.metadataCache.getFileCache(file).tags;
-    let tags: string = "";
-    if (tagArr) {
-        for (let i = 0; i < tagArr.length; i++)
-            tags += tagArr[i].tag.replace(/#/, "") + " ";
-        tags = tags.trimEnd();
-    }
-
-    let attributes: [string, string][] = [];
-    let frontmatter = plugin.app.metadataCache.getFileCache(file).frontmatter;
-    for (let attr in frontmatter) {
-        if (attr != "mathLink" && attr != "position") {
-            for (let i = 0; i < data.selectors.length; i++) {
-                if (data.selectors[i].name == attr && data.selectors[i].value == frontmatter[attr]) {
-                    attributes.push([attr, frontmatter[attr]]);
-                } else if (data.selectors[i].type == "tag" && data.selectors[i].value == frontmatter[attr] && data.targetTags) {
-                    attributes.push([attr, frontmatter[attr]]);
-                }
-            }
-        }
-    }
-
-    return [tags, attributes];
-}
-
-// Exclude files; include all canvases
-export function isValid(plugin: MathLinks, element: HTMLElement, fileName: string): boolean {
-    while (element.parentNode && element.parentNode.nodeName.toLowerCase() != "body") {
-        element = element.parentNode;
-        if (element.className.toLowerCase().includes("canvas")) {
-            return true;
-        }
-    }
-
-    for (let i = 0; i < plugin.settings.excludedFilePaths.length; i++) {
-        let path = plugin.settings.excludedFilePaths[i];
-        if (path.isFile && fileName == path.path) {
-            return false;
-        } else if (!path.isFile) {
-            let pathRegex = new RegExp(`\\b${path.path}/`);
-            if (pathRegex.test(fileName)) return false;
-        }
-    }
-
-    return true;
-}  
-
-// Convert "filename#heading" to "filename > heading" and "filename#^blockID" to "filename > ^blockID"
-function translateLink(targetLink: string): string {
-    function translateLinkImpl(targetLink: string, pattern: RegExp): string | undefined {
-        let result = pattern.exec(targetLink);
-        if (result)
-            return (result[1] ? `${result[1]} > ` : "") + `${result[2]}`
-    }
-
-    let headingPattern = /(^.*)#([^\^].*)/;
-    let blockPattern = /(^.*)#(\^[a-zA-Z0-9\-]+)/;
-    let translatedAsHeading = translateLinkImpl(targetLink, headingPattern);
-    let translatedAsBlock = translateLinkImpl(targetLink, blockPattern);
-    return translatedAsHeading ?? translatedAsBlock ?? "";
-}  
