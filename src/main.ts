@@ -55,7 +55,7 @@ export default class MathLinks extends Plugin {
         await this.saveData(this.settings);
     }
 
-    getAPI(plugin: Plugin, blockPrefix: string = "^") {
+    getAPIAccount(plugin: Plugin, blockPrefix: string = "^") {
         // register `plugin` as a user of MathLinks API and return the account
         let pluginID = plugin.manifest.id;
         // If the account already exists, return it

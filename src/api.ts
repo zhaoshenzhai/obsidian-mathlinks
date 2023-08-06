@@ -9,7 +9,7 @@ export class MathLinksAPIAccount {
         this.metadataSet = {};
     }
 
-    update(path: string, newMetadata: MathLinksMetadata) {
+    update(path: string, newMetadata: MathLinksMetadata): void {
         let file = this.plugin.app.vault.getAbstractFileByPath(path);
         if (file instanceof TFile && file.extension == "md") {
             this.metadataSet[path] = Object.assign(
@@ -22,7 +22,7 @@ export class MathLinksAPIAccount {
         }
     }
 
-    get(path: string, blockID?: string) {
+    get(path: string, blockID?: string): string | undefined {
         // If blockID === undefined, return mathLink
         // If blockID is given, return the corresponding item of mathLink-blocks
         let metadata = this.metadataSet[path];
@@ -37,7 +37,7 @@ export class MathLinksAPIAccount {
         }
     }
 
-    delete(path: string, which?: string) {
+    delete(path: string, which?: string): void {
         // `which === undefined`: remove all the mathLinks associated with `path`
         // `which == "mathLink": remove `mathLink`
         // `which == "mathLink-blocks": remove `mathLink-blocks`
@@ -65,7 +65,7 @@ export class MathLinksAPIAccount {
         }
     }
 
-    deleteUser() {
+    deleteAccount(): void {
         let index = this.plugin.apiAccounts.findIndex(
             (account) => account.pluginID == this.pluginID
         );
