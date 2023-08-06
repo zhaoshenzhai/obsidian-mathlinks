@@ -55,8 +55,11 @@ MathLinks supports links to blocks and headings like `[[note#^block-id]]` and `[
 ### Enable API
 Expose some of `MathLinks`' features to other community plugins. Enabled by default.
 
+## Contributing
+If you would like to point out a bug, add support, or have a feature request, don't hesitate to open an issue/pull request! Thank you to all who have contributed.
+
 ## Changelog
-### 0.4.x: _Heading/Block Links, and API Integration._
+### 0.4.x: _Heading/Block Links and API Integration._
 * 0.4.0: Enable `mathLinks` in heading/block links with `mathLink-blocks` and API integration with other plugins, with credits to [RyotaUshio](https://github.com/RyotaUshio); fixed Supercharged links in live-preview ([#23](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/23), [#26](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/26), [#27](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/27), [#28](https://github.com/zhaoshenzhai/obsidian-mathlinks/discussions/28), [#30](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/30), [#31](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/31), [#32](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/32)).
 ### 0.3.x: _Merged with [obsidian-mathjax-wikilinks](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks)._
 * 0.3.5: Fixed creating new notes when anchor links are pressed ([#24](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/24)).
