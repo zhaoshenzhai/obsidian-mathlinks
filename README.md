@@ -28,8 +28,10 @@ This plugin also makes Wikilinks and Markdown Links compatible with MathJax, so 
 Additionally, Obsidian also supports links to blocks `[[note#^block-id]]` and section headings like `[[note#section]]`. Any `MathJax` in `#section` will be rendered, and you can associate a `mathLink` to `^block-id` as well by adding a YAML frontmatter like so:
 
 ```
+---
 mathLink-blocks:
     block-id: yourMathLink
+---
 ```
 
 ### Templates
