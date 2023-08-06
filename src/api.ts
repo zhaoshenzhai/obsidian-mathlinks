@@ -1,11 +1,11 @@
-import { TFile } from 'obsidian';
+import { PluginManifest, TFile } from 'obsidian';
 
 import MathLinks, { MathLinksMetadata, MathLinksMetadataSet } from './main';
 
 export class MathLinksAPIAccount {
     metadataSet: MathLinksMetadataSet;
 
-    constructor(public plugin: MathLinks, public pluginID: string, public blockPrefix: string) {
+    constructor(public plugin: MathLinks, public manifest: PluginManifest, public blockPrefix: string) {
         this.metadataSet = {};
     }
 
@@ -67,7 +67,7 @@ export class MathLinksAPIAccount {
 
     deleteAccount(): void {
         let index = this.plugin.apiAccounts.findIndex(
-            (account) => account.pluginID == this.pluginID
+            (account) => account.manifest.id == this.manifest.id
         );
         this.plugin.apiAccounts.splice(index, 1);
     }

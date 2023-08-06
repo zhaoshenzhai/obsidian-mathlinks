@@ -55,18 +55,18 @@ export default class MathLinks extends Plugin {
         await this.saveData(this.settings);
     }
 
-    getAPIAccount(plugin: Plugin, blockPrefix: string = "^") {
-        // register `plugin` as a user of MathLinks API and return the account
-        let pluginID = plugin.manifest.id;
+    getAPIAccount(userPlugin: Plugin, blockPrefix: string = "^") {
+        // register `userPlugin` as a user of MathLinks API and return the account
+
         // If the account already exists, return it
         let account = this.apiAccounts.find(
-            (account) => account.pluginID == pluginID
+            (account) => account.manifest.id == userPlugin.manifest.id
         );
         if (account) {
             return account;  
         }
         // If not, create a new one
-        account = new MathLinksAPIAccount(this, pluginID, blockPrefix);
+        account = new MathLinksAPIAccount(this, userPlugin.manifest, blockPrefix);
         this.apiAccounts.push(account);
         return account;
     }
