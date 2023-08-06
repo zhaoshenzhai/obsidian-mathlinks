@@ -1,9 +1,14 @@
 import { App, Plugin, TFile, loadMathJax } from "obsidian";
-import { generateMathLinks, isValid } from "./tools";
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from "./settings";
+import { MathLinksAPIAccount } from "./api";
+import { generateMathLinks } from "./links";
 import { buildLivePreview } from "./preview";
+import { isValid } from "./utils"
 
 export default class MathLinks extends Plugin {
+    settings: MathLinksSettings;
+    apiAccounts: MathLinksAPIAccount[];
+
     async onload() {
         await this.loadSettings();
         await loadMathJax();
@@ -31,6 +36,8 @@ export default class MathLinks extends Plugin {
                 });
             }
         });
+
+        this.apiAccounts = [];
     }
 
     async loadSettings() {
@@ -40,5 +47,14 @@ export default class MathLinks extends Plugin {
 
     async saveSettings() {
         await this.saveData(this.settings);
+    }
+
+    getAPIAccount(userPlugin: Plugin, blockPrefix: string = "^") {
+        let account = this.apiAccounts.find((account) => account.manifest.id == userPlugin.manifest.id);
+        if (account) return account;
+
+        account = new MathLinksAPIAccount(this, userPlugin.manifest, blockPrefix);
+        this.apiAccounts.push(account);
+        return account;
     }
 }

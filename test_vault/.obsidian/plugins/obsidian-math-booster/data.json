@@ -1,0 +1,18 @@
+{
+  "settings": {
+    "/": {
+      "lang": "en",
+      "number_prefix": "",
+      "number_suffix": "",
+      "number_init": 1,
+      "number_style": "arabic",
+      "eq_number_style": "arabic",
+      "label_prefix": "",
+      "rename": {},
+      "preamblePath": "",
+      "lineByLine": true
+    },
+    "Tests/Callouts.md": {}
+  },
+  "excludedFiles": []
+}
