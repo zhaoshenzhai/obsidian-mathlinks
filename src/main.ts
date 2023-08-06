@@ -4,12 +4,6 @@ import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from "./sett
 import { buildLivePreview } from "./preview";
 import { MathLinksAPIAccount } from "./api";
 
-export interface MathLinksMetadata {
-    "mathLink"?: string;
-    "mathLink-blocks"?: Record<string, string>
-}
-
-export type MathLinksMetadataSet = Record<string, MathLinksMetadata>; // {[path]: [metadata for the file], ...}
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;

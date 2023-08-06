@@ -25,16 +25,16 @@ export class MathLinksSettingTab extends PluginSettingTab {
         const { containerEl } = this;
 
         containerEl.empty();
-        containerEl.createEl("h2", { text: "MathLinks Settings" });
+        containerEl.createEl("h2", {text: "MathLinks Settings"});
 
         // Add a new template
         new Setting(containerEl)
             .setName("Add a new template")
             .setDesc(
                 createFragment((e) => {
-                    e.createSpan({ text: "Generate mathLinks with a new template. Use " });
-                    e.createEl("code", { text: "mathLink: auto" });
-                    e.createSpan({ text: " to use templates in a file." });
+                    e.createSpan({text: "Generate mathLinks with a new template. Use "});
+                    e.createEl("code", {text: "mathLink: auto"});
+                    e.createSpan({text: " to use templates in a file."});
                 })
             )
             .addButton((button: ButtonComponent): ButtonComponent => {
@@ -193,7 +193,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
                         excludedFilePath = null;
                 });
             })
-            .addExtraButton((button: ButtonComponent): ButtonComponent => {
+            .addExtraButton((button: ExtraButtonComponent): ExtraButtonComponent => {
                 let b = button
                     .setTooltip("Remove")
                     .setIcon("trash")
@@ -229,11 +229,11 @@ export class MathLinksSettingTab extends PluginSettingTab {
             .setDesc(
                 createFragment((e) => {
                     let accounts = this.plugin.apiAccounts;
-                    e.createSpan({ text: "Allow other community plugins to use MathLinks." });
+                    e.createSpan({text: "Allow other community plugins to use MathLinks."});
                     if (accounts.length) {
                         let list = e.createEl("ul");
                         for (let account of accounts) {
-                            list.createEl("li", { text: account.manifest.name });
+                            list.createEl("li", {text: account.manifest.name});
                         }    
                     }
                 })
@@ -326,11 +326,11 @@ class AddExcludedModal extends Modal {
             .setName("File name/path of folder")
             .setDesc(
                 createFragment((e) => {
-                    e.createSpan({ text: "Enter a file as" });
-                    e.createEl("code", { text: "path/name.md" });
-                    e.createSpan({ text: " and a folder as " });
-                    e.createEl("code", { text: "path" });
-                    e.createSpan({ text: "." });
+                    e.createSpan({text: "Enter a file as"});
+                    e.createEl("code", {text: "path/name.md"});
+                    e.createSpan({text: " and a folder as "});
+                    e.createEl("code", {text: "path"});
+                    e.createSpan({text: "."});
                 })
             )
             .addText((text) => {
@@ -383,7 +383,7 @@ class ConfirmModal extends Modal {
         const { contentEl } = this;
         contentEl.empty();
 
-        contentEl.createEl("h3", { text: this.areYouSure });
+        contentEl.createEl("h3", {text: this.areYouSure});
         loadButtonsToClose(this, this.contentEl.createDiv(), this.proceed, this.noProceed);
     }
 }

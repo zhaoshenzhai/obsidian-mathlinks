@@ -1,6 +1,13 @@
 import { PluginManifest, TFile } from 'obsidian';
 
-import MathLinks, { MathLinksMetadata, MathLinksMetadataSet } from './main';
+import MathLinks from './main';
+
+export interface MathLinksMetadata {
+    "mathLink"?: string;
+    "mathLink-blocks"?: Record<string, string>
+}
+
+export type MathLinksMetadataSet = Record<string, MathLinksMetadata>; // {[path]: [metadata for the file], ...}
 
 export class MathLinksAPIAccount {
     metadataSet: MathLinksMetadataSet;
