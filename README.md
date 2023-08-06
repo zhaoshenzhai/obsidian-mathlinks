@@ -47,6 +47,11 @@ MathLinks will ignore those files. If `path` is entered, all files under `path` 
 > **Note**:
 > `path` must be relative to the vault directory.
 
+### Links to Blocks/Sections
+MathLinks supports links to blocks and sections like `[[note#^block-id]]` and `[[note#section]]`. You can modify how they are rendered by:
+* Editing the prefix for block links: By default, block links are prefixed by `^`. This can be changed (or removed).
+* Toggling whether to render `note`: If disabled, the above links will be rendered as `[[^block-id]]` and `[[section]]`.
+
 ## Changelog
 ### 0.3.x: _Merged with [obsidian-mathjax-wikilinks](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks)._
 * 0.3.5: Fixed creating new notes when anchor links are pressed ([#24](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/24)).
