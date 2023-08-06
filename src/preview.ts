@@ -2,6 +2,7 @@ import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType } from "@codemirror/view";
 import { getMathLink, addMathLink, getSuperCharged } from "./tools"
+import MathLinks from "./main";
 
 export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin>
 {

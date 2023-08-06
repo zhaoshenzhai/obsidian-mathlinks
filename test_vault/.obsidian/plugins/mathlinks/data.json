@@ -1,0 +1,14 @@
+{
+  "templates": [
+    {
+      "title": "Templates",
+      "replaced": "Templates",
+      "replacement": "$\\Leftrightarrow$",
+      "globalMatch": true,
+      "sensitive": true,
+      "word": true
+    }
+  ],
+  "excludedFilePaths": [],
+  "enableAPI": true
+}

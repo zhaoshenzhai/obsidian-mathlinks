@@ -96,25 +96,7 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
         } else {
             mathLink = cache.frontmatter.mathLink;
             if (mathLink == "auto") {
-                let templates = plugin.settings.templates;
-                mathLink = file.name.replace("\.md", "");
-                for (let i = 0; i < templates.length; i++) {
-                    let replaced = new RegExp(templates[i].replaced);
-                    let replacement = templates[i].replacement;
-
-                    let flags = "";
-                    if (templates[i].globalMatch)
-                        flags += "g";
-                    if (!templates[i].sensitive)
-                        flags += "i";
-
-                    if (templates[i].word)
-                        replaced = RegExp(replaced.source.replace(/^/, "\\b").replace(/$/, "\\b"), flags);
-                    else
-                        replaced = RegExp(replaced.source, flags);
-
-                    mathLink = mathLink.replace(replaced, replacement);
-                }
+                mathLink = getMathLinkFromTemplates(plugin, file);
             }
         }
     }
@@ -160,6 +142,28 @@ function getMathLinkFromSubpath(
     } else {
         return "";
     }
+}
+
+function getMathLinkFromTemplates(plugin: MathLinks, file: TFile): string {
+    let templates = plugin.settings.templates;
+    mathLink = file.name.replace(/\.md$/, "");
+    for (let i = 0; i < templates.length; i++) {
+        let replaced = new RegExp(templates[i].replaced);
+        let replacement = templates[i].replacement;
+
+        let flags = "";
+        if (templates[i].globalMatch) flags += "g";
+        if (!templates[i].sensitive) flags += "i";
+
+        if (templates[i].word)
+            replaced = RegExp(replaced.source.replace(/^/, "\\b").replace(/$/, "\\b"), flags);
+        else
+            replaced = RegExp(replaced.source, flags);
+
+        mathLink = mathLink.replace(replaced, replacement);
+    }
+
+    return mathLink;
 }
 
 export function getSuperCharged(plugin: MathLinks, file: TFile): [string, [string, string][]] {

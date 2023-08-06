@@ -1,5 +1,4 @@
 import { PluginManifest, TFile } from 'obsidian';
-
 import MathLinks from './main';
 
 export interface MathLinksMetadata {

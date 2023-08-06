@@ -4,7 +4,6 @@ import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from "./sett
 import { buildLivePreview } from "./preview";
 import { MathLinksAPIAccount } from "./api";
 
-
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
     apiAccounts: MathLinksAPIAccount[];
@@ -53,12 +52,9 @@ export default class MathLinks extends Plugin {
         // register `userPlugin` as a user of MathLinks API and return the account
 
         // If the account already exists, return it
-        let account = this.apiAccounts.find(
-            (account) => account.manifest.id == userPlugin.manifest.id
-        );
-        if (account) {
-            return account;  
-        }
+        let account = this.apiAccounts.find((account) => account.manifest.id == userPlugin.manifest.id);
+        if (account) return account;
+
         // If not, create a new one
         account = new MathLinksAPIAccount(this, userPlugin.manifest, blockPrefix);
         this.apiAccounts.push(account);
