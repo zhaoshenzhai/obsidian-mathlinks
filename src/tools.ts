@@ -121,12 +121,11 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
 
     // Read mathLink registered via API
     if (!mathLink && plugin.settings.enableAPI) {
-        for (let { userID, blockPrefix } of plugin.APIUserPrecedence) {
-            let metadataSet = plugin.mathLinksFromAPI[userID];
-            if (metadataSet && metadataSet[file.path]) {
-                let metadata = metadataSet[file.path];
+        for (let account of plugin.apiAccounts) {
+            if (account.metadataSet[file.path]) {
+                let metadata = account.metadataSet[file.path];
                 if (subpathResult) {
-                    mathLink = getMathLinkFromSubpath(path, subpathResult, metadata, blockPrefix);
+                    mathLink = getMathLinkFromSubpath(path, subpathResult, metadata, account.blockPrefix);
                 } else {
                     mathLink = metadata["mathLink"] ?? "";
                 }

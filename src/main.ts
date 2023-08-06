@@ -2,7 +2,7 @@ import { App, Plugin, TFile, loadMathJax } from "obsidian";
 import { generateMathLinks, isValid } from "./tools";
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { buildLivePreview } from "./preview";
-import { MathLinksAPI } from "./api";
+import { MathLinksAPIAccount } from "./api";
 
 export interface MathLinksMetadata {
     "mathLink"?: string;
@@ -13,8 +13,7 @@ export type MathLinksMetadataSet = Record<string, MathLinksMetadata>; // {[path]
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
-    mathLinksFromAPI: Record<string, MathLinksMetadataSet>; // {[userID]: [metadata set for the user], ...}
-    APIUserPrecedence: {userID: string, blockPrefix: string}[];
+    apiAccounts: MathLinksAPIAccount[];
 
     async onload() {
         await this.loadSettings();
@@ -44,8 +43,7 @@ export default class MathLinks extends Plugin {
             }
         });
 
-        this.mathLinksFromAPI = {};
-        this.APIUserPrecedence = [];
+        this.apiAccounts = [];
     }
 
     async loadSettings() {
@@ -57,9 +55,19 @@ export default class MathLinks extends Plugin {
         await this.saveData(this.settings);
     }
 
-    getAPI(userID: string, blockPrefix: string = "^") {
-        this.APIUserPrecedence.push({userID, blockPrefix});
-        let api = new MathLinksAPI(this, userID, blockPrefix);
-        return api;
+    getAPI(plugin: Plugin, blockPrefix: string = "^") {
+        // register `plugin` as a user of MathLinks API and return the account
+        let pluginID = plugin.manifest.id;
+        // If the account already exists, return it
+        let account = this.apiAccounts.find(
+            (account) => account.pluginID == pluginID
+        );
+        if (account) {
+            return account;  
+        }
+        // If not, create a new one
+        account = new MathLinksAPIAccount(this, pluginID, blockPrefix);
+        this.apiAccounts.push(account);
+        return account;
     }
 }

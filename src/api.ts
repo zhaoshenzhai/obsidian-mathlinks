@@ -1,16 +1,12 @@
-import { App, TFile } from 'obsidian';
+import { TFile } from 'obsidian';
 
 import MathLinks, { MathLinksMetadata, MathLinksMetadataSet } from './main';
 
-export class MathLinksAPI {
+export class MathLinksAPIAccount {
     metadataSet: MathLinksMetadataSet;
 
-    constructor(public plugin: MathLinks, public userID: string, public blockPrefix: string) {
-        if (this.plugin.mathLinksFromAPI[userID] !== undefined) {
-            throw Error(`MathLinks API: user ID ${userID} is already taken`);
-        }
-        this.plugin.mathLinksFromAPI[userID] = {};
-        this.metadataSet = this.plugin.mathLinksFromAPI[userID];
+    constructor(public plugin: MathLinks, public pluginID: string, public blockPrefix: string) {
+        this.metadataSet = {};
     }
 
     update(path: string, newMetadata: MathLinksMetadata) {
@@ -70,6 +66,9 @@ export class MathLinksAPI {
     }
 
     deleteUser() {
-        delete this.plugin.mathLinksFromAPI[this.userID];
+        let index = this.plugin.apiAccounts.findIndex(
+            (account) => account.pluginID == this.pluginID
+        );
+        this.plugin.apiAccounts.splice(index, 1);
     }
 }
