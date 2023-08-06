@@ -24,6 +24,14 @@ Content starts here.
 
 This plugin also makes Wikilinks and Markdown Links compatible with MathJax, so links like `[[note|yourAlias]]` and `[yourAlias](note.md)` will be displayed as the rendered MathJax of `yourAlias`. A `mathLink` in `note`, if present, will be overridden by `yourAlias`.
 
+### Links to Blocks/Headings
+Additionally, Obsidian also supports links to blocks `[[note#^block-id]]` and section headings like `[[note#section]]`. Any `MathJax` in `#section` will be rendered, and you can associate a `mathLink` to `^block-id` as well by adding a YAML frontmatter like so:
+
+```
+mathLink-blocks:
+    block-id: yourMathLink
+```
+
 ### Templates
 Oftentimes, `mathLinks` of notes involve replacing some text with its math counterpart. For instance, you might have many notes whose title is of the form `... iff ...`.
 
