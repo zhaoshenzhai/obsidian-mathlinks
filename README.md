@@ -53,7 +53,7 @@ MathLinks supports links to blocks and sections like `[[note#^block-id]]` and `[
 * Toggling whether to render `note`: If disabled, the links will be rendered as `[[^block-id]]` and `[[section]]`.
 
 ### Enable API
-Expose some of `MathLinks`' features to other community plugins.
+Expose some of `MathLinks`' features to other community plugins. Enabled by default.
 
 ## Changelog
 ### 0.3.x: _Merged with [obsidian-mathjax-wikilinks](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks)._
