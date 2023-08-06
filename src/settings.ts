@@ -4,12 +4,16 @@ import MathLinks from "./main";
 export interface MathLinksSettings {
     templates: string[];
     excludedFilePaths: string[];
+    blockPrefix: string;
+    enableFileNameBlockLinks: boolean;
     enableAPI: boolean;
 }
 
 export const DEFAULT_SETTINGS: MathLinksSettings = {
     templates: [],
     excludedFilePaths: [],
+    blockPrefix: "^",
+    enableFileNameBlockLinks: true,
     enableAPI: true,
 }
 
@@ -221,6 +225,40 @@ export class MathLinksSettingTab extends PluginSettingTab {
                         }
                     });
                 return b;
+            });
+
+        // Block links
+        let prefix: TextComponent;
+        new Setting(containerEl)
+            .setName("Edit prefix for block links")
+            .setDesc(
+                createFragment((e) => {
+                    e.createSpan({text: "Links like "});
+                    e.createEl("code", {text: "note#^block-id"});
+                    e.createSpan({text: " will be rendered as"});
+                    if (this.plugin.settings.enableFileNameBlockLinks) {
+                        e.createEl("code", {text: "note > " + this.plugin.settings.blockPrefix + "block-id"});
+                    } else {
+                        e.createEl("code", {text: this.plugin.settings.blockPrefix + "block-id"});
+                    }
+                    e.createSpan({text: "."});
+                })
+            )
+            .addText((text) => {
+                prefix = text;
+                prefix.setValue(this.plugin.settings.blockPrefix).onChange(async (current: string) => {
+                    this.plugin.settings.blockPrefix = current;
+                    await this.plugin.saveSettings();
+                });
+                prefix.setPlaceholder("No prefix");
+            })
+            .addToggle((toggle: ToggleComponent) => {
+                toggle.setValue(this.plugin.settings.enableFileNameBlockLinks)
+                    .onChange(async (value: boolean) => {
+                        this.plugin.settings.enableFileNameBlockLinks = value;
+                        await this.plugin.saveSettings();
+                    });
+                toggle.setTooltip("Disable to ignore note name.");
             });
 
         // Enable API

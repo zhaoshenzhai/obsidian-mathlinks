@@ -90,7 +90,7 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
     let mathLink = "";
     if (cache.frontmatter) {
         if (subpathResult) {
-            mathLink = getMathLinkFromSubpath(path, subpathResult, cache.frontmatter, "^");
+            mathLink = getMathLinkFromSubpath(plugin, path, subpathResult, cache.frontmatter, plugin.settings.blockPrefix);
         } else if (path) {
             mathLink = cache.frontmatter.mathLink;
             if (mathLink == "auto") {
@@ -119,7 +119,7 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
     return mathLink;
 }
 
-function getMathLinkFromSubpath(linkpath: string, subpathResult: HeadingSubpathResult | BlockSubpathResult, metadata: Object, blockPrefix: string): string {
+function getMathLinkFromSubpath(plugin: MathLinks, linkpath: string, subpathResult: HeadingSubpathResult | BlockSubpathResult, metadata: Object, blockPrefix: string): string {
     let subMathLink = ""
     if (subpathResult.type == "heading") {
         subMathLink = subpathResult.current.heading;
@@ -127,7 +127,7 @@ function getMathLinkFromSubpath(linkpath: string, subpathResult: HeadingSubpathR
         subMathLink = blockPrefix + metadata["mathLink-blocks"][subpathResult.block.id];
     }
     if (subMathLink) {
-        if (linkpath) { 
+        if (linkpath && plugin.settings.enableFileNameBlockLinks) {
             return (metadata["mathLink"] ?? linkpath) + " > " + subMathLink;
         } else { 
             return subMathLink;

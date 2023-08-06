@@ -10,5 +10,7 @@
     }
   ],
   "excludedFilePaths": [],
+  "blockPrefix": "",
+  "enableFileNameBlockLinks": false,
   "enableAPI": true
 }
