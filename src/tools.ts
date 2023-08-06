@@ -93,7 +93,7 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
     if (cache.frontmatter) {
         if (subpathResult) {
             mathLink = getMathLinkFromSubpath(path, subpathResult, cache.frontmatter, "^");
-        } else {
+        } else if (path) {
             mathLink = cache.frontmatter.mathLink;
             if (mathLink == "auto") {
                 mathLink = getMathLinkFromTemplates(plugin, file);

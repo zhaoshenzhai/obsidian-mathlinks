@@ -18,9 +18,9 @@
       "match": "exact",
       "uid": "ebb6-7451",
       "selectText": true,
-      "selectAppend": false,
+      "selectAppend": true,
       "selectPrepend": true,
-      "selectBackground": true
+      "selectBackground": false
     }
   ]
 }
