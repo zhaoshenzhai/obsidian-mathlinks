@@ -47,8 +47,8 @@ MathLinks will ignore those files. If `path` is entered, all files under `path` 
 > **Note**:
 > `path` must be relative to the vault directory.
 
-### Links to Blocks/Sections
-MathLinks supports links to blocks and sections like `[[note#^block-id]]` and `[[note#section]]`. You can modify how they are rendered by:
+### Links to Blocks/Headings
+MathLinks supports links to blocks and headings like `[[note#^block-id]]` and `[[note#section]]`. You can modify how they are rendered by:
 * Editing the prefix for block links: By default, block links are prefixed by `^`. This can be changed (or removed).
 * Toggling whether to render `note`: If disabled, the links will be rendered as `[[^block-id]]` and `[[section]]`.
 
@@ -56,6 +56,8 @@ MathLinks supports links to blocks and sections like `[[note#^block-id]]` and `[
 Expose some of `MathLinks`' features to other community plugins. Enabled by default.
 
 ## Changelog
+### 0.4.x: _Heading/Block Links, and API Integration._
+* 0.4.0: Enable `mathLinks` in heading/block links with `mathLink-blocks` and API integration with other plugins, with credits to [RyotaUshio](https://github.com/RyotaUshio); fixed Supercharged links in live-preview ([#23](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/23), [#26](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/26), [#27](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/27), [#28](https://github.com/zhaoshenzhai/obsidian-mathlinks/discussions/28), [#30](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/30), [#31](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/31), [#32](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/32)).
 ### 0.3.x: _Merged with [obsidian-mathjax-wikilinks](https://github.com/aaron-jack-manning/obsidian-mathjax-wikilinks)._
 * 0.3.5: Fixed creating new notes when anchor links are pressed ([#24](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/24)).
 * 0.3.4: Fixed opening notes in new tab (`cmd` key and mouse); proper Dataview rendering in callouts ([#17](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/17), [#18](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/18), [#19](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/19), [#20](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/20)).
