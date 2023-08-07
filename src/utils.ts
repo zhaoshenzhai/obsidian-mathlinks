@@ -1,8 +1,8 @@
 import MathLinks from "./main";
 
 export function isValid(plugin: MathLinks, element: HTMLElement, fileName: string): boolean {
-    while (element.parentNode && element.parentNode.nodeName.toLowerCase() != "body") {
-        element = element.parentNode;
+    while (element.parentElement && element.parentElement.nodeName.toLowerCase() != "body") {
+        element = element.parentElement;
         if (element.className.toLowerCase().includes("canvas")) {
             return true;
         }

@@ -3,27 +3,32 @@ import { translateLink } from "./utils"
 import MathLinks from "./main";
 
 export function generateMathLinks(plugin: MathLinks, element: HTMLElement, sourcePath: string): void {
-    for (let targetEl of element.querySelectorAll(".internal-link")) {
+    for (let targetEl of element.querySelectorAll<HTMLElement>(".internal-link")) {
         if (targetEl.classList.contains("mathLink-internal-link")) {
             targetEl.remove();
-            targetEl = element.querySelector(".original-internal-link");
-            targetEl.classList.remove("original-internal-link");
-            targetEl.style.display = "";
+            let queryResult = element.querySelector<HTMLElement>(".original-internal-link");
+            if (queryResult) {
+                targetEl = queryResult;
+                targetEl.classList.remove("original-internal-link");
+                targetEl.style.display = "";    
+            }
         }
 
-        let targetDisplay = targetEl.textContent.trim();
+        let targetDisplay = targetEl.textContent?.trim();
         if (targetDisplay != "" && !/math-inline is-loaded/.test(targetEl.innerHTML)) {
-            let targetLink = targetEl.getAttribute("data-href").replace(/\.md/, "");
-            if (targetDisplay != targetLink && targetDisplay != translateLink(targetLink)) {
-                addMathLink(targetEl, targetDisplay, true);
-            } else {
-                let targetMathLink = getMathLink(plugin, targetLink, sourcePath);
-                if (targetMathLink) {
-                    let targetName = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(targetLink), sourcePath).basename;
-                    if (targetEl.innerText == targetName || targetEl.innerText == translateLink(targetLink)) {
-                        addMathLink(targetEl, targetMathLink, true);
+            let targetLink = targetEl.getAttribute("data-href")?.replace(/\.md/, "");
+            if (targetLink) {
+                if (targetDisplay && targetDisplay != targetLink && targetDisplay != translateLink(targetLink)) {
+                    addMathLink(targetEl, targetDisplay, true);
+                } else {
+                    let targetMathLink = getMathLink(plugin, targetLink, sourcePath);
+                    if (targetMathLink) {
+                        let targetName = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(targetLink), sourcePath)?.basename;
+                        if (targetEl.innerText == targetName || targetEl.innerText == translateLink(targetLink)) {
+                            addMathLink(targetEl, targetMathLink, true);
+                        }
                     }
-                }
+                }    
             }
         }
     }
@@ -51,7 +56,7 @@ export function addMathLink(targetEl: HTMLElement, mathLink: string, newElement:
         }
     }
 
-    let mathLinkEl = targetEl.cloneNode(newElement);
+    let mathLinkEl = targetEl.cloneNode(newElement) as HTMLElement;
     mathLinkEl.innerText = "";
     for (let i = 0; i < splits.length; i++) {
         let word = splits[i][0];
@@ -67,7 +72,7 @@ export function addMathLink(targetEl: HTMLElement, mathLink: string, newElement:
 
     finishRenderMath();
     if (newElement) {
-        targetEl.parentNode.insertBefore(mathLinkEl, targetEl.nextSibling);
+        targetEl.parentNode?.insertBefore(mathLinkEl, targetEl.nextSibling);
         mathLinkEl.classList.add("mathLink-internal-link");
         targetEl.classList.add("original-internal-link");
         targetEl.style.display = "none";
@@ -105,7 +110,7 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
             if (account.metadataSet[file.path]) {
                 let metadata = account.metadataSet[file.path];
                 if (subpathResult) {
-                    mathLink = getMathLinkFromSubpath(path, subpathResult, metadata, account.blockPrefix);
+                    mathLink = getMathLinkFromSubpath(plugin, path, subpathResult, metadata, account.blockPrefix);
                 } else {
                     mathLink = metadata["mathLink"] ?? "";
                 }
@@ -139,7 +144,7 @@ function getMathLinkFromSubpath(plugin: MathLinks, linkpath: string, subpathResu
 
 function getMathLinkFromTemplates(plugin: MathLinks, file: TFile): string {
     let templates = plugin.settings.templates;
-    mathLink = file.name.replace(/\.md$/, "");
+    let mathLink = file.name.replace(/\.md$/, "");
     for (let i = 0; i < templates.length; i++) {
         let replaced = new RegExp(templates[i].replaced);
         let replacement = templates[i].replacement;
