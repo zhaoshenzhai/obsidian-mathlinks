@@ -4,10 +4,22 @@ import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetTy
 import { getMathLink, addMathLink } from "./links"
 import { addSuperCharged } from "./supercharged"
 import MathLinks from "./main";
-import { WorkspaceLeaf } from "obsidian";
+import { FileView, MarkdownView, WorkspaceLeaf } from "obsidian";
+
+declare module "obsidian" {
+    interface FileView {
+        canvas?: any;
+    }
+
+    interface Editor {
+        cm?: EditorView;
+    }
+}
 
 export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin<V>>
-{
+{    
+    let leafView = leaf.view as FileView;
+
     class MathWidget extends WidgetType {
         outLinkText: string;
         outLinkMathLink: string;
@@ -25,7 +37,10 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
 
             let spanInner = document.createElement("span");
             spanInner.appendChild(mathLink);
-            addSuperCharged(plugin, spanInner, plugin.app.metadataCache.getFirstLinkpathDest(this.outLinkText.replace(/#.*$/, ""), ""));
+            let outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(this.outLinkText.replace(/#.*$/, ""), "");
+            if (outLinkFile) {
+                addSuperCharged(plugin, spanInner, outLinkFile);
+            }
 
             let spanOuter = document.createElement("span");
             spanOuter.classList.add("cm-hmd-internal-link");
@@ -33,12 +48,14 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
 
             let outLinkFileName = this.outLinkText.replace(/#.*$/, "");
             if (!outLinkFileName) {
-                outLinkFileName = leaf.view.file.path;
-                if (outLinkFileName == "Canvas.canvas") {
-                    for (let node of leaf.view.canvas.selection.values()) {
-                        outLinkFileName = node.filePath;
-                        break;
-                    }
+                if (leafView.file) {
+                    outLinkFileName = leafView.file.path;
+                    if (outLinkFileName == "Canvas.canvas") {
+                        for (let node of leafView.canvas.selection.values()) {
+                            outLinkFileName = node.filePath;
+                            break;
+                        }
+                    }    
                 }
             }
 
@@ -79,18 +96,18 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                 this.decorations = this.destroyDecorations(view);
                 let editorView = leaf.getViewState();
 
-                if (leaf.view.editor) {
+                if (leaf.view instanceof MarkdownView) {
                     let curView = leaf.view.editor.cm as EditorView;
                     if (curView == view && editorView.state.mode == "source" && !editorView.state.source) {
                         this.decorations = this.buildDecorations(view);
                     } else {
                         this.decorations = this.destroyDecorations(view);
                     }
-                } else if (leaf.view.canvas) {
+                } else if ((leaf.view as FileView).canvas) {
                     this.decorations = this.buildDecorations(view);
 
                     plugin.app.workspace.iterateRootLeaves((otherLeaf: WorkspaceLeaf) => {
-                        if (otherLeaf.view.editor) {
+                        if (otherLeaf.view instanceof MarkdownView) {
                             let otherView = otherLeaf.view.editor.cm as EditorView;
                             if (otherView == view) {
                                 this.decorations = this.destroyDecorations(view);
@@ -124,23 +141,23 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                             // Alias: File name
                             else if (name.contains("has-alias")) {
                                 outLinkText += view.state.doc.sliceString(node.from, node.to);
-                                if (outLinkMathLink == outLinkText.replace(/\.md/, "")) {
-                                    outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
+                                if (leafView.file && outLinkMathLink == outLinkText.replace(/\.md/, "")) {
+                                    outLinkMathLink = getMathLink(plugin, outLinkText, leafView.file.path);
                                 }
                             }
 
                             // Alias: File name (with decoding)
                             else if (/string_url$/.test(name) && !name.contains("format")) {
                                 outLinkText += decodeURI(view.state.doc.sliceString(node.from, node.to));
-                                if (outLinkMathLink == outLinkText.replace(/\.md/, "")) {
-                                    outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
+                                if (leafView.file && outLinkMathLink == outLinkText.replace(/\.md/, "")) {
+                                    outLinkMathLink = getMathLink(plugin, outLinkText, leafView.file.path);
                                 }
                             }
 
                             // No alias
-                            else if (name.contains("hmd-internal-link") && !name.contains("alias")) {
+                            else if (leafView.file && name.contains("hmd-internal-link") && !name.contains("alias")) {
                                 outLinkText += view.state.doc.sliceString(node.from, node.to);
-                                outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
+                                outLinkMathLink = getMathLink(plugin, outLinkText, leafView.file.path);
                             }
 
                             // End
@@ -172,8 +189,8 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                             // Alias: MathLink
                             else if (!name.contains("pipe") && ((name.contains("hmd-internal-link") && name.contains("alias")) || name.contains("hmd-escape") || /^link/.test(name))) {
                                 outLinkMathLink += view.state.doc.sliceString(node.from, node.to);
-                                if (outLinkMathLink == outLinkText.replace(/\.md/, "")) {
-                                    outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
+                                if (leafView.file && outLinkMathLink == outLinkText.replace(/\.md/, "")) {
+                                    outLinkMathLink = getMathLink(plugin, outLinkText, leafView.file.path);
                                 }
                             }
                         }
