@@ -1,34 +1,6 @@
 import { TFile } from "obsidian";
 import MathLinks from "./main";
 
-// Reference: https://gist.github.com/aidenlx/6067c943fbec8ead230f2b163bfd3bc8#file-api-d-ts-L25
-declare module "obsidian" {
-    interface App {
-        plugins: {
-            enabledPlugins: Set<string>;
-            plugins: {
-                ["supercharged-links-obsidian"]?: {
-                    settings: SuperchargedLinksSettings;
-                }, 
-                ["mathlinks"]?: MathLinks,
-            };
-        };
-    }
-}
-
-type SelectorTypes = 'attribute' | 'tag' | 'path';
-
-interface CSSLink {
-    type: SelectorTypes
-    name: string
-    value: string
-}
-
-interface SuperchargedLinksSettings {
-    targetTags: boolean;
-    selectors: CSSLink[];
-}
-
 export function addSuperCharged(plugin: MathLinks, span: HTMLElement, outLinkFile: TFile): void {
     if (outLinkFile && plugin.app.plugins.enabledPlugins.has("supercharged-links-obsidian")) {
         let superCharged = getSuperCharged(plugin, outLinkFile);

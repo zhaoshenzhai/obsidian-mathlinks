@@ -13,7 +13,7 @@ export class MathLinksAPIAccount {
 
     constructor(
         public plugin: MathLinks, 
-        public manifest: PluginManifest, 
+        public manifest: Readonly<PluginManifest>, 
         public blockPrefix: string, 
         public enableFileNameBlockLinks: boolean, 
     ) {

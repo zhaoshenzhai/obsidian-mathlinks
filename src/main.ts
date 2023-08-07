@@ -1,4 +1,4 @@
-import { App, FileView, MarkdownView, Plugin, TFile, WorkspaceLeaf, loadMathJax } from "obsidian";
+import { FileView, MarkdownView, Plugin, WorkspaceLeaf, loadMathJax } from "obsidian";
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { MathLinksAPIAccount } from "./api";
 import { generateMathLinks } from "./links";
@@ -49,7 +49,7 @@ export default class MathLinks extends Plugin {
         await this.saveData(this.settings);
     }
 
-    getAPIAccount<UserPlugin extends Plugin>(userPlugin: UserPlugin, blockPrefix?: string, enableFileNameBlockLinks?: boolean): MathLinksAPIAccount {
+    getAPIAccount<UserPlugin extends Plugin>(userPlugin: Readonly<UserPlugin>, blockPrefix?: string, enableFileNameBlockLinks?: boolean): MathLinksAPIAccount {
         let account = this.apiAccounts.find((account) => account.manifest.id == userPlugin.manifest.id);
         if (account) return account;
 
