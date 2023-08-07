@@ -1,13 +1,10 @@
 import MathLinks from "./main";
 
-export function isValid(plugin: MathLinks, element: HTMLElement, fileName: string): boolean {
-    while (element.parentElement && element.parentElement.nodeName.toLowerCase() != "body") {
-        element = element.parentElement;
-        if (element.className.toLowerCase().includes("canvas")) {
-            return true;
-        }
-    }
-
+export function isValid(plugin: MathLinks, fileName: string): boolean {
+    // if (fileName.endsWith(".canvas")) {
+    //     console.log("Found a cancas via path!");
+    //     return true;
+    // }
     for (let i = 0; i < plugin.settings.excludedFilePaths.length; i++) {
         let path = plugin.settings.excludedFilePaths[i];
         if (path.isFile && fileName == path.path) {
