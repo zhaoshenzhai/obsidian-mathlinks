@@ -9,7 +9,8 @@ declare module "obsidian" {
             plugins: {
                 ["supercharged-links-obsidian"]?: {
                     settings: SuperchargedLinksSettings;
-                };
+                }, 
+                ["mathlinks"]?: MathLinks,
             };
         };
     }
