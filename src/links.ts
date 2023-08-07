@@ -1,6 +1,7 @@
 import { TFile, renderMath, finishRenderMath, parseLinktext, resolveSubpath, getLinkpath, BlockSubpathResult, HeadingSubpathResult } from "obsidian";
 import { translateLink } from "./utils"
 import MathLinks from "./main";
+import { MathLinksMetadata } from "./api";
 
 export function generateMathLinks(plugin: MathLinks, element: HTMLElement, sourcePath: string): void {
     for (let targetEl of element.querySelectorAll<HTMLElement>(".internal-link")) {
@@ -95,7 +96,7 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
     let mathLink = "";
     if (cache.frontmatter) {
         if (subpathResult) {
-            mathLink = getMathLinkFromSubpath(plugin, path, subpathResult, cache.frontmatter, plugin.settings.blockPrefix);
+            mathLink = getMathLinkFromSubpath(plugin, path, subpathResult, cache.frontmatter, plugin.settings.blockPrefix, plugin.settings.enableFileNameBlockLinks);
         } else if (path) {
             mathLink = cache.frontmatter.mathLink;
             if (mathLink == "auto") {
@@ -110,7 +111,7 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
             if (account.metadataSet[file.path]) {
                 let metadata = account.metadataSet[file.path];
                 if (subpathResult) {
-                    mathLink = getMathLinkFromSubpath(plugin, path, subpathResult, metadata, account.blockPrefix);
+                    mathLink = getMathLinkFromSubpath(plugin, path, subpathResult, metadata, account.blockPrefix, account.enableFileNameBlockLinks);
                 } else {
                     mathLink = metadata["mathLink"] ?? "";
                 }
@@ -124,7 +125,14 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
     return mathLink;
 }
 
-function getMathLinkFromSubpath(plugin: MathLinks, linkpath: string, subpathResult: HeadingSubpathResult | BlockSubpathResult, metadata: Object, blockPrefix: string): string {
+function getMathLinkFromSubpath(
+    plugin: MathLinks, 
+    linkpath: string, 
+    subpathResult: HeadingSubpathResult | BlockSubpathResult, 
+    metadata: MathLinksMetadata, 
+    blockPrefix: string, 
+    enableFileNameBlockLinks: boolean,
+): string {
     let subMathLink = ""
     if (subpathResult.type == "heading") {
         subMathLink = subpathResult.current.heading;
@@ -132,7 +140,7 @@ function getMathLinkFromSubpath(plugin: MathLinks, linkpath: string, subpathResu
         subMathLink = blockPrefix + metadata["mathLink-blocks"][subpathResult.block.id];
     }
     if (subMathLink) {
-        if (linkpath && plugin.settings.enableFileNameBlockLinks) {
+        if (linkpath && enableFileNameBlockLinks) {
             return (metadata["mathLink"] ?? linkpath) + " > " + subMathLink;
         } else { 
             return subMathLink;

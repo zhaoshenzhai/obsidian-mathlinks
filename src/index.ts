@@ -11,7 +11,7 @@ import { MathLinksAPIAccount } from "./api";
  * When called for the first time, register userPlugin as a user of MathLinks API and returns its account.
  * From the second time on, returns the existing account of userPlugin.
  */
-export const getAPIAccount = (userPlugin: Plugin): MathLinksAPIAccount | undefined => {
+export const getAPIAccount = <UserPlugin extends Plugin>(userPlugin: UserPlugin): MathLinksAPIAccount | undefined => {
     return userPlugin.app.plugins.plugins.mathlinks?.getAPIAccount(userPlugin);
 };
 

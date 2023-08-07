@@ -11,7 +11,12 @@ export type MathLinksMetadataSet = Record<string, MathLinksMetadata>; // {[path]
 export class MathLinksAPIAccount {
     metadataSet: MathLinksMetadataSet;
 
-    constructor(public plugin: MathLinks, public manifest: PluginManifest, public blockPrefix: string) {
+    constructor(
+        public plugin: MathLinks, 
+        public manifest: PluginManifest, 
+        public blockPrefix: string, 
+        public enableFileNameBlockLinks: boolean, 
+    ) {
         this.metadataSet = {};
     }
 

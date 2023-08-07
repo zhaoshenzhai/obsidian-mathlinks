@@ -49,11 +49,16 @@ export default class MathLinks extends Plugin {
         await this.saveData(this.settings);
     }
 
-    getAPIAccount(userPlugin: Plugin, blockPrefix: string = "^"): MathLinksAPIAccount {
+    getAPIAccount<UserPlugin extends Plugin>(userPlugin: UserPlugin, blockPrefix?: string, enableFileNameBlockLinks?: boolean): MathLinksAPIAccount {
         let account = this.apiAccounts.find((account) => account.manifest.id == userPlugin.manifest.id);
         if (account) return account;
 
-        account = new MathLinksAPIAccount(this, userPlugin.manifest, blockPrefix);
+        account = new MathLinksAPIAccount(
+            this, 
+            userPlugin.manifest, 
+            blockPrefix ?? DEFAULT_SETTINGS.blockPrefix, 
+            enableFileNameBlockLinks ?? DEFAULT_SETTINGS.enableFileNameBlockLinks, 
+        );
         this.apiAccounts.push(account);
         return account;
     }
