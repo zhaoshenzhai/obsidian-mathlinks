@@ -1,9 +1,28 @@
 import { Setting, PluginSettingTab, Modal, TextComponent, DropdownComponent, Notice, TFile, ToggleComponent, ButtonComponent, ExtraButtonComponent, App } from "obsidian";
 import MathLinks from "./main";
 
+interface MathLinksModalState {
+    saved: boolean;
+    error: string[];
+}
+
+export type Template = {
+    title: string;
+    replaced: string;
+    replacement: string;
+    globalMatch: boolean;
+    sensitive: boolean;
+    word: boolean;
+}
+
+export type FilePath = {
+    path: string;
+    isFile: boolean;
+}
+
 export interface MathLinksSettings {
-    templates: string[];
-    excludedFilePaths: string[];
+    templates: Template[];
+    excludedFilePaths: FilePath[];
     blockPrefix: string;
     enableFileNameBlockLinks: boolean;
     enableAPI: boolean;
@@ -29,16 +48,16 @@ export class MathLinksSettingTab extends PluginSettingTab {
         const { containerEl } = this;
 
         containerEl.empty();
-        containerEl.createEl("h2", {text: "MathLinks Settings"});
+        containerEl.createEl("h2", { text: "MathLinks Settings" });
 
         // Add a new template
         new Setting(containerEl)
             .setName("Add a new template")
             .setDesc(
                 createFragment((e) => {
-                    e.createSpan({text: "Generate mathLinks with a new template. Use "});
-                    e.createEl("code", {text: "mathLink: auto"});
-                    e.createSpan({text: " to use templates in a file."});
+                    e.createSpan({ text: "Generate mathLinks with a new template. Use " });
+                    e.createEl("code", { text: "mathLink: auto" });
+                    e.createSpan({ text: " to use templates in a file." });
                 })
             )
             .addButton((button: ButtonComponent): ButtonComponent => {
@@ -50,16 +69,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
 
                         modal.onClose = async () => {
                             if (modal.saved) {
-                                const template = {
-                                    title: modal.title,
-                                    replaced: modal.replaced,
-                                    replacement: modal.replacement,
-                                    globalMatch: modal.globalMatch,
-                                    sensitive: modal.sensitive,
-                                    word: modal.word
-                                };
-
-                                this.plugin.settings.templates.push(template);
+                                this.plugin.settings.templates.push(modal.newTemplate);
                                 await this.plugin.saveSettings();
 
                                 new Notice("MathLinks: Template added");
@@ -159,15 +169,10 @@ export class MathLinksSettingTab extends PluginSettingTab {
 
                         modal.onClose = async () => {
                             if (modal.saved) {
-                                const excludedFilePath = {
-                                    path: modal.excludedFilePath,
-                                    isFile: modal.isFile
-                                }
-
-                                this.plugin.settings.excludedFilePaths.push(excludedFilePath);
+                                this.plugin.settings.excludedFilePaths.push(modal.newExcludedFilePath);
                                 await this.plugin.saveSettings();
 
-                                if (modal.isFile)
+                                if (modal.newExcludedFilePath.isFile)
                                     new Notice("MathLinks: File excluded");
                                 else
                                     new Notice("MathLinks: Path exclcuded");
@@ -233,15 +238,15 @@ export class MathLinksSettingTab extends PluginSettingTab {
             .setName("Edit prefix for block links")
             .setDesc(
                 createFragment((e) => {
-                    e.createSpan({text: "Links like "});
-                    e.createEl("code", {text: "note#^block-id"});
-                    e.createSpan({text: " will be rendered as"});
+                    e.createSpan({ text: "Links like " });
+                    e.createEl("code", { text: "note#^block-id" });
+                    e.createSpan({ text: " will be rendered as" });
                     if (this.plugin.settings.enableFileNameBlockLinks) {
-                        e.createEl("code", {text: "note > " + this.plugin.settings.blockPrefix + "block-id"});
+                        e.createEl("code", { text: "note > " + this.plugin.settings.blockPrefix + "block-id" });
                     } else {
-                        e.createEl("code", {text: this.plugin.settings.blockPrefix + "block-id"});
+                        e.createEl("code", { text: this.plugin.settings.blockPrefix + "block-id" });
                     }
-                    e.createSpan({text: "."});
+                    e.createSpan({ text: "." });
                 })
             )
             .addText((text) => {
@@ -267,12 +272,12 @@ export class MathLinksSettingTab extends PluginSettingTab {
             .setDesc(
                 createFragment((e) => {
                     let accounts = this.plugin.apiAccounts;
-                    e.createSpan({text: "Allow other community plugins to use MathLinks."});
+                    e.createSpan({ text: "Allow other community plugins to use MathLinks." });
                     if (accounts.length) {
                         let list = e.createEl("ul");
                         for (let account of accounts) {
-                            list.createEl("li", {text: account.manifest.name});
-                        }    
+                            list.createEl("li", { text: account.manifest.name });
+                        }
                     }
                 })
             ).addToggle((toggle: ToggleComponent) => {
@@ -285,20 +290,15 @@ export class MathLinksSettingTab extends PluginSettingTab {
     }
 }
 
-class AddTemplatesModal extends Modal {
+class AddTemplatesModal extends Modal implements MathLinksModalState {
     saved: boolean = false;
     error: string[] = ["MathLinks: Please enter a title", "MathLinks: Please enter a non-empty string to be replaced"];
 
-    title: string = "";
-    replaced: string = "";
-    replacement: string = "";
-    globalMatch: boolean = true;
-    sensitive: boolean = true;
-    word: boolean = true
+    newTemplate: Template;
 
-    templates: string[] = [];
+    templates: Template[] = [];
 
-    constructor(app: App, templates: string[]) {
+    constructor(app: App, templates: Template[]) {
         super(app);
         this.templates = templates;
     }
@@ -307,19 +307,19 @@ class AddTemplatesModal extends Modal {
         const { contentEl } = this;
         contentEl.empty();
 
-        loadTemplateSettings(contentEl, this, this, "add");
+        loadTemplateSettings(contentEl, this.newTemplate, this);
         loadButtonsToClose(this, this.contentEl.createDiv(), "Add", "Cancel");
     }
 }
 
-class EditTemplatesModal extends Modal {
+class EditTemplatesModal extends Modal implements MathLinksModalState {
     saved: boolean = false;
     error: string[] = ["", ""];
 
     templateTitle: string;
-    templates: string[];
+    templates: Template[];
 
-    constructor(app: App, templateTitle: string, templates: string[]) {
+    constructor(app: App, templateTitle: string, templates: Template[]) {
         super(app);
         this.templateTitle = templateTitle;
         this.templates = templates;
@@ -331,7 +331,7 @@ class EditTemplatesModal extends Modal {
 
         this.templates.every((template) => {
             if (this.templateTitle != undefined && template.title == this.templateTitle) {
-                loadTemplateSettings(contentEl, template, this, "edit");
+                loadTemplateSettings(contentEl, template, this);
                 return false;
             }
             return true;
@@ -341,16 +341,15 @@ class EditTemplatesModal extends Modal {
     }
 }
 
-class AddExcludedModal extends Modal {
+class AddExcludedModal extends Modal implements MathLinksModalState {
     saved: boolean = false;
     error: string[] = ["MathLinks: Please enter a valid file/path", ""];
 
-    excludedFilePath: string;
-    isFile: boolean;
+    newExcludedFilePath: FilePath;
 
-    excludedFilePaths: string[];
+    excludedFilePaths: FilePath[];
 
-    constructor(app: App, excludedFilePaths: string[]) {
+    constructor(app: App, excludedFilePaths: FilePath[]) {
         super(app);
         this.excludedFilePaths = excludedFilePaths;
     }
@@ -364,11 +363,11 @@ class AddExcludedModal extends Modal {
             .setName("File name/path of folder")
             .setDesc(
                 createFragment((e) => {
-                    e.createSpan({text: "Enter a file as"});
-                    e.createEl("code", {text: "path/name.md"});
-                    e.createSpan({text: " and a folder as "});
-                    e.createEl("code", {text: "path"});
-                    e.createSpan({text: "."});
+                    e.createSpan({ text: "Enter a file as" });
+                    e.createEl("code", { text: "path/name.md" });
+                    e.createSpan({ text: " and a folder as " });
+                    e.createEl("code", { text: "path" });
+                    e.createSpan({ text: "." });
                 })
             )
             .addText((text) => {
@@ -379,16 +378,15 @@ class AddExcludedModal extends Modal {
                     .onChange((current) => {
                         let file = app.vault.getAbstractFileByPath(current);
                         if (file != null) {
-                            this.excludedFilePath = file.path;
-                            this.isFile = file instanceof TFile;
+                            this.newExcludedFilePath = {path: file.path, isFile: file instanceof TFile};
                             this.error[0] = "";
                         } else {
                             this.error[0] = "MathLinks: Please enter a valid file/path";
                         }
 
                         this.error[1] = "";
-                        this.excludedFilePaths.every((path) => {
-                            if (path.path == current) {
+                        this.excludedFilePaths.every((filePath) => {
+                            if (filePath.path == current) {
                                 this.error[1] = "MathLinks: Duplicate file/path";
                                 return false;
                             }
@@ -402,7 +400,7 @@ class AddExcludedModal extends Modal {
     }
 }
 
-class ConfirmModal extends Modal {
+class ConfirmModal extends Modal implements MathLinksModalState {
     saved: boolean = false;
     error: string[] = [];
 
@@ -421,12 +419,12 @@ class ConfirmModal extends Modal {
         const { contentEl } = this;
         contentEl.empty();
 
-        contentEl.createEl("h3", {text: this.areYouSure});
+        contentEl.createEl("h3", { text: this.areYouSure });
         loadButtonsToClose(this, this.contentEl.createDiv(), this.proceed, this.noProceed);
     }
 }
 
-function loadTemplateSettings(contentEl: HTMLElement, template: string, modal: Modal, modalType: string) {
+function loadTemplateSettings<M extends Modal & MathLinksModalState>(contentEl: HTMLElement, template: Template, modal: M) {
     let titleText: TextComponent;
     new Setting(contentEl)
         .setName("Title")
@@ -436,8 +434,8 @@ function loadTemplateSettings(contentEl: HTMLElement, template: string, modal: M
             titleText.setValue(template.title).onChange((current) => {
                 template.title = current;
                 modal.error[0] = "";
-                if (modalType == "add") {
-                    template.templates.every((t) => {
+                if (modal instanceof AddTemplatesModal) {
+                    modal.templates.every((t) => {
                         if (template.title != "" && template.title == t.title) {
                             modal.error[0] = "MathLinks: Duplicate title";
                             return false;
@@ -499,7 +497,7 @@ function loadTemplateSettings(contentEl: HTMLElement, template: string, modal: M
         });
 }
 
-function loadButtonsToClose(modal: Modal, element: HTMLElement, trueToolTip: string, falseToolTip: string) {
+function loadButtonsToClose<M extends Modal & MathLinksModalState>(modal: M, element: HTMLElement, trueToolTip: string, falseToolTip: string) {
     let footerButtons = new Setting(element);
     footerButtons.addButton((b) => {
         b.setTooltip(trueToolTip)
