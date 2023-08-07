@@ -6,16 +6,6 @@ import { addSuperCharged } from "./supercharged"
 import MathLinks from "./main";
 import { FileView, MarkdownView, WorkspaceLeaf } from "obsidian";
 
-declare module "obsidian" {
-    interface FileView {
-        canvas?: any;
-    }
-
-    interface Editor {
-        cm?: EditorView;
-    }
-}
-
 export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin<V>>
 {    
     let leafView = leaf.view as FileView;
