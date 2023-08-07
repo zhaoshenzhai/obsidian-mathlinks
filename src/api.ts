@@ -56,18 +56,18 @@ export class MathLinksAPIAccount {
                 if (metadata[which] !== undefined) {
                     delete metadata[which];
                 } else {
-                    throw Error(`MathLinks API: Key "${which}" does not exist in MathLinks.externalMathLinks[${path}]`);
+                    throw Error(`MathLinks API: MathLinksMetadata of type "${which}" does not exist for ${path}`);
                 }
             } else {
                 let blocks = metadata["mathLink-blocks"];
                 if (blocks && blocks[which] !== undefined) {
                     delete blocks[which];
                 } else {
-                    throw Error(`MathLinks API: Block ID "${which}" does not exist in MathLinks.externalMathLinks[${path}]["mathLink-blocks"]`);
+                    throw Error(`MathLinks API: MathLinksMetadata for ${path}#^${which}" does not exist`);
                 }
             }
         } else {
-            throw Error(`MathLinks API: Path ${path} does not exist in MathLinks.externalMathLinks`);
+            throw Error(`MathLinks API: MathLinksMetadata for ${path} does not exist`);
         }
     }
 

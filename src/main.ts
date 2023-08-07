@@ -49,7 +49,7 @@ export default class MathLinks extends Plugin {
         await this.saveData(this.settings);
     }
 
-    getAPIAccount(userPlugin: Plugin, blockPrefix: string = "^") {
+    getAPIAccount(userPlugin: Plugin, blockPrefix: string = "^"): MathLinksAPIAccount {
         let account = this.apiAccounts.find((account) => account.manifest.id == userPlugin.manifest.id);
         if (account) return account;
 
