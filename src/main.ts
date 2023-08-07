@@ -1,4 +1,4 @@
-import { App, MarkdownView, Plugin, TFile, WorkspaceLeaf, loadMathJax } from "obsidian";
+import { App, FileView, MarkdownView, Plugin, TFile, WorkspaceLeaf, loadMathJax } from "obsidian";
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { MathLinksAPIAccount } from "./api";
 import { generateMathLinks } from "./links";
@@ -21,7 +21,7 @@ export default class MathLinks extends Plugin {
 
         this.app.workspace.onLayoutReady(()=> {
             this.app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
-                if (leaf.view instanceof MarkdownView && leaf.view.file && isValid(this, leaf.view.containerEl, leaf.view.file.path)) {
+                if (leaf.view instanceof FileView && leaf.view.file && isValid(this, leaf.view.containerEl, leaf.view.file.path)) {
                     buildLivePreview(this, leaf).then((livePreview) => {
                         this.registerEditorExtension(livePreview);
                     });

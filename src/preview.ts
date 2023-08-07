@@ -1,11 +1,12 @@
 import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
-import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType } from "@codemirror/view";
+import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType, PluginValue } from "@codemirror/view";
 import { getMathLink, addMathLink } from "./links"
-import { addSuperCharged } from "./supercharged.ts"
+import { addSuperCharged } from "./supercharged"
 import MathLinks from "./main";
+import { WorkspaceLeaf } from "obsidian";
 
-export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin>
+export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin<V>>
 {
     class MathWidget extends WidgetType {
         outLinkText: string;
@@ -20,7 +21,7 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
         toDOM() {
             let mathLink = addMathLink(document.createElement("span"), this.outLinkMathLink, false);
             mathLink.classList.add("cm-underline");
-            mathLink.setAttribute("draggable", true);
+            mathLink.setAttribute("draggable", "true");
 
             let spanInner = document.createElement("span");
             spanInner.appendChild(mathLink);
@@ -194,5 +195,5 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
         }, {decorations: v => v.decorations}
     );
 
-    return new Promise<ViewPlugin> ((resolve) => {resolve(viewPlugin)});
+    return new Promise<ViewPlugin<V>> ((resolve) => {resolve(viewPlugin)});
 }
