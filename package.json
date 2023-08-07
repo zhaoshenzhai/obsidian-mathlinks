@@ -2,10 +2,15 @@
     "name": "MathLinks",
     "version": "0.4.0",
     "description": "Render MathJax in your links",
-    "main": "main.js",
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
+    "files": [
+        "lib/**/*"
+    ],
     "scripts": {
         "dev": "node esbuild.mjs",
         "build": "tsc -noEmit -skipLibCheck && node esbuild.mjs production",
+        "lib": "tsc --project tsconfig-lib.json",
         "version": "node version-bump.mjs && git add manifest.json versions.json"
     },
     "keywords": [],
