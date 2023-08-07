@@ -11,8 +11,8 @@ import { MathLinksAPIAccount } from "./api";
  * When called for the first time, register userPlugin as a user of MathLinks API and returns its account.
  * From the second time on, returns the existing account of userPlugin.
  */
-export function getAPIAccount<UserPlugin extends Plugin>(userPlugin: Readonly<UserPlugin>, blockPrefix?: string, enableFileNameBlockLinks?: boolean): MathLinksAPIAccount | undefined {
-    return userPlugin.app.plugins.plugins.mathlinks?.getAPIAccount<UserPlugin>(userPlugin, blockPrefix, enableFileNameBlockLinks);
+export function getAPIAccount<UserPlugin extends Plugin>(userPlugin: Readonly<UserPlugin>): MathLinksAPIAccount | undefined {
+    return userPlugin.app.plugins.plugins.mathlinks?.getAPIAccount<UserPlugin>(userPlugin);
 }
 
 /** Check if MathLinks is enabled. */

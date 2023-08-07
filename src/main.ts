@@ -49,15 +49,15 @@ export default class MathLinks extends Plugin {
         await this.saveData(this.settings);
     }
 
-    getAPIAccount<UserPlugin extends Plugin>(userPlugin: Readonly<UserPlugin>, blockPrefix?: string, enableFileNameBlockLinks?: boolean): MathLinksAPIAccount {
+    getAPIAccount<UserPlugin extends Plugin>(userPlugin: Readonly<UserPlugin>): MathLinksAPIAccount {
         let account = this.apiAccounts.find((account) => account.manifest.id == userPlugin.manifest.id);
         if (account) return account;
 
         account = new MathLinksAPIAccount(
             this, 
             userPlugin.manifest, 
-            blockPrefix ?? DEFAULT_SETTINGS.blockPrefix, 
-            enableFileNameBlockLinks ?? DEFAULT_SETTINGS.enableFileNameBlockLinks, 
+            DEFAULT_SETTINGS.blockPrefix, 
+            DEFAULT_SETTINGS.enableFileNameBlockLinks
         );
         this.apiAccounts.push(account);
         return account;
