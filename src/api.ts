@@ -1,5 +1,6 @@
-import { PluginManifest, TFile } from 'obsidian';
+import { FileView, MarkdownView, PluginManifest, TFile, WorkspaceLeaf } from 'obsidian';
 import MathLinks from './main';
+import { buildLivePreview } from './preview';
 
 export interface MathLinksMetadata {
     "mathLink"?: string;
@@ -28,6 +29,11 @@ export class MathLinksAPIAccount {
                 this.metadataSet[path],
                 newMetadata
             );
+            this.plugin.app.workspace.iterateRootLeaves((leaf) => {
+                if (leaf.view instanceof MarkdownView) {
+                    leaf.view.editor.cm?.dispatch(); // call ViewPlugin's update() method to reflesh mathLinks
+                }
+            });
         } else {
             throw Error(`MathLinks API: Invalid path: ${path}`);
         }
