@@ -33,9 +33,11 @@ export class MathLinksAPIAccount {
                 if (leaf.view instanceof MarkdownView) {
                     if (leaf.view.getMode() == 'source') {
                         leaf.view.editor.cm?.dispatch(); // call ViewPlugin's update() method
-                    } else if (leaf.view.getMode() == 'preview') {
-                        leaf.view.previewMode.rerender(true);
                     }
+                    /** commented out because this resets page position */
+                    //  else if (leaf.view.getMode() == 'preview') {
+                    //     leaf.view.previewMode.rerender(true); 
+                    // }
                 }
             });
         } else {
