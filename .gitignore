@@ -1,6 +1,7 @@
 node_modules
 main.js
 package-lock.json
+lib
 
 test_vault/.obsidian/workspace.json
 test_vault/.obsidian/snippets/supercharged-links-gen.css
