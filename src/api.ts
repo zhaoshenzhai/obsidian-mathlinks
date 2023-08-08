@@ -1,6 +1,5 @@
-import { FileView, MarkdownView, PluginManifest, TFile, WorkspaceLeaf } from 'obsidian';
+import { MarkdownView, PluginManifest, TFile, WorkspaceLeaf } from 'obsidian';
 import MathLinks from './main';
-import { buildLivePreview } from './preview';
 
 export interface MathLinksMetadata {
     "mathLink"?: string;
@@ -13,10 +12,10 @@ export class MathLinksAPIAccount {
     metadataSet: MathLinksMetadataSet;
 
     constructor(
-        public plugin: MathLinks, 
-        public manifest: Readonly<PluginManifest>, 
-        public blockPrefix: string, 
-        public enableFileNameBlockLinks: boolean, 
+        public plugin: MathLinks,
+        public manifest: Readonly<PluginManifest>,
+        public blockPrefix: string,
+        public enableFileNameBlockLinks: boolean,
     ) {
         this.metadataSet = {};
     }
@@ -29,9 +28,14 @@ export class MathLinksAPIAccount {
                 this.metadataSet[path],
                 newMetadata
             );
-            this.plugin.app.workspace.iterateRootLeaves((leaf) => {
+            // reflesh mathLinks display based on the new metadata
+            this.plugin.app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
                 if (leaf.view instanceof MarkdownView) {
-                    leaf.view.editor.cm?.dispatch(); // call ViewPlugin's update() method to reflesh mathLinks
+                    if (leaf.view.getMode() == 'source') {
+                        leaf.view.editor.cm?.dispatch(); // call ViewPlugin's update() method
+                    } else if (leaf.view.getMode() == 'preview') {
+                        leaf.view.previewMode.rerender(true);
+                    }
                 }
             });
         } else {
