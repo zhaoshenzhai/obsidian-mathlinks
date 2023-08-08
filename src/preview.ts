@@ -1,10 +1,11 @@
 import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType, PluginValue } from "@codemirror/view";
+import { FileView, MarkdownView, WorkspaceLeaf } from "obsidian";
 import { getMathLink, addMathLink } from "./links"
 import { addSuperCharged } from "./supercharged"
+import { isValid } from "./utils"
 import MathLinks from "./main";
-import { FileView, MarkdownView, WorkspaceLeaf } from "obsidian";
 
 export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin<V>>
 {    
@@ -86,7 +87,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                 this.decorations = this.destroyDecorations(view);
                 let editorView = leaf.getViewState();
 
-                if (leaf.view instanceof MarkdownView) {
+                if (leaf.view instanceof MarkdownView && isValid(plugin, leaf.view.file.name)) {
                     let curView = leaf.view.editor.cm;
                     if (curView == view && editorView.state.mode == "source" && !editorView.state.source) {
                         this.decorations = this.buildDecorations(view);

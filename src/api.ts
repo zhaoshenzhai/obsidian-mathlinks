@@ -28,15 +28,17 @@ export class MathLinksAPIAccount {
                 this.metadataSet[path],
                 newMetadata
             );
-            // reflesh mathLinks display based on the new metadata
+
+            // refresh mathLinks display based on the new metadata
             this.plugin.app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
                 if (leaf.view instanceof MarkdownView) {
                     if (leaf.view.getMode() == 'source') {
-                        leaf.view.editor.cm?.dispatch(); // call ViewPlugin's update() method
+                        leaf.view.editor.cm?.dispatch();
                     }
+
                     /** commented out because this resets page position */
                     //  else if (leaf.view.getMode() == 'preview') {
-                    //     leaf.view.previewMode.rerender(true); 
+                    //     leaf.view.previewMode.rerender(true);
                     // }
                 }
             });

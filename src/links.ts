@@ -1,7 +1,7 @@
 import { TFile, renderMath, finishRenderMath, parseLinktext, resolveSubpath, getLinkpath, BlockSubpathResult, HeadingSubpathResult } from "obsidian";
 import { translateLink } from "./utils"
-import MathLinks from "./main";
 import { MathLinksMetadata } from "./api";
+import MathLinks from "./main";
 
 export function generateMathLinks(plugin: MathLinks, element: HTMLElement, sourcePath: string): void {
     for (let targetEl of element.querySelectorAll<HTMLElement>(".internal-link")) {

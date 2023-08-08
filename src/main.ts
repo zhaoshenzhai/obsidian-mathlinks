@@ -19,7 +19,7 @@ export default class MathLinks extends Plugin {
             }
         });
 
-        this.app.workspace.onLayoutReady(()=> {
+        this.app.workspace.onLayoutReady(() => {
             this.app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
                 if (leaf.view instanceof FileView && leaf.view.file && isValid(this, leaf.view.file.path)) {
                     buildLivePreview(this, leaf).then((livePreview) => {
@@ -40,15 +40,6 @@ export default class MathLinks extends Plugin {
         this.apiAccounts = [];
     }
 
-    async loadSettings() {
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-        this.addSettingTab(new MathLinksSettingTab(this.app, this));
-    }
-
-    async saveSettings() {
-        await this.saveData(this.settings);
-    }
-
     getAPIAccount<UserPlugin extends Plugin>(userPlugin: Readonly<UserPlugin>): MathLinksAPIAccount {
         let account = this.apiAccounts.find((account) => account.manifest.id == userPlugin.manifest.id);
         if (account) return account;
@@ -61,5 +52,14 @@ export default class MathLinks extends Plugin {
         );
         this.apiAccounts.push(account);
         return account;
+    }
+
+    async loadSettings() {
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+        this.addSettingTab(new MathLinksSettingTab(this.app, this));
+    }
+
+    async saveSettings() {
+        await this.saveData(this.settings);
     }
 }
