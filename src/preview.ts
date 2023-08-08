@@ -87,18 +87,18 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                 let editorView = leaf.getViewState();
 
                 if (leaf.view instanceof MarkdownView) {
-                    let curView = leaf.view.editor.cm as EditorView;
+                    let curView = leaf.view.editor.cm;
                     if (curView == view && editorView.state.mode == "source" && !editorView.state.source) {
                         this.decorations = this.buildDecorations(view);
                     } else {
                         this.decorations = this.destroyDecorations(view);
                     }
-                } else if ((leaf.view as FileView).canvas) {
+                } else if (leafView.canvas) {
                     this.decorations = this.buildDecorations(view);
 
                     plugin.app.workspace.iterateRootLeaves((otherLeaf: WorkspaceLeaf) => {
                         if (otherLeaf.view instanceof MarkdownView) {
-                            let otherView = otherLeaf.view.editor.cm as EditorView;
+                            let otherView = otherLeaf.view.editor.cm;
                             if (otherView == view) {
                                 this.decorations = this.destroyDecorations(view);
                             }
