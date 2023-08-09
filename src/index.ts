@@ -1,11 +1,7 @@
 export type { MathLinksMetadata, MathLinksMetadataSet, MathLinksAPIAccount} from "./api";
 
-// Implementation
-
 import type { App, Plugin } from "obsidian";
 import { MathLinksAPIAccount } from "./api";
-
-// Utility functions
 
 /**
  * When called for the first time, register userPlugin as a user of MathLinks API and returns its account.
@@ -15,5 +11,4 @@ export function getAPIAccount<UserPlugin extends Plugin>(userPlugin: Readonly<Us
     return userPlugin.app.plugins.plugins.mathlinks?.getAPIAccount<UserPlugin>(userPlugin);
 }
 
-/** Check if MathLinks is enabled. */
 export const isPluginEnabled = (app: App) => app.plugins.enabledPlugins.has("mathlinks");

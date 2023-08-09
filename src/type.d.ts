@@ -1,5 +1,4 @@
 import { EditorView } from "@codemirror/view";
-
 import MathLinks from "./main";
 import { MathLinksAPIAccount, MathLinksMetadata } from "./api";
 
@@ -43,7 +42,6 @@ declare module "obsidian" {
         ): EventRef;
     }
 }
-
 
 // Type definitions for Supercharged Links
 

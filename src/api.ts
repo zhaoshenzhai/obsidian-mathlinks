@@ -28,6 +28,7 @@ export class MathLinksAPIAccount {
                 this.metadataSet[path],
                 newMetadata
             );
+            
             // trigger an event informing this update
             this.plugin.app.metadataCache.trigger(
                 "mathlinks:updated-via-api",
@@ -37,7 +38,7 @@ export class MathLinksAPIAccount {
             // reflesh mathLinks display based on the new metadata
             this.plugin.app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
                 if (leaf.view instanceof MarkdownView && leaf.view.getMode() == 'source') {
-                    leaf.view.editor.cm?.dispatch(); // call ViewPlugin's update() method
+                    leaf.view.editor.cm?.dispatch();
                 }
             });
         } else {
