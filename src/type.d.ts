@@ -1,5 +1,7 @@
-import MathLinks from "./main";
 import { EditorView } from "@codemirror/view";
+
+import MathLinks from "./main";
+import { MathLinksAPIAccount, MathLinksMetadata } from "./api";
 
 // Reference: 
 // https://gist.github.com/aidenlx/6067c943fbec8ead230f2b163bfd3bc8#file-api-d-ts-L25
@@ -28,23 +30,20 @@ declare module "obsidian" {
     interface Editor {
         cm?: EditorView;
     }
+
+    interface MetadataCache {
+        // Custom event triggered when an API user updates its MathLinks metadata
+        on(
+            name: "mathlinks:updated-via-api",
+            callback: (
+                apiAccount: MathLinksAPIAccount, 
+                path: string, 
+                newMetadata: MathLinksMetadata
+            ) => any
+        ): EventRef;
+    }
 }
 
-
-// // An alternative way
-// // https://github.com/eth-p/obsidian-callout-manager/blob/master/api/index.ts
-// type ObsidianAppWithPlugins = App & {
-//     plugins: {
-//         enabledPlugins: Set<string>;
-//         plugins: {
-//             [id: string]: any;
-//             ["supercharged-links-obsidian"]?: {
-//                 settings: SuperchargedLinksSettings;
-//             };
-//             ["mathlinks"]?: MathLinks;
-//         };
-//     };
-// }
 
 // Type definitions for Supercharged Links
 

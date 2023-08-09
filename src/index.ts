@@ -1,4 +1,4 @@
-export * from "./api";
+export type { MathLinksMetadata, MathLinksMetadataSet, MathLinksAPIAccount} from "./api";
 
 // Implementation
 

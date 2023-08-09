@@ -28,16 +28,16 @@ export class MathLinksAPIAccount {
                 this.metadataSet[path],
                 newMetadata
             );
+            // trigger an event informing this update
+            this.plugin.app.metadataCache.trigger(
+                "mathlinks:updated-via-api",
+                this, path, newMetadata
+            );
+
             // reflesh mathLinks display based on the new metadata
             this.plugin.app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
-                if (leaf.view instanceof MarkdownView) {
-                    if (leaf.view.getMode() == 'source') {
-                        leaf.view.editor.cm?.dispatch(); // call ViewPlugin's update() method
-                    }
-                    /** commented out because this resets page position */
-                    //  else if (leaf.view.getMode() == 'preview') {
-                    //     leaf.view.previewMode.rerender(true); 
-                    // }
+                if (leaf.view instanceof MarkdownView && leaf.view.getMode() == 'source') {
+                    leaf.view.editor.cm?.dispatch(); // call ViewPlugin's update() method
                 }
             });
         } else {
