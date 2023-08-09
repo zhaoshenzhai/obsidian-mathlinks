@@ -6,7 +6,8 @@
 		{"type":"file","file":"Tests/Markdown Links.md","id":"7ce6fd7f2c2a28e7","x":160,"y":-300,"width":260,"height":186},
 		{"type":"file","file":"Tests/Wikilinks.md","id":"72af7f7e6ad41a84","x":-160,"y":-300,"width":260,"height":186},
 		{"type":"file","file":"Tests/Callouts.md","id":"ce67ad19d3800d0e","x":160,"y":-70,"width":260,"height":300},
-		{"id":"83d3a4f8973194dd","x":-160,"y":-70,"width":260,"height":190,"type":"file","file":"Tests/API Exposure.md"}
+		{"type":"file","file":"Tests/API Exposure.md","id":"83d3a4f8973194dd","x":-160,"y":-70,"width":260,"height":190},
+		{"type":"file","file":"Tests/Excluded.md","id":"dbcb2b838f398b22","x":160,"y":280,"width":260,"height":100}
 	],
 	"edges":[]
 }
