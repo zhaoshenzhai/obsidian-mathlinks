@@ -39,7 +39,7 @@ declare module "obsidian" {
             callback: (apiAccount: MathLinksAPIAccount, path: string) => any
         ): EventRef;
 
-        // triggered when an API account is deleted: type == "account-deleted"
+        // triggered when an API account is deleted
         on(
             name: "mathlinks:account-deleted",
             callback: (apiAccount: MathLinksAPIAccount) => any
