@@ -3,7 +3,7 @@ import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from "./sett
 import { MathLinksAPIAccount } from "./api";
 import { generateMathLinks } from "./links";
 import { buildLivePreview } from "./preview";
-import { isValid } from "./utils"
+import { isValid } from "./utils";
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;

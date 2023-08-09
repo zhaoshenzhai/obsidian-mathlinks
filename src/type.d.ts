@@ -1,6 +1,6 @@
 import { EditorView } from "@codemirror/view";
-import MathLinks from "./main";
 import { MathLinksAPIAccount, MathLinksMetadata } from "./api";
+import MathLinks from "./main";
 
 // Reference: 
 // https://gist.github.com/aidenlx/6067c943fbec8ead230f2b163bfd3bc8#file-api-d-ts-L25

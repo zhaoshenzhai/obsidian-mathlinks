@@ -1,5 +1,5 @@
 import { TFile, renderMath, finishRenderMath, parseLinktext, resolveSubpath, getLinkpath, BlockSubpathResult, HeadingSubpathResult } from "obsidian";
-import { translateLink } from "./utils"
+import { translateLink } from "./utils";
 import { MathLinksMetadata } from "./api";
 import MathLinks from "./main";
 

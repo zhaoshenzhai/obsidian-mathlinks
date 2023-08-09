@@ -2,9 +2,9 @@ import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType, PluginValue } from "@codemirror/view";
 import { FileView, MarkdownView, WorkspaceLeaf, TFile } from "obsidian";
-import { getMathLink, addMathLink } from "./links"
-import { addSuperCharged } from "./supercharged"
-import { isValid } from "./utils"
+import { getMathLink, addMathLink } from "./links";
+import { addSuperCharged } from "./supercharged";
+import { isValid } from "./utils";
 import MathLinks from "./main";
 
 export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin<V>>
