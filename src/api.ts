@@ -1,4 +1,4 @@
-import { MarkdownView, PluginManifest, TFile, WorkspaceLeaf } from 'obsidian';
+import { App, MarkdownView, PluginManifest, TFile, WorkspaceLeaf } from 'obsidian';
 import MathLinks from './main';
 
 export interface MathLinksMetadata {
@@ -20,32 +20,6 @@ export class MathLinksAPIAccount {
         this.metadataSet = {};
     }
 
-    update(path: string, newMetadata: MathLinksMetadata): void {
-        let file = this.plugin.app.vault.getAbstractFileByPath(path);
-        if (file instanceof TFile && file.extension == "md") {
-            this.metadataSet[path] = Object.assign(
-                {},
-                this.metadataSet[path],
-                newMetadata
-            );
-            
-            // trigger an event informing this update
-            this.plugin.app.metadataCache.trigger(
-                "mathlinks:updated-via-api",
-                this, path, newMetadata
-            );
-
-            // reflesh mathLinks display based on the new metadata
-            this.plugin.app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
-                if (leaf.view instanceof MarkdownView && leaf.view.getMode() == 'source') {
-                    leaf.view.editor.cm?.dispatch();
-                }
-            });
-        } else {
-            throw Error(`MathLinks API: Invalid path: ${path}`);
-        }
-    }
-
     get(path: string, blockID?: string): string | undefined {
         // If blockID === undefined, return mathLink
         // If blockID is given, return the corresponding item of mathLink-blocks
@@ -58,6 +32,20 @@ export class MathLinksAPIAccount {
             if (blocks) {
                 return blocks[blockID];
             }
+        }
+    }
+
+    update(path: string, newMetadata: MathLinksMetadata): void {
+        let file = this.plugin.app.vault.getAbstractFileByPath(path);
+        if (file instanceof TFile && file.extension == "md") {
+            this.metadataSet[path] = Object.assign(
+                {},
+                this.metadataSet[path],
+                newMetadata
+            );
+            informChange(this.plugin.app, "mathlinks:updated", this, path);
+        } else {
+            throw Error(`MathLinks API: Invalid path: ${path}`);
         }
     }
 
@@ -87,12 +75,21 @@ export class MathLinksAPIAccount {
         } else {
             throw Error(`MathLinks API: MathLinksMetadata for ${path} does not exist`);
         }
+        informChange(this.plugin.app, "mathlinks:updated", this, path);
     }
+}
 
-    deleteAccount(): void {
-        let index = this.plugin.apiAccounts.findIndex(
-            (account) => account.manifest.id == this.manifest.id
-        );
-        this.plugin.apiAccounts.splice(index, 1);
-    }
+export function informChange(
+    app: App, 
+    eventName: "mathlinks:updated" | "mathlinks:account-deleted",
+    ...callbackArgs: [apiAccount: MathLinksAPIAccount, path?: string]) {
+    // trigger an event informing this update
+    app.metadataCache.trigger(eventName, ...callbackArgs);
+
+    // reflesh mathLinks display based on the new metadata
+    app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
+        if (leaf.view instanceof MarkdownView && leaf.view.getMode() == 'source') {
+            leaf.view.editor.cm?.dispatch();
+        }
+    });
 }
