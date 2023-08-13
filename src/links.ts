@@ -53,7 +53,7 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
 }
 
 
-export async function generateMathLinks(plugin: MathLinks, element: HTMLElement, context: MarkdownPostProcessorContext): Promise<void> {
+export function generateMathLinks(plugin: MathLinks, element: HTMLElement, context: MarkdownPostProcessorContext): void {
     for (let targetEl of element.querySelectorAll<HTMLElement>(".internal-link")) {
         const targetDisplay = targetEl.textContent?.trim();
         if (targetDisplay != "" && !/math-inline is-loaded/.test(targetEl.innerHTML)) {
