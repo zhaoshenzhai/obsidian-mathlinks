@@ -3,22 +3,20 @@ import { translateLink } from "./utils";
 import { MathLinksMetadata } from "./api";
 import MathLinks from "./main";
 
-
 export class MathLinksRenderChild extends MarkdownRenderChild {
+    plugin: MathLinks;
+    sourcePath: string;
+    targetLink: string;
+    displayText: string;
     targetFile: TFile | null;
 
-    constructor(
-        containerEl: HTMLElement,
-        public plugin: MathLinks,
-        public sourcePath: string,
-        public targetLink: string,
-        public displayText: string
-    ) {
+    constructor(containerEl: HTMLElement, plugin: MathLinks, sourcePath: string, targetLink: string, displayText: string) {
         super(containerEl);
-        this.targetFile = plugin.app.metadataCache.getFirstLinkpathDest(
-            getLinkpath(this.targetLink),
-            this.sourcePath
-        );
+        this.plugin = plugin;
+        this.sourcePath = sourcePath;
+        this.targetLink = targetLink;
+        this.displayText = displayText;
+        this.targetFile = this.plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(this.targetLink), this.sourcePath);
     }
 
     onload(): void {
@@ -52,7 +50,8 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
             mathLink = this.displayText;
         } else {
             const targetName = this.targetFile?.basename;
-            if (this.containerEl.innerText == targetName || this.containerEl.innerText == translateLink(this.targetLink)) { // Can targetEl.innerText be replaced with targetDisplay? (just for a consistency purpose)
+            const targetDisplay = this.containerEl.innerText;
+            if (targetDisplay == targetName || targetDisplay == translateLink(this.targetLink)) {
                 // [[note name]], [[note name#heading]] or [[note name#^blockID]]
                 mathLink = getMathLink(this.plugin, this.targetLink, this.sourcePath);
             }
@@ -66,7 +65,6 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
         }
     }
 }
-
 
 export function generateMathLinks(plugin: MathLinks, element: HTMLElement, context: MarkdownPostProcessorContext): void {
     for (let targetEl of element.querySelectorAll<HTMLElement>(".internal-link")) {
@@ -87,9 +85,9 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement, conte
 export async function renderTextWithMath(source: string): Promise<(HTMLElement | string)[]> {
     let elements: (HTMLElement | string)[] = [];
     let mathPattern = /\$(.*?[^\s])\$/g;
+    let textFrom = 0, textTo = 0;
+
     let result;
-    let textFrom = 0;
-    let textTo = 0;
     while ((result = mathPattern.exec(source)) !== null) {
         let match = result[0];
         let mathString = result[1];
@@ -106,9 +104,9 @@ export async function renderTextWithMath(source: string): Promise<(HTMLElement |
         mathSpan.replaceChildren(mathJaxEl);
         elements.push(mathSpan);
     }
-    if (textFrom < source.length) {
-        elements.push(source.slice(textFrom));
-    }
+
+    if (textFrom < source.length) elements.push(source.slice(textFrom));
+
     return elements;
 }
 
@@ -149,12 +147,12 @@ export function addMathLink(targetEl: HTMLElement, mathLink: string, newElement:
     }
 
     finishRenderMath();
-    if (newElement) {
-        targetEl.parentNode?.insertBefore(mathLinkEl, targetEl.nextSibling);
-        mathLinkEl.classList.add("mathLink-internal-link");
-        targetEl.classList.add("original-internal-link");
-        targetEl.style.display = "none";
-    }
+    // if (newElement) {
+    //     targetEl.parentNode?.insertBefore(mathLinkEl, targetEl.nextSibling);
+    //     mathLinkEl.classList.add("mathLink-internal-link");
+    //     targetEl.classList.add("original-internal-link");
+    //     targetEl.style.display = "none";
+    // }
 
     return mathLinkEl;
 }
@@ -202,14 +200,7 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
     return mathLink;
 }
 
-function getMathLinkFromSubpath(
-    plugin: MathLinks, 
-    linkpath: string, 
-    subpathResult: HeadingSubpathResult | BlockSubpathResult, 
-    metadata: MathLinksMetadata, 
-    blockPrefix: string, 
-    enableFileNameBlockLinks: boolean,
-): string {
+function getMathLinkFromSubpath(plugin: MathLinks, linkpath: string, subpathResult: HeadingSubpathResult | BlockSubpathResult, metadata: MathLinksMetadata, blockPrefix: string, enableFileNameBlockLinks: boolean): string {
     let subMathLink = ""
     if (subpathResult.type == "heading") {
         subMathLink = subpathResult.current.heading;

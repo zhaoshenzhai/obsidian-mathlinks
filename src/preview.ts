@@ -2,7 +2,7 @@ import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType, PluginValue } from "@codemirror/view";
 import { FileView, MarkdownView, WorkspaceLeaf, TFile } from "obsidian";
-import { getMathLink, addMathLink } from "./links";
+import { getMathLink, renderTextWithMath } from "./links";
 import { addSuperCharged } from "./supercharged";
 import { isValid } from "./utils";
 import MathLinks from "./main";
@@ -22,20 +22,18 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
         }
 
         toDOM() {
-            let mathLink = addMathLink(document.createElement("span"), this.outLinkMathLink, false);
+            let children = renderTextWithMath(this.outLinkMathLink);
+            let mathLink = document.createElement("span");
+            mathLink.replaceChildren(...children);
             mathLink.classList.add("cm-underline");
             mathLink.setAttribute("draggable", "true");
 
-            let spanInner = document.createElement("span");
-            spanInner.appendChild(mathLink);
             let outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(this.outLinkText.replace(/#.*$/, ""), "");
-            if (outLinkFile) {
-                addSuperCharged(plugin, spanInner, outLinkFile);
-            }
+            if (outLinkFile) addSuperCharged(plugin, mathLink, outLinkFile);
 
-            let spanOuter = document.createElement("span");
-            spanOuter.classList.add("cm-hmd-internal-link");
-            spanOuter.appendChild(spanInner);
+            let mathLinkWrapper = document.createElement("span");
+            mathLinkWrapper.classList.add("cm-hmd-internal-link");
+            mathLinkWrapper.appendChild(mathLink);
 
             let outLinkFileName = this.outLinkText.replace(/#.*$/, "");
             if (!outLinkFileName) {
@@ -50,24 +48,24 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                 }
             }
 
-            spanOuter.onclick = ((evt: MouseEvent) => {
+            mathLinkWrapper.onclick = ((evt: MouseEvent) => {
                 evt.preventDefault();
                 plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, evt.ctrlKey || evt.metaKey);
             });
 
-            spanOuter.onmousedown = ((evt: MouseEvent) => {
+            mathLinkWrapper.onmousedown = ((evt: MouseEvent) => {
                 if (evt.button == 1) {
                     evt.preventDefault();
                 }
             });
 
-            spanOuter.onauxclick = ((evt: MouseEvent) => {
+            mathLinkWrapper.onauxclick = ((evt: MouseEvent) => {
                 if (evt.button == 1) {
                     plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, true);
                 }
             });
 
-            return spanOuter;
+            return mathLinkWrapper;
         }
     }
 

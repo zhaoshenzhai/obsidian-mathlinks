@@ -10,13 +10,16 @@ export type MathLinksMetadataSet = Record<string, MathLinksMetadata>; // {[path]
 
 export class MathLinksAPIAccount {
     metadataSet: MathLinksMetadataSet;
+    plugin: MathLinks;
+    manifest: Readonly<PluginManifest>;
+    blockPrefix: string;
+    enableFileNameBlockLinks: boolean;
 
-    constructor(
-        public plugin: MathLinks,
-        public manifest: Readonly<PluginManifest>,
-        public blockPrefix: string,
-        public enableFileNameBlockLinks: boolean,
-    ) {
+    constructor(plugin: MathLinks, manifest: Readonly<PluginManifest>, blockPrefix: string, enableFileNameBlockLinks: boolean) {
+        this.plugin = plugin;
+        this.manifest = manifest;
+        this.blockPrefix = blockPrefix;
+        this.enableFileNameBlockLinks = enableFileNameBlockLinks;
         this.metadataSet = {};
     }
 
@@ -38,11 +41,7 @@ export class MathLinksAPIAccount {
     update(path: string, newMetadata: MathLinksMetadata): void {
         let file = this.plugin.app.vault.getAbstractFileByPath(path);
         if (file instanceof TFile && file.extension == "md") {
-            this.metadataSet[path] = Object.assign(
-                {},
-                this.metadataSet[path],
-                newMetadata
-            );
+            this.metadataSet[path] = Object.assign({}, this.metadataSet[path], newMetadata);
             informChange(this.plugin.app, "mathlinks:updated", this, path);
         } else {
             throw Error(`MathLinks API: Invalid path: ${path}`);
@@ -79,10 +78,8 @@ export class MathLinksAPIAccount {
     }
 }
 
-export function informChange(
-    app: App, 
-    eventName: "mathlinks:updated" | "mathlinks:account-deleted",
-    ...callbackArgs: [apiAccount: MathLinksAPIAccount, path?: string]) {
+// eventName: "mathlinks:updated" | "mathlinks:account-deleted"
+export function informChange(app: App, eventName: string, ...callbackArgs: [apiAccount: MathLinksAPIAccount, path?: string]) {
     // trigger an event informing this update
     app.metadataCache.trigger(eventName, ...callbackArgs);
 
