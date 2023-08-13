@@ -12,7 +12,7 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
         public plugin: MathLinks,
         public sourcePath: string,
         public targetLink: string,
-        public displayText?: string
+        public displayText: string
     ) {
         super(containerEl);
         this.targetFile = plugin.app.metadataCache.getFirstLinkpathDest(
@@ -46,9 +46,24 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
     }
 
     async update(): Promise<void> {
-        const mathLink = this.displayText ?? getMathLink(this.plugin, this.targetLink, this.sourcePath);
-        const children = await renderTextWithMath(mathLink);
-        this.containerEl.replaceChildren(...children);
+        let mathLink = "";
+        if (this.displayText != this.targetLink && this.displayText != translateLink(this.targetLink)) {
+            // [[note name|display name]] -> use display name as mathLink
+            mathLink = this.displayText;
+        } else {
+            const targetName = this.targetFile?.basename;
+            if (this.containerEl.innerText == targetName || this.containerEl.innerText == translateLink(this.targetLink)) { // Can targetEl.innerText be replaced with targetDisplay? (just for a consistency purpose)
+                // [[note name]], [[note name#heading]] or [[note name#^blockID]]
+                mathLink = getMathLink(this.plugin, this.targetLink, this.sourcePath);
+            }
+        }
+
+        if (mathLink) {
+            const children = await renderTextWithMath(mathLink);
+            this.containerEl.replaceChildren(...children);    
+        } else {
+            this.containerEl.replaceChildren(this.displayText);
+        }
     }
 }
 
@@ -60,19 +75,9 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement, conte
             const targetLink = targetEl.getAttribute("data-href")?.replace(/\.md/, "");
             if (targetLink) {
                 const targetFile = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(targetLink), context.sourcePath);
-                if (targetFile) {
-                    if (targetDisplay && targetDisplay != targetLink && targetDisplay != translateLink(targetLink)) {
-                        // [[note name|display name]] -> use display name as mathLink
-                        const child = new MathLinksRenderChild(targetEl, plugin, context.sourcePath, targetLink, targetDisplay);
-                        context.addChild(child);
-                    } else {
-                        const targetName = targetFile?.basename;
-                        if (targetEl.innerText == targetName || targetEl.innerText == translateLink(targetLink)) { // Can targetEl.innerText be replaced with targetDisplay? (just for a consistency purpose)
-                            // [[note name]], [[note name#heading]] or [[note name#^blockID]]
-                            const child = new MathLinksRenderChild(targetEl, plugin, context.sourcePath, targetLink);
-                            context.addChild(child);
-                        }
-                    }
+                if (targetDisplay && targetFile) {
+                    const child = new MathLinksRenderChild(targetEl, plugin, context.sourcePath, targetLink, targetDisplay);
+                    context.addChild(child);
                 }
             }
         }
