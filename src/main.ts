@@ -16,19 +16,7 @@ export default class MathLinks extends Plugin {
         // Markdown Post Processor for reading view
         this.registerMarkdownPostProcessor((element, context) => {
             if (isValid(this, context.sourcePath)) {
-                generateMathLinks(this, element, context.sourcePath);
-
-                // dynamically update the displayed text when an API user updates its metadata
-                this.registerEvent(this.app.metadataCache.on("mathlinks:updated", (apiAccount, path) => {
-                    if (path == context.sourcePath) {
-                        generateMathLinks(this, element, context.sourcePath);
-                    }
-                }));
-
-                // dynamically update the displayed text when an API account is deleted
-                this.registerEvent(this.app.metadataCache.on("mathlinks:account-deleted", (apiAccount) => {
-                    generateMathLinks(this, element, context.sourcePath);
-                }));
+                generateMathLinks(this, element, context);
             }
         });
 

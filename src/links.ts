@@ -1,38 +1,110 @@
-import { TFile, renderMath, finishRenderMath, parseLinktext, resolveSubpath, getLinkpath, BlockSubpathResult, HeadingSubpathResult } from "obsidian";
+import { TFile, renderMath, finishRenderMath, parseLinktext, resolveSubpath, getLinkpath, BlockSubpathResult, HeadingSubpathResult, MarkdownRenderChild, MarkdownPostProcessorContext } from "obsidian";
 import { translateLink } from "./utils";
 import { MathLinksMetadata } from "./api";
 import MathLinks from "./main";
 
-export function generateMathLinks(plugin: MathLinks, element: HTMLElement, sourcePath: string): void {
-    for (let targetEl of element.querySelectorAll<HTMLElement>(".internal-link")) {
-        if (targetEl.classList.contains("mathLink-internal-link")) {
-            targetEl.remove();
-            let queryResult = element.querySelector<HTMLElement>(".original-internal-link");
-            if (queryResult) {
-                targetEl = queryResult;
-                targetEl.classList.remove("original-internal-link");
-                targetEl.style.display = "";    
-            }
-        }
 
-        let targetDisplay = targetEl.textContent?.trim();
+export class MathLinksRenderChild extends MarkdownRenderChild {
+    targetFile: TFile | null;
+
+    constructor(
+        containerEl: HTMLElement,
+        public plugin: MathLinks,
+        public sourcePath: string,
+        public targetLink: string,
+        public displayText?: string
+    ) {
+        super(containerEl);
+        this.targetFile = plugin.app.metadataCache.getFirstLinkpathDest(
+            getLinkpath(this.targetLink),
+            this.sourcePath
+        );
+    }
+
+    onload(): void {
+        this.update();
+
+        // dynamically update the displayed text
+        // 1. when user updates the YAML frontmatter
+        this.plugin.registerEvent(this.plugin.app.metadataCache.on("changed", (changedFile) => {
+            if (!this.targetFile || this.targetFile == changedFile) {
+                this.update();
+            }
+        }));
+
+        // 2. when an API user updates its metadata
+        this.plugin.registerEvent(this.plugin.app.metadataCache.on("mathlinks:updated", (apiAccount, changedFilePath) => {
+            if (!this.targetFile || this.targetFile.path == changedFilePath) {
+                this.update();
+            }
+        }));
+
+        // 3. when an API account is deleted
+        this.plugin.registerEvent(this.plugin.app.metadataCache.on("mathlinks:account-deleted", (apiAccount) => {
+            this.update();
+        }));
+    }
+
+    async update(): Promise<void> {
+        const mathLink = this.displayText ?? getMathLink(this.plugin, this.targetLink, this.sourcePath);
+        const children = await renderTextWithMath(mathLink);
+        this.containerEl.replaceChildren(...children);
+    }
+}
+
+
+export async function generateMathLinks(plugin: MathLinks, element: HTMLElement, context: MarkdownPostProcessorContext): Promise<void> {
+    for (let targetEl of element.querySelectorAll<HTMLElement>(".internal-link")) {
+        const targetDisplay = targetEl.textContent?.trim();
         if (targetDisplay != "" && !/math-inline is-loaded/.test(targetEl.innerHTML)) {
-            let targetLink = targetEl.getAttribute("data-href")?.replace(/\.md/, "");
+            const targetLink = targetEl.getAttribute("data-href")?.replace(/\.md/, "");
             if (targetLink) {
-                if (targetDisplay && targetDisplay != targetLink && targetDisplay != translateLink(targetLink)) {
-                    addMathLink(targetEl, targetDisplay, true);
-                } else {
-                    let targetMathLink = getMathLink(plugin, targetLink, sourcePath);
-                    if (targetMathLink) {
-                        let targetName = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(targetLink), sourcePath)?.basename;
-                        if (targetEl.innerText == targetName || targetEl.innerText == translateLink(targetLink)) {
-                            addMathLink(targetEl, targetMathLink, true);
+                const targetFile = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(targetLink), context.sourcePath);
+                if (targetFile) {
+                    if (targetDisplay && targetDisplay != targetLink && targetDisplay != translateLink(targetLink)) {
+                        // [[note name|display name]] -> use display name as mathLink
+                        const child = new MathLinksRenderChild(targetEl, plugin, context.sourcePath, targetLink, targetDisplay);
+                        context.addChild(child);
+                    } else {
+                        const targetName = targetFile?.basename;
+                        if (targetEl.innerText == targetName || targetEl.innerText == translateLink(targetLink)) { // Can targetEl.innerText be replaced with targetDisplay? (just for a consistency purpose)
+                            // [[note name]], [[note name#heading]] or [[note name#^blockID]]
+                            const child = new MathLinksRenderChild(targetEl, plugin, context.sourcePath, targetLink);
+                            context.addChild(child);
                         }
                     }
-                }    
+                }
             }
         }
     }
+}
+
+export async function renderTextWithMath(source: string): Promise<(HTMLElement | string)[]> {
+    let elements: (HTMLElement | string)[] = [];
+    let mathPattern = /\$(.*?[^\s])\$/g;
+    let result;
+    let textFrom = 0;
+    let textTo = 0;
+    while ((result = mathPattern.exec(source)) !== null) {
+        let match = result[0];
+        let mathString = result[1];
+        textTo = result.index;
+        if (textTo > textFrom) {
+            elements.push(source.slice(textFrom, textTo));
+        }
+        textFrom = mathPattern.lastIndex;
+
+        let mathJaxEl = renderMath(mathString, false);
+        await finishRenderMath();
+
+        let mathSpan = createSpan({ cls: ["math", "math-inline", "is-loaded"] });
+        mathSpan.replaceChildren(mathJaxEl);
+        elements.push(mathSpan);
+    }
+    if (textFrom < source.length) {
+        elements.push(source.slice(textFrom));
+    }
+    return elements;
 }
 
 export function addMathLink(targetEl: HTMLElement, mathLink: string, newElement: boolean): HTMLElement {
