@@ -22,7 +22,6 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
     onload(): void {
         this.update();
 
-        // dynamically update the displayed text
         // 1. when user updates the YAML frontmatter
         this.plugin.registerEvent(this.plugin.app.metadataCache.on("changed", (changedFile) => {
             if (!this.targetFile || this.targetFile == changedFile) {
@@ -46,20 +45,20 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
     async update(): Promise<void> {
         let mathLink = "";
         if (this.displayText != this.targetLink && this.displayText != translateLink(this.targetLink)) {
-            // [[note name|display name]] -> use display name as mathLink
+            // [[note|display]] -> use display as mathLink
             mathLink = this.displayText;
         } else {
             const targetName = this.targetFile?.basename;
             const targetDisplay = this.containerEl.innerText;
             if (targetDisplay == targetName || targetDisplay == translateLink(this.targetLink)) {
-                // [[note name]], [[note name#heading]] or [[note name#^blockID]]
+                // [[note]], [[note#heading]] or [[note#^blockID]]
                 mathLink = getMathLink(this.plugin, this.targetLink, this.sourcePath);
             }
         }
 
         if (mathLink) {
-            const children = await renderTextWithMath(mathLink);
-            this.containerEl.replaceChildren(...children);    
+            const children = await renderTextWithMathAsync(mathLink);
+            this.containerEl.replaceChildren(...children);
         } else {
             this.containerEl.replaceChildren(this.displayText);
         }
@@ -82,7 +81,7 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement, conte
     }
 }
 
-export async function renderTextWithMath(source: string): Promise<(HTMLElement | string)[]> {
+export async function renderTextWithMathAsync(source: string): Promise<(HTMLElement | string)[]> {
     let elements: (HTMLElement | string)[] = [];
     let mathPattern = /\$(.*?[^\s])\$/g;
     let textFrom = 0, textTo = 0;
@@ -110,51 +109,32 @@ export async function renderTextWithMath(source: string): Promise<(HTMLElement |
     return elements;
 }
 
-export function addMathLink(targetEl: HTMLElement, mathLink: string, newElement: boolean): HTMLElement {
-    let splits: [string, boolean][] = [];
+export function renderTextWithMath(source: string): (HTMLElement | string)[] {
+    let elements: (HTMLElement | string)[] = [];
+    let mathPattern = /\$(.*?[^\s])\$/g;
+    let textFrom = 0, textTo = 0;
 
-    let split = "";
-    let isMath = false;
-    for (let i = 0; i < mathLink.length; i++) {
-        let character = mathLink[i];
-        if (character == "$") {
-            if (split != "") {
-                splits.push([split, isMath]);
-                split = "";
-            }
-            isMath = !isMath;
-        } else {
-            split += character;
+    let result;
+    while ((result = mathPattern.exec(source)) !== null) {
+        let match = result[0];
+        let mathString = result[1];
+        textTo = result.index;
+        if (textTo > textFrom) {
+            elements.push(source.slice(textFrom, textTo));
         }
+        textFrom = mathPattern.lastIndex;
 
-        if (i == mathLink.length - 1 && split != "") {
-            splits.push([split, isMath]);
-        }
+        let mathJaxEl = renderMath(mathString, false);
+        finishRenderMath();
+
+        let mathSpan = createSpan({ cls: ["math", "math-inline", "is-loaded"] });
+        mathSpan.replaceChildren(mathJaxEl);
+        elements.push(mathSpan);
     }
 
-    let mathLinkEl = targetEl.cloneNode(newElement) as HTMLElement;
-    mathLinkEl.innerText = "";
-    for (let i = 0; i < splits.length; i++) {
-        let word = splits[i][0];
-        if (splits[i][1]) {
-            let wordMath = renderMath(word, false);
-            let mathEl = mathLinkEl.createSpan();
-            mathEl.replaceWith(wordMath);
-        } else {
-            let wordEl = mathLinkEl.createSpan();
-            wordEl.innerText += word;
-        }
-    }
+    if (textFrom < source.length) elements.push(source.slice(textFrom));
 
-    finishRenderMath();
-    // if (newElement) {
-    //     targetEl.parentNode?.insertBefore(mathLinkEl, targetEl.nextSibling);
-    //     mathLinkEl.classList.add("mathLink-internal-link");
-    //     targetEl.classList.add("original-internal-link");
-    //     targetEl.style.display = "none";
-    // }
-
-    return mathLinkEl;
+    return elements;
 }
 
 export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: string): string {
