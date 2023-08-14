@@ -1,9 +1,9 @@
-import { App, Plugin, TFile, loadMathJax } from "obsidian";
+import { FileView, Plugin, WorkspaceLeaf, loadMathJax } from "obsidian";
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { MathLinksAPIAccount } from "./api";
 import { generateMathLinks } from "./links";
 import { buildLivePreview } from "./preview";
-import { isValid } from "./utils"
+import { isValid } from "./utils";
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
@@ -13,15 +13,17 @@ export default class MathLinks extends Plugin {
         await this.loadSettings();
         await loadMathJax();
 
+        // Markdown Post Processor for reading view
         this.registerMarkdownPostProcessor((element, context) => {
-            if (isValid(this, context.containerEl, context.sourcePath)) {
-                generateMathLinks(this, element, context.sourcePath);
+            if (isValid(this, context.sourcePath)) {
+                generateMathLinks(this, element, context);
             }
         });
 
-        this.app.workspace.onLayoutReady(()=> {
+        // Live-preview; update all when Obsidian launches
+        this.app.workspace.onLayoutReady(() => {
             this.app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
-                if (leaf.view.file && isValid(this, leaf.containerEl, leaf.view.file.path)) {
+                if (leaf.view instanceof FileView && leaf.view.file && isValid(this, leaf.view.file.path)) {
                     buildLivePreview(this, leaf).then((livePreview) => {
                         this.registerEditorExtension(livePreview);
                     });
@@ -29,8 +31,9 @@ export default class MathLinks extends Plugin {
             });
         });
 
+        // Live-preview; update on leaf-change
         this.app.workspace.on("active-leaf-change", (leaf: WorkspaceLeaf) => {
-            if (leaf.view.file && isValid(this, leaf.containerEl, leaf.view.file.path)) {
+            if (leaf.view instanceof FileView && leaf.view.file && isValid(this, leaf.view.file.path)) {
                 buildLivePreview(this, leaf).then((livePreview) => {
                     this.registerEditorExtension(livePreview);
                 });
@@ -40,6 +43,20 @@ export default class MathLinks extends Plugin {
         this.apiAccounts = [];
     }
 
+    getAPIAccount<UserPlugin extends Plugin>(userPlugin: Readonly<UserPlugin>): MathLinksAPIAccount {
+        let account = this.apiAccounts.find((account) => account.manifest.id == userPlugin.manifest.id);
+        if (account) return account;
+
+        account = new MathLinksAPIAccount(
+            this, 
+            userPlugin.manifest, 
+            DEFAULT_SETTINGS.blockPrefix, 
+            DEFAULT_SETTINGS.enableFileNameBlockLinks
+        );
+        this.apiAccounts.push(account);
+        return account;
+    }
+
     async loadSettings() {
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
         this.addSettingTab(new MathLinksSettingTab(this.app, this));
@@ -47,14 +64,5 @@ export default class MathLinks extends Plugin {
 
     async saveSettings() {
         await this.saveData(this.settings);
-    }
-
-    getAPIAccount(userPlugin: Plugin, blockPrefix: string = "^") {
-        let account = this.apiAccounts.find((account) => account.manifest.id == userPlugin.manifest.id);
-        if (account) return account;
-
-        account = new MathLinksAPIAccount(this, userPlugin.manifest, blockPrefix);
-        this.apiAccounts.push(account);
-        return account;
     }
 }

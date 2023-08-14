@@ -1,4 +1,4 @@
-import { PluginManifest, TFile } from 'obsidian';
+import { App, MarkdownView, PluginManifest, TFile, WorkspaceLeaf } from 'obsidian';
 import MathLinks from './main';
 
 export interface MathLinksMetadata {
@@ -10,22 +10,17 @@ export type MathLinksMetadataSet = Record<string, MathLinksMetadata>; // {[path]
 
 export class MathLinksAPIAccount {
     metadataSet: MathLinksMetadataSet;
+    plugin: MathLinks;
+    manifest: Readonly<PluginManifest>;
+    blockPrefix: string;
+    enableFileNameBlockLinks: boolean;
 
-    constructor(public plugin: MathLinks, public manifest: PluginManifest, public blockPrefix: string) {
+    constructor(plugin: MathLinks, manifest: Readonly<PluginManifest>, blockPrefix: string, enableFileNameBlockLinks: boolean) {
+        this.plugin = plugin;
+        this.manifest = manifest;
+        this.blockPrefix = blockPrefix;
+        this.enableFileNameBlockLinks = enableFileNameBlockLinks;
         this.metadataSet = {};
-    }
-
-    update(path: string, newMetadata: MathLinksMetadata): void {
-        let file = this.plugin.app.vault.getAbstractFileByPath(path);
-        if (file instanceof TFile && file.extension == "md") {
-            this.metadataSet[path] = Object.assign(
-                {},
-                this.metadataSet[path],
-                newMetadata
-            );
-        } else {
-            throw Error(`MathLinks API: Invalid path: ${path}`);
-        }
     }
 
     get(path: string, blockID?: string): string | undefined {
@@ -43,6 +38,16 @@ export class MathLinksAPIAccount {
         }
     }
 
+    update(path: string, newMetadata: MathLinksMetadata): void {
+        let file = this.plugin.app.vault.getAbstractFileByPath(path);
+        if (file instanceof TFile && file.extension == "md") {
+            this.metadataSet[path] = Object.assign({}, this.metadataSet[path], newMetadata);
+            informChange(this.plugin.app, "mathlinks:updated", this, path);
+        } else {
+            throw Error(`MathLinks API: Invalid path: ${path}`);
+        }
+    }
+
     delete(path: string, which?: string): void {
         // `which === undefined`: remove all the mathLinks associated with `path`
         // `which == "mathLink": remove `mathLink`
@@ -56,25 +61,32 @@ export class MathLinksAPIAccount {
                 if (metadata[which] !== undefined) {
                     delete metadata[which];
                 } else {
-                    throw Error(`MathLinks API: Key "${which}" does not exist in MathLinks.externalMathLinks[${path}]`);
+                    throw Error(`MathLinks API: MathLinksMetadata of type "${which}" does not exist for ${path}`);
                 }
             } else {
                 let blocks = metadata["mathLink-blocks"];
                 if (blocks && blocks[which] !== undefined) {
                     delete blocks[which];
                 } else {
-                    throw Error(`MathLinks API: Block ID "${which}" does not exist in MathLinks.externalMathLinks[${path}]["mathLink-blocks"]`);
+                    throw Error(`MathLinks API: MathLinksMetadata for ${path}#^${which}" does not exist`);
                 }
             }
         } else {
-            throw Error(`MathLinks API: Path ${path} does not exist in MathLinks.externalMathLinks`);
+            throw Error(`MathLinks API: MathLinksMetadata for ${path} does not exist`);
         }
+        informChange(this.plugin.app, "mathlinks:updated", this, path);
     }
+}
 
-    deleteAccount(): void {
-        let index = this.plugin.apiAccounts.findIndex(
-            (account) => account.manifest.id == this.manifest.id
-        );
-        this.plugin.apiAccounts.splice(index, 1);
-    }
+// eventName: "mathlinks:updated" | "mathlinks:account-deleted"
+export function informChange(app: App, eventName: string, ...callbackArgs: [apiAccount: MathLinksAPIAccount, path?: string]) {
+    // trigger an event informing this update
+    app.metadataCache.trigger(eventName, ...callbackArgs);
+
+    // reflesh mathLinks display based on the new metadata
+    app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
+        if (leaf.view instanceof MarkdownView && leaf.view.getMode() == 'source') {
+            leaf.view.editor.cm?.dispatch();
+        }
+    });
 }

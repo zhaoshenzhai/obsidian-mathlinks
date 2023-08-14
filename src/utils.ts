@@ -1,13 +1,7 @@
 import MathLinks from "./main";
 
-export function isValid(plugin: MathLinks, element: HTMLElement, fileName: string): boolean {
-    while (element.parentNode && element.parentNode.nodeName.toLowerCase() != "body") {
-        element = element.parentNode;
-        if (element.className.toLowerCase().includes("canvas")) {
-            return true;
-        }
-    }
-
+export function isValid(plugin: MathLinks, fileName: string): boolean {
+    if (fileName.endsWith(".canvas")) return true;
     for (let i = 0; i < plugin.settings.excludedFilePaths.length; i++) {
         let path = plugin.settings.excludedFilePaths[i];
         if (path.isFile && fileName == path.path) {
@@ -19,7 +13,7 @@ export function isValid(plugin: MathLinks, element: HTMLElement, fileName: strin
     }
 
     return true;
-}  
+}
 
 // Convert "filename#heading" to "filename > heading" and "filename#^blockID" to "filename > ^blockID"
 export function translateLink(targetLink: string): string {

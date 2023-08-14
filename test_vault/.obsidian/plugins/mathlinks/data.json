@@ -9,8 +9,13 @@
       "word": true
     }
   ],
-  "excludedFilePaths": [],
-  "blockPrefix": "",
-  "enableFileNameBlockLinks": false,
+  "excludedFilePaths": [
+    {
+      "path": "Tests/Excluded.md",
+      "isFile": true
+    }
+  ],
+  "blockPrefix": "^",
+  "enableFileNameBlockLinks": true,
   "enableAPI": true
 }

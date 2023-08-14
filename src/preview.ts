@@ -1,12 +1,16 @@
 import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
-import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType } from "@codemirror/view";
-import { getMathLink, addMathLink } from "./links"
-import { addSuperCharged } from "./supercharged.ts"
+import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType, PluginValue } from "@codemirror/view";
+import { FileView, MarkdownView, WorkspaceLeaf, TFile } from "obsidian";
+import { getMathLink, renderTextWithMath } from "./links";
+import { addSuperCharged } from "./supercharged";
+import { isValid } from "./utils";
 import MathLinks from "./main";
 
-export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin>
-{
+export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin<V>>
+{    
+    let leafView = leaf.view as FileView;
+
     class MathWidget extends WidgetType {
         outLinkText: string;
         outLinkMathLink: string;
@@ -18,47 +22,50 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
         }
 
         toDOM() {
-            let mathLink = addMathLink(document.createElement("span"), this.outLinkMathLink, false);
+            let children = renderTextWithMath(this.outLinkMathLink);
+            let mathLink = document.createElement("span");
+            mathLink.replaceChildren(...children);
             mathLink.classList.add("cm-underline");
-            mathLink.setAttribute("draggable", true);
+            mathLink.setAttribute("draggable", "true");
 
-            let spanInner = document.createElement("span");
-            spanInner.appendChild(mathLink);
-            addSuperCharged(plugin, spanInner, plugin.app.metadataCache.getFirstLinkpathDest(this.outLinkText.replace(/#.*$/, ""), ""));
+            let outLinkFile = plugin.app.metadataCache.getFirstLinkpathDest(this.outLinkText.replace(/#.*$/, ""), "");
+            if (outLinkFile) addSuperCharged(plugin, mathLink, outLinkFile);
 
-            let spanOuter = document.createElement("span");
-            spanOuter.classList.add("cm-hmd-internal-link");
-            spanOuter.appendChild(spanInner);
+            let mathLinkWrapper = document.createElement("span");
+            mathLinkWrapper.classList.add("cm-hmd-internal-link");
+            mathLinkWrapper.appendChild(mathLink);
 
             let outLinkFileName = this.outLinkText.replace(/#.*$/, "");
             if (!outLinkFileName) {
-                outLinkFileName = leaf.view.file.path;
-                if (outLinkFileName == "Canvas.canvas") {
-                    for (let node of leaf.view.canvas.selection.values()) {
-                        outLinkFileName = node.filePath;
-                        break;
-                    }
+                if (leafView.file) {
+                    outLinkFileName = leafView.file.path;
+                    if (outLinkFileName.endsWith(".canvas")) {
+                        for (let node of leafView.canvas.selection.values()) {
+                            outLinkFileName = node.filePath;
+                            break;
+                        }
+                    }    
                 }
             }
 
-            spanOuter.onclick = ((evt: MouseEvent) => {
+            mathLinkWrapper.onclick = ((evt: MouseEvent) => {
                 evt.preventDefault();
                 plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, evt.ctrlKey || evt.metaKey);
             });
 
-            spanOuter.onmousedown = ((evt: MouseEvent) => {
+            mathLinkWrapper.onmousedown = ((evt: MouseEvent) => {
                 if (evt.button == 1) {
                     evt.preventDefault();
                 }
             });
 
-            spanOuter.onauxclick = ((evt: MouseEvent) => {
+            mathLinkWrapper.onauxclick = ((evt: MouseEvent) => {
                 if (evt.button == 1) {
                     plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, true);
                 }
             });
 
-            return spanOuter;
+            return mathLinkWrapper;
         }
     }
 
@@ -78,19 +85,23 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                 this.decorations = this.destroyDecorations(view);
                 let editorView = leaf.getViewState();
 
-                if (leaf.view.editor) {
-                    let curView = leaf.view.editor.cm as EditorView;
+                if (leaf.view instanceof MarkdownView && leaf.view.file instanceof TFile && isValid(plugin, leaf.view.file.name)) {
+                    let curView = leaf.view.editor.cm;
                     if (curView == view && editorView.state.mode == "source" && !editorView.state.source) {
                         this.decorations = this.buildDecorations(view);
                     } else {
                         this.decorations = this.destroyDecorations(view);
                     }
-                } else if (leaf.view.canvas) {
-                    this.decorations = this.buildDecorations(view);
+                } else if (leafView.canvas) {
+                    for (let node of leafView.canvas.selection.values()) {
+                        if (isValid(plugin, node.filePath)) {
+                            this.decorations = this.buildDecorations(view);
+                        }
+                    }
 
                     plugin.app.workspace.iterateRootLeaves((otherLeaf: WorkspaceLeaf) => {
-                        if (otherLeaf.view.editor) {
-                            let otherView = otherLeaf.view.editor.cm as EditorView;
+                        if (otherLeaf.view instanceof MarkdownView) {
+                            let otherView = otherLeaf.view.editor.cm;
                             if (otherView == view) {
                                 this.decorations = this.destroyDecorations(view);
                             }
@@ -123,23 +134,23 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                             // Alias: File name
                             else if (name.contains("has-alias")) {
                                 outLinkText += view.state.doc.sliceString(node.from, node.to);
-                                if (outLinkMathLink == outLinkText.replace(/\.md/, "")) {
-                                    outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
+                                if (leafView.file && outLinkMathLink == outLinkText.replace(/\.md/, "")) {
+                                    outLinkMathLink = getMathLink(plugin, outLinkText, leafView.file.path);
                                 }
                             }
 
                             // Alias: File name (with decoding)
                             else if (/string_url$/.test(name) && !name.contains("format")) {
                                 outLinkText += decodeURI(view.state.doc.sliceString(node.from, node.to));
-                                if (outLinkMathLink == outLinkText.replace(/\.md/, "")) {
-                                    outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
+                                if (leafView.file && outLinkMathLink == outLinkText.replace(/\.md/, "")) {
+                                    outLinkMathLink = getMathLink(plugin, outLinkText, leafView.file.path);
                                 }
                             }
 
                             // No alias
-                            else if (name.contains("hmd-internal-link") && !name.contains("alias")) {
+                            else if (leafView.file && name.contains("hmd-internal-link") && !name.contains("alias")) {
                                 outLinkText += view.state.doc.sliceString(node.from, node.to);
-                                outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
+                                outLinkMathLink = getMathLink(plugin, outLinkText, leafView.file.path);
                             }
 
                             // End
@@ -171,8 +182,8 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
                             // Alias: MathLink
                             else if (!name.contains("pipe") && ((name.contains("hmd-internal-link") && name.contains("alias")) || name.contains("hmd-escape") || /^link/.test(name))) {
                                 outLinkMathLink += view.state.doc.sliceString(node.from, node.to);
-                                if (outLinkMathLink == outLinkText.replace(/\.md/, "")) {
-                                    outLinkMathLink = getMathLink(plugin, outLinkText, leaf.view.file.path);
+                                if (leafView.file && outLinkMathLink == outLinkText.replace(/\.md/, "")) {
+                                    outLinkMathLink = getMathLink(plugin, outLinkText, leafView.file.path);
                                 }
                             }
                         }
@@ -194,5 +205,5 @@ export function buildLivePreview(plugin: MathLinks, leaf: WorkspaceLeaf): Promis
         }, {decorations: v => v.decorations}
     );
 
-    return new Promise<ViewPlugin> ((resolve) => {resolve(viewPlugin)});
+    return new Promise<ViewPlugin<V>> ((resolve) => {resolve(viewPlugin)});
 }

@@ -1,11 +1,16 @@
 {
-    "name": "MathLinks",
+    "name": "obsidian-mathlinks",
     "version": "0.4.0",
     "description": "Render MathJax in your links",
-    "main": "main.js",
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
+    "files": [
+        "lib/**/*"
+    ],
     "scripts": {
         "dev": "node esbuild.mjs",
         "build": "tsc -noEmit -skipLibCheck && node esbuild.mjs production",
+        "lib": "tsc --project tsconfig-lib.json",
         "version": "node version-bump.mjs && git add manifest.json versions.json"
     },
     "keywords": [],
@@ -16,9 +21,10 @@
         "builtin-modules": "3.3.0",
         "esbuild": "0.14.47",
         "obsidian": "latest",
-        "tslib": "2.4.0"
+        "tslib": "2.4.0",
+        "typescript": "^4.8.4"
     },
     "dependencies": {
-        "typescript": "^4.8.4"
+        "@codemirror/language": "^6.8.0"
     }
 }
