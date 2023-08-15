@@ -38,9 +38,7 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
 
         // 2. when an API user updates its metadata
         this.plugin.registerEvent(this.plugin.app.metadataCache.on("mathlinks:updated", (apiAccount, changedFilePath) => {
-            console.log("observed event mathlinks:updated: ", changedFilePath);
             if (!this.targetFile || this.targetFile.path == changedFilePath) {
-                console.log("update!");
                 this.update();
             }
         }));
