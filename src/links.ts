@@ -9,6 +9,7 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
     targetLink: string;
     displayText: string;
     targetFile: TFile | null;
+    mathLinkEl: HTMLElement;
 
     constructor(containerEl: HTMLElement, plugin: MathLinks, sourcePath: string, targetLink: string, displayText: string) {
         super(containerEl);
@@ -17,6 +18,12 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
         this.targetLink = targetLink;
         this.displayText = displayText;
         this.targetFile = this.plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(this.targetLink), this.sourcePath);
+        this.mathLinkEl = this.containerEl.cloneNode(true) as HTMLElement;
+        this.mathLinkEl.textContent = ""; // https://stackoverflow.com/questions/35213147/difference-between-textcontent-vs-innertext
+        this.containerEl.parentNode?.insertBefore(this.mathLinkEl, this.containerEl.nextSibling);
+        this.mathLinkEl.classList.add("mathLink-internal-link");
+        this.containerEl.classList.add("original-internal-link");
+        this.containerEl.style.display = "none";
     }
 
     onload(): void {
@@ -51,20 +58,16 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
             mathLink = this.displayText;
         } else {
             const targetName = this.targetFile?.basename;
-            const targetDisplay = this.containerEl.innerText;
-            if (targetDisplay == targetName || targetDisplay == translateLink(this.targetLink)) {
+            if (this.displayText == targetName || this.displayText == translateLink(this.targetLink)) {
                 // [[note]], [[note#heading]] or [[note#^blockID]]
                 mathLink = getMathLink(this.plugin, this.targetLink, this.sourcePath);
             }
         }
 
         if (mathLink) {
-            console.log("new mathlink:", mathLink);
-            this.containerEl = addMathLink(mathLink, this.containerEl, true);
-            // addMathLink(mathLink, this.containerEl, true);
+            setMathLink(mathLink, this.mathLinkEl);
         } else {
-            this.containerEl = addMathLink(this.displayText, this.containerEl, true);
-            // addMathLink(this.displayText, this.containerEl, true);
+            setMathLink(this.displayText, this.mathLinkEl);
         }
     }
 }
@@ -95,10 +98,8 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement, conte
     }
 }
 
-export function addMathLink(source: string, targetEl: HTMLElement, newElement: boolean): HTMLElement {
-    let mathLinkEl = targetEl.cloneNode(newElement) as HTMLElement;
-    mathLinkEl.innerText = "";
-
+export function setMathLink(source: string, mathLinkEl: HTMLElement) {
+    mathLinkEl.replaceChildren();
     const mathPattern = /\$(.*?[^\s])\$/g;
     let textFrom = 0, textTo = 0;
     let result;
@@ -115,15 +116,6 @@ export function addMathLink(source: string, targetEl: HTMLElement, newElement: b
     }
 
     if (textFrom < source.length) mathLinkEl.createSpan().replaceWith(source.slice(textFrom));
-
-    if (newElement) {
-        targetEl.parentNode?.insertBefore(mathLinkEl, targetEl.nextSibling);
-        mathLinkEl.classList.add("mathLink-internal-link");
-        targetEl.classList.add("original-internal-link");
-        targetEl.style.display = "none";
-    }
-
-    return mathLinkEl;
 }
 
 export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: string): string {
