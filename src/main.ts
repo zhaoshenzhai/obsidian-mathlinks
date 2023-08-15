@@ -13,18 +13,6 @@ export default class MathLinks extends Plugin {
         await this.loadSettings();
         await loadMathJax();
 
-        this.addCommand({
-            id: "inform-change", 
-            name: "Inform Change", 
-            callback: () => {
-                const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-                if (this.apiAccounts.length && view?.file) {
-                    console.log(this.apiAccounts[0].manifest.name);
-                    informChange(this.app, "mathlinks:updated", this.apiAccounts[0], view.file.path);
-                }
-            }
-        });
-
         // Markdown Post Processor for reading view
         this.registerMarkdownPostProcessor((element, context) => {
             if (isValid(this, context.sourcePath)) {
