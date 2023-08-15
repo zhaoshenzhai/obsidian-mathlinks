@@ -163,10 +163,8 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
     if (!mathLink && plugin.settings.enableAPI) {
         for (let account of plugin.apiAccounts) {
             if (account.metadataSet[file.path]) {
-                console.log(`getMathLink: ${file.path}:`, account.metadataSet[file.path]);
                 let metadata = account.metadataSet[file.path];
                 if (subpathResult) {
-                    console.log("subpathResult");
                     mathLink = getMathLinkFromSubpath(plugin, path, subpathResult, metadata, account.blockPrefix, account.enableFileNameBlockLinks);
                 } else {
                     mathLink = metadata["mathLink"] ?? "";
