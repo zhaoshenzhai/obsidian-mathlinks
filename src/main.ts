@@ -1,6 +1,6 @@
-import { FileView, Plugin, WorkspaceLeaf, loadMathJax } from "obsidian";
+import { FileView, MarkdownEditView, MarkdownView, Plugin, WorkspaceLeaf, loadMathJax } from "obsidian";
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from "./settings";
-import { MathLinksAPIAccount } from "./api";
+import { MathLinksAPIAccount, informChange } from "./api";
 import { generateMathLinks } from "./links";
 import { buildLivePreview } from "./preview";
 import { isValid } from "./utils";
@@ -12,6 +12,18 @@ export default class MathLinks extends Plugin {
     async onload() {
         await this.loadSettings();
         await loadMathJax();
+
+        this.addCommand({
+            id: "inform-change", 
+            name: "Inform Change", 
+            callback: () => {
+                const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+                if (this.apiAccounts.length && view?.file) {
+                    console.log(this.apiAccounts[0].manifest.name);
+                    informChange(this.app, "mathlinks:updated", this.apiAccounts[0], view.file.path);
+                }
+            }
+        });
 
         // Markdown Post Processor for reading view
         this.registerMarkdownPostProcessor((element, context) => {
