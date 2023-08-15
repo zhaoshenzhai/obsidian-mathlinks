@@ -1,6 +1,6 @@
-import { FileView, Plugin, WorkspaceLeaf, loadMathJax } from "obsidian";
+import { FileView, MarkdownEditView, MarkdownView, Plugin, WorkspaceLeaf, loadMathJax } from "obsidian";
 import { MathLinksSettings, MathLinksSettingTab, DEFAULT_SETTINGS } from "./settings";
-import { MathLinksAPIAccount } from "./api";
+import { MathLinksAPIAccount, informChange } from "./api";
 import { generateMathLinks } from "./links";
 import { buildLivePreview } from "./preview";
 import { isValid } from "./utils";
