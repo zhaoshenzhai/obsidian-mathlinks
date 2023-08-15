@@ -20,7 +20,7 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
         this.displayText = displayText;
         this.targetFile = this.plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(this.targetLink), this.sourcePath);
         this.mathLinkEl = this.containerEl.cloneNode(true) as HTMLElement;
-        this.mathLinkEl.textContent = ""; // https://stackoverflow.com/questions/35213147/difference-between-textcontent-vs-innertext
+        this.mathLinkEl.textContent = "";
         this.containerEl.parentNode?.insertBefore(this.mathLinkEl, this.containerEl.nextSibling);
         this.mathLinkEl.classList.add("mathLink-internal-link");
         this.containerEl.classList.add("original-internal-link");
@@ -30,6 +30,8 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
 
     onload(): void {
         this.update();
+        console.log(this.containerEl);
+        console.log(this.mathLinkEl);
 
         // 1. when user updates the YAML frontmatter
         this.plugin.registerEvent(this.plugin.app.metadataCache.on("changed", (changedFile) => {
