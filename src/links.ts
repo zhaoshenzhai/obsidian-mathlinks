@@ -96,12 +96,12 @@ export async function renderTextWithMathAsync(source: string): Promise<(HTMLElem
         textFrom = mathPattern.lastIndex;
 
         let mathJaxEl = renderMath(mathString, false);
-        await finishRenderMath();
 
         let mathSpan = createSpan({ cls: ["math", "math-inline", "is-loaded"] });
         mathSpan.replaceChildren(mathJaxEl);
         elements.push(mathSpan);
     }
+    await finishRenderMath();
 
     if (textFrom < source.length) elements.push(source.slice(textFrom));
 
@@ -191,9 +191,9 @@ function getMathLinkFromSubpath(plugin: MathLinks, linkpath: string, subpathResu
     if (subMathLink) {
         if (linkpath && enableFileNameBlockLinks) {
             return (metadata["mathLink"] ?? linkpath) + " > " + subMathLink;
-        } else { 
+        } else {
             return subMathLink;
-        }    
+        }
     } else {
         return "";
     }
