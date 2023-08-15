@@ -44,18 +44,26 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
 
     async update(): Promise<void> {
         let mathLink = "";
+        console.log(`update(): entered: ${this.displayText}`);
         if (this.displayText != this.targetLink && this.displayText != translateLink(this.targetLink)) {
             // [[note|display]] -> use display as mathLink
+            console.log("update(): use display");
             mathLink = this.displayText;
         } else {
             const targetName = this.targetFile?.basename;
             const targetDisplay = this.containerEl.innerText;
-            if (targetDisplay == targetName || targetDisplay == translateLink(this.targetLink)) {
+            console.log(`targetName = ${targetName}`);
+            console.log(`targetDisplay = ${targetDisplay}`);
+            console.log(`this.targetLink = ${this.targetLink}`);
+            console.log(`translateLink(this.targetLink) = ${translateLink(this.targetLink)}`);
+            if (this.displayText == targetName || this.displayText == translateLink(this.targetLink)) {
                 // [[note]], [[note#heading]] or [[note#^blockID]]
+                console.log("update(): go getMathLinks");
                 mathLink = getMathLink(this.plugin, this.targetLink, this.sourcePath);
             }
         }
 
+        console.log(`update: ${this.displayText}: mathLink = "${mathLink}"`);
         if (mathLink) {
             const children = await renderTextWithMathAsync(mathLink);
             this.containerEl.replaceChildren(...children);
@@ -164,8 +172,10 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
     if (!mathLink && plugin.settings.enableAPI) {
         for (let account of plugin.apiAccounts) {
             if (account.metadataSet[file.path]) {
+                console.log(`getMathLink: ${file.path}:`, account.metadataSet[file.path]);
                 let metadata = account.metadataSet[file.path];
                 if (subpathResult) {
+                    console.log("subpathResult");
                     mathLink = getMathLinkFromSubpath(plugin, path, subpathResult, metadata, account.blockPrefix, account.enableFileNameBlockLinks);
                 } else {
                     mathLink = metadata["mathLink"] ?? "";
