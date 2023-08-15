@@ -43,16 +43,6 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
     }
 
     async update(): Promise<void> {
-        if (this.containerEl.classList.contains("mathLink-internal-link")) {
-            this.containerEl.remove();
-            let queryResult = element.querySelector<HTMLElement>(".original-internal-link");
-            if (queryResult) {
-                this.containerEl = queryResult;
-                this.containerEl.classList.remove("original-internal-link");
-                this.containerEl.style.display = "";
-            }
-        }
-
         let mathLink = "";
         if (this.displayText != this.targetLink && this.displayText != translateLink(this.targetLink)) {
             // [[note|display]] -> use display as mathLink
