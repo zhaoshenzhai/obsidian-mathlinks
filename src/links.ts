@@ -4,11 +4,12 @@ import { MathLinksMetadata } from "./api";
 import MathLinks from "./main";
 
 export class MathLinksRenderChild extends MarkdownRenderChild {
-    plugin: MathLinks;
-    sourcePath: string;
-    targetLink: string;
-    displayText: string;
-    targetFile: TFile | null;
+    readonly plugin: MathLinks;
+    readonly sourcePath: string;
+    readonly targetLink: string;
+    readonly displayText: string;
+    readonly targetFile: TFile | null;
+    readonly getMathLink: () => string;
     mathLinkEl: HTMLElement;
 
     constructor(containerEl: HTMLElement, plugin: MathLinks, sourcePath: string, targetLink: string, displayText: string) {
@@ -24,6 +25,7 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
         this.mathLinkEl.classList.add("mathLink-internal-link");
         this.containerEl.classList.add("original-internal-link");
         this.containerEl.style.display = "none";
+        this.getMathLink = this.setMathLinkGetter();
     }
 
     onload(): void {
@@ -49,18 +51,23 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
         }));
     }
 
-    async update(): Promise<void> {
-        let mathLink = "";
+    setMathLinkGetter(): () => string {
+        let getter = () => "";
         if (this.displayText != this.targetLink && this.displayText != translateLink(this.targetLink)) {
             // [[note|display]] -> use display as mathLink
-            mathLink = this.displayText;
+            getter = () => this.displayText;
         } else {
             const targetName = this.targetFile?.basename;
             if (this.displayText == targetName || this.displayText == translateLink(this.targetLink)) {
                 // [[note]], [[note#heading]] or [[note#^blockID]]
-                mathLink = getMathLink(this.plugin, this.targetLink, this.sourcePath);
+                getter = () => getMathLink(this.plugin, this.targetLink, this.sourcePath);
             }
         }
+        return getter;
+    }
+
+    async update(): Promise<void> {
+        const mathLink = this.getMathLink();
 
         if (mathLink) {
             setMathLink(mathLink, this.mathLinkEl);
@@ -169,9 +176,9 @@ function getMathLinkFromSubpath(plugin: MathLinks, linkpath: string, subpathResu
     if (subMathLink) {
         if (linkpath && enableFileNameBlockLinks) {
             return (metadata["mathLink"] ?? linkpath) + " > " + subMathLink;
-        } else { 
+        } else {
             return subMathLink;
-        }    
+        }
     } else {
         return "";
     }
