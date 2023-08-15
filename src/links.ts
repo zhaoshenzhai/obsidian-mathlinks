@@ -60,9 +60,11 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
 
         if (mathLink) {
             console.log("new mathlink:", mathLink);
-            addMathLink(mathLink, this.containerEl, true);
+            this.containerEl = addMathLink(mathLink, this.containerEl, true);
+            // addMathLink(mathLink, this.containerEl, true);
         } else {
-            addMathLink(this.displayText, this.containerEl, true);
+            this.containerEl = addMathLink(this.displayText, this.containerEl, true);
+            // addMathLink(this.displayText, this.containerEl, true);
         }
     }
 }
@@ -97,16 +99,15 @@ export function addMathLink(source: string, targetEl: HTMLElement, newElement: b
     let mathLinkEl = targetEl.cloneNode(newElement) as HTMLElement;
     mathLinkEl.innerText = "";
 
-    let mathPattern = /\$(.*?[^\s])\$/g;
+    const mathPattern = /\$(.*?[^\s])\$/g;
     let textFrom = 0, textTo = 0;
     let result;
     while ((result = mathPattern.exec(source)) !== null) {
-        let match = result[0];
-        let mathString = result[1];
+        const mathString = result[1];
         textTo = result.index;
         if (textTo > textFrom) mathLinkEl.createSpan().replaceWith(source.slice(textFrom, textTo));
 
-        let mathEl = renderMath(mathString, false);
+        const mathEl = renderMath(mathString, false);
         mathLinkEl.createSpan({ cls: ["math", "math-inline", "is-loaded"] }).replaceWith(mathEl);
         finishRenderMath();
 
