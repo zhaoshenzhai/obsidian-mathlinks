@@ -2,7 +2,7 @@ import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType, PluginValue } from "@codemirror/view";
 import { FileView, MarkdownView, WorkspaceLeaf, TFile } from "obsidian";
-import { getMathLink, renderTextWithMath } from "./links";
+import { getMathLink, addMathLink } from "./links";
 import { addSuperCharged } from "./supercharged";
 import { isValid } from "./utils";
 import MathLinks from "./main";
@@ -22,9 +22,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
         }
 
         toDOM() {
-            let children = renderTextWithMath(this.outLinkMathLink);
-            let mathLink = document.createElement("span");
-            mathLink.replaceChildren(...children);
+            let mathLink = addMathLink(this.outLinkMathLink, document.createElement("span"), false);
             mathLink.classList.add("cm-underline");
             mathLink.setAttribute("draggable", "true");
 

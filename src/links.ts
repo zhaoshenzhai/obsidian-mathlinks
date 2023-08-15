@@ -43,6 +43,16 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
     }
 
     async update(): Promise<void> {
+        if (this.containerEl.classList.contains("mathLink-internal-link")) {
+            this.containerEl.remove();
+            let queryResult = element.querySelector<HTMLElement>(".original-internal-link");
+            if (queryResult) {
+                this.containerEl = queryResult;
+                this.containerEl.classList.remove("original-internal-link");
+                this.containerEl.style.display = "";
+            }
+        }
+
         let mathLink = "";
         if (this.displayText != this.targetLink && this.displayText != translateLink(this.targetLink)) {
             // [[note|display]] -> use display as mathLink
@@ -57,16 +67,25 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
         }
 
         if (mathLink) {
-            const children = await renderTextWithMathAsync(mathLink);
-            this.containerEl.replaceChildren(...children);
+            addMathLink(mathLink, this.containerEl, true);
         } else {
-            this.containerEl.replaceChildren(this.displayText);
+            addMathLink(this.displayText, this.containerEl, true);
         }
     }
 }
 
 export function generateMathLinks(plugin: MathLinks, element: HTMLElement, context: MarkdownPostProcessorContext): void {
     for (let targetEl of element.querySelectorAll<HTMLElement>(".internal-link")) {
+        if (targetEl.classList.contains("mathLink-internal-link")) {
+            targetEl.remove();
+            let queryResult = element.querySelector<HTMLElement>(".original-internal-link");
+            if (queryResult) {
+                targetEl = queryResult;
+                targetEl.classList.remove("original-internal-link");
+                targetEl.style.display = "";
+            }
+        }
+
         const targetDisplay = targetEl.textContent?.trim();
         if (targetDisplay != "" && !/math-inline is-loaded/.test(targetEl.innerHTML)) {
             const targetLink = targetEl.getAttribute("data-href")?.replace(/\.md/, "");
@@ -81,60 +100,36 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement, conte
     }
 }
 
-export async function renderTextWithMathAsync(source: string): Promise<(HTMLElement | string)[]> {
-    let elements: (HTMLElement | string)[] = [];
+export function addMathLink(source: string, targetEl: HTMLElement, newElement: boolean): HTMLElement {
+    let mathLinkEl = targetEl.cloneNode(newElement) as HTMLElement;
+    mathLinkEl.innerText = "";
+
     let mathPattern = /\$(.*?[^\s])\$/g;
     let textFrom = 0, textTo = 0;
-
     let result;
     while ((result = mathPattern.exec(source)) !== null) {
         let match = result[0];
         let mathString = result[1];
         textTo = result.index;
-        if (textTo > textFrom) {
-            elements.push(source.slice(textFrom, textTo));
-        }
-        textFrom = mathPattern.lastIndex;
+        if (textTo > textFrom) mathLinkEl.createSpan().replaceWith(source.slice(textFrom, textTo));
 
-        let mathJaxEl = renderMath(mathString, false);
-        await finishRenderMath();
-
-        let mathSpan = createSpan({ cls: ["math", "math-inline", "is-loaded"] });
-        mathSpan.replaceChildren(mathJaxEl);
-        elements.push(mathSpan);
-    }
-
-    if (textFrom < source.length) elements.push(source.slice(textFrom));
-
-    return elements;
-}
-
-export function renderTextWithMath(source: string): (HTMLElement | string)[] {
-    let elements: (HTMLElement | string)[] = [];
-    let mathPattern = /\$(.*?[^\s])\$/g;
-    let textFrom = 0, textTo = 0;
-
-    let result;
-    while ((result = mathPattern.exec(source)) !== null) {
-        let match = result[0];
-        let mathString = result[1];
-        textTo = result.index;
-        if (textTo > textFrom) {
-            elements.push(source.slice(textFrom, textTo));
-        }
-        textFrom = mathPattern.lastIndex;
-
-        let mathJaxEl = renderMath(mathString, false);
+        let mathEl = renderMath(mathString, false);
+        mathLinkEl.createSpan({ cls: ["math", "math-inline", "is-loaded"] }).replaceWith(mathEl);
         finishRenderMath();
 
-        let mathSpan = createSpan({ cls: ["math", "math-inline", "is-loaded"] });
-        mathSpan.replaceChildren(mathJaxEl);
-        elements.push(mathSpan);
+        textFrom = mathPattern.lastIndex;
     }
 
-    if (textFrom < source.length) elements.push(source.slice(textFrom));
+    if (textFrom < source.length) mathLinkEl.createSpan().replaceWith(source.slice(textFrom));
 
-    return elements;
+    if (newElement) {
+        targetEl.parentNode?.insertBefore(mathLinkEl, targetEl.nextSibling);
+        mathLinkEl.classList.add("mathLink-internal-link");
+        targetEl.classList.add("original-internal-link");
+        targetEl.style.display = "none";
+    }
+
+    return mathLinkEl;
 }
 
 export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: string): string {
