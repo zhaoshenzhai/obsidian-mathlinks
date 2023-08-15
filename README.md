@@ -70,6 +70,7 @@ If you would like to point out a bug, add support, or have a feature request, do
 
 ## Changelog
 ### 0.4.x: _Heading/Block Links and API Integration._
+* 0.4.3: Fix in `0.4.2` no longer prevents dynamic updating ([#35](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/35), [#36](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/36)).
 * 0.4.2: Fixed rendering delay when opening files.
 * 0.4.1: Dynamic updating and published API as an `npm` package ([#33](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/33), [#34](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/34)).
 * 0.4.0: Enable `mathLinks` in heading/block links with `mathLink-blocks` and API integration with other plugins, with credits to [RyotaUshio](https://github.com/RyotaUshio); fixed Supercharged links in live-preview ([#23](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/23), [#26](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/26), [#27](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/27), [#28](https://github.com/zhaoshenzhai/obsidian-mathlinks/discussions/28), [#30](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/30), [#31](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/31), [#32](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/32)).
