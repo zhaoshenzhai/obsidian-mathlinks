@@ -30,8 +30,6 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
 
     onload(): void {
         this.update();
-        console.log(this.containerEl);
-        console.log(this.mathLinkEl);
 
         // 1. when user updates the YAML frontmatter
         this.plugin.registerEvent(this.plugin.app.metadataCache.on("changed", (changedFile) => {
