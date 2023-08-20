@@ -1,0 +1,82 @@
+{
+  "version": "0.5.3",
+  "settings": {
+    "/": {
+      "profile": "English",
+      "titleSuffix": ".",
+      "numberPrefix": "",
+      "numberSuffix": "",
+      "numberInit": 1,
+      "numberStyle": "arabic",
+      "numberDefault": "auto",
+      "refFormat": "Type + number (+ title)",
+      "noteMathLinkFormat": "Type + number (+ title)",
+      "eqNumberPrefix": "",
+      "eqNumberSuffix": "",
+      "eqNumberInit": 1,
+      "eqNumberStyle": "arabic",
+      "eqRefPrefix": "",
+      "eqRefSuffix": "",
+      "labelPrefix": "",
+      "lineByLine": true,
+      "mathCalloutStyle": "framed",
+      "mathCalloutFontInherit": false,
+      "beginProof": "\\begin{proof}",
+      "endProof": "\\end{proof}",
+      "beginProofReplace": "Proof.",
+      "endProofReplace": "□"
+    }
+  },
+  "extraSettings": {
+    "noteTitleInLink": true,
+    "profiles": {
+      "English": {
+        "id": "English",
+        "meta": {
+          "tags": [
+            "en"
+          ]
+        },
+        "body": {
+          "axiom": "Axiom",
+          "definition": "Definition",
+          "lemma": "Lemma",
+          "proposition": "Proposition",
+          "theorem": "Theorem",
+          "corollary": "Corollary",
+          "claim": "Claim",
+          "assumption": "Assumption",
+          "example": "Example",
+          "exercise": "Exercise",
+          "conjecture": "Conjecture",
+          "hypothesis": "Hypothesis",
+          "remark": "Remark"
+        }
+      },
+      "Japanese": {
+        "id": "Japanese",
+        "meta": {
+          "tags": [
+            "ja"
+          ]
+        },
+        "body": {
+          "axiom": "公理",
+          "definition": "定義",
+          "lemma": "補題",
+          "proposition": "命題",
+          "theorem": "定理",
+          "corollary": "系",
+          "claim": "主張",
+          "assumption": "仮定",
+          "example": "例",
+          "exercise": "演習問題",
+          "conjecture": "予想",
+          "hypothesis": "仮説",
+          "remark": "注"
+        }
+      }
+    }
+  },
+  "excludedFiles": []
+}

@@ -1,6 +1,20 @@
 {
-  "templates": [],
-  "excludedFilePaths": [],
+  "templates": [
+    {
+      "title": "Templates",
+      "replaced": "Templates",
+      "replacement": "$\\Leftrightarrow$",
+      "globalMatch": true,
+      "sensitive": true,
+      "word": true
+    }
+  ],
+  "excludedFilePaths": [
+    {
+      "path": "Tests/Excluded.md",
+      "isFile": true
+    }
+  ],
   "blockPrefix": "^",
   "enableFileNameBlockLinks": true,
   "enableAPI": true

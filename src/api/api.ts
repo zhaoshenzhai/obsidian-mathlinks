@@ -1,5 +1,5 @@
 import { App, MarkdownView, PluginManifest, TFile, WorkspaceLeaf } from 'obsidian';
-import MathLinks from './main';
+import MathLinks from '../main';
 
 export interface MathLinksMetadata {
     "mathLink"?: string;
@@ -83,7 +83,7 @@ export function informChange(app: App, eventName: string, ...callbackArgs: [apiA
     // trigger an event informing this update
     app.metadataCache.trigger(eventName, ...callbackArgs);
 
-    // reflesh mathLinks display based on the new metadata
+    // refresh mathLinks display based on the new metadata
     app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
         if (leaf.view instanceof MarkdownView && leaf.view.getMode() == 'source') {
             leaf.view.editor.cm?.dispatch();

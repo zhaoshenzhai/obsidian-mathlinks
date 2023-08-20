@@ -1,5 +1,5 @@
 import { EditorView } from "@codemirror/view";
-import { MathLinksAPIAccount, MathLinksMetadata } from "./api";
+import { MathLinksAPIAccount, MathLinksMetadata } from "./api/api";
 import MathLinks from "./main";
 
 // Reference: 
