@@ -22,7 +22,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
             .setName("Templates")
             .setDesc(
                 createFragment((e) => {
-                    e.createSpan({ text: "Generate mathLinks with a new template. Use " });
+                    e.createSpan({ text: "Generate mathLinks with a template. Use " });
                     e.createEl("code", { text: "mathLink: auto" });
                     e.createSpan({ text: " to use templates in a file." });
                 })
@@ -38,92 +38,6 @@ export class MathLinksSettingTab extends PluginSettingTab {
                     };
                 });
             });
-
-        /*// Add a new template
-        new Setting(containerEl)
-            .setName("Add a new template")
-            .setDesc(
-                createFragment((e) => {
-                    e.createSpan({ text: "Generate mathLinks with a new template. Use " });
-                    e.createEl("code", { text: "mathLink: auto" });
-                    e.createSpan({ text: " to use templates in a file." });
-                })
-            )
-            .addButton((button: ButtonComponent): ButtonComponent => {
-                return button.setTooltip("Add").setIcon("plus").onClick(async () => {
-                    let modal = new AddTemplatesModal(this.app, this.plugin.settings.templates);
-                    modal.open();
-                    modal.onClose = async () => {
-                        if (modal.saved) {
-                            this.plugin.settings.templates.push(modal.newTemplate);
-                            await this.plugin.saveSettings().then(() => {
-                                new Notice("MathLinks: Template added");
-                                this.display();
-                            });
-                        }
-                    };
-                });
-            });
-
-        // Edit/delete template
-        let templateTitle: string | null;
-        new Setting(containerEl)
-            .setName("Edit/delete template")
-            .setDesc("Select a template to edit/delete it.")
-            .addDropdown((dropdown: DropdownComponent) => {
-                dropdown.addOption("__select", "Select");
-                this.plugin.settings.templates.forEach((template) => {
-                    dropdown.addOption(template.title, template.title);
-                })
-                dropdown.onChange(async (current) => {
-                    if (current != "__select")
-                        templateTitle = current;
-                    else
-                        templateTitle = null;
-                });
-            })
-            .addExtraButton((button: ExtraButtonComponent): ExtraButtonComponent => {
-                return button.setTooltip("Edit").setIcon("edit").onClick(async () => {
-                    if (templateTitle) {
-                        let modal = new EditTemplatesModal(this.app, templateTitle, this.plugin.settings.templates);
-                        modal.open();
-                        modal.onClose = async () => {
-                            if (modal.saved) {
-                                await this.plugin.saveSettings().then(() => {
-                                    new Notice("MathLinks: Template saved");
-                                    this.display();
-                                });
-                            }
-                        };
-                    } else {
-                        new Notice("MathLinks: Please select a template");
-                    }
-                });
-            })
-            .addExtraButton((button: ExtraButtonComponent): ExtraButtonComponent => {
-                return button.setTooltip("Delete").setIcon("trash").onClick(async () => {
-                    if (templateTitle) {
-                        let modal = new ConfirmModal(this.app, `Are you sure you want to delete "${templateTitle}"?`, "Yes", "No");
-                        modal.open();
-                        modal.onClose = async () => {
-                            if (modal.saved) {
-                                for (let i = 0; i < this.plugin.settings.templates.length; i++) {
-                                    if (this.plugin.settings.templates[i].title == templateTitle) {
-                                        this.plugin.settings.templates.splice(i, 1);
-                                        await this.plugin.saveSettings().then(() => {
-                                            this.display();
-                                            new Notice(`MathLinks: Template "${templateTitle}" deleted`);
-                                        });
-                                        break;
-                                    }
-                                }
-                            }
-                        };
-                    } else {
-                        new Notice("MathLinks: Please select a template");
-                    }
-                });
-            });*/
 
         // Excluded files
         new Setting(containerEl)

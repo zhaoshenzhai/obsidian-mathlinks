@@ -3,57 +3,6 @@ import { Template } from "./settings";
 import { isEqualToOrChildOf } from "../utils";
 import MathLinks from "../main"
 
-/*export class AddTemplatesModal extends Modal implements MathLinksModalState {
-    saved: boolean = false;
-    error: string[] = ["MathLinks: Please enter a title", "MathLinks: Please enter a non-empty string to be replaced"];
-
-    newTemplate: Template;
-    templates: Template[] = [];
-
-    constructor(app: App, templates: Template[]) {
-        super(app);
-        this.templates = templates;
-        this.newTemplate = { title: "", replaced: "", replacement: "", globalMatch: true, sensitive: true, word: true };
-    }
-
-    onOpen() {
-        const { contentEl } = this;
-        contentEl.empty();
-
-        loadTemplateSettings(contentEl, this.newTemplate, this);
-        loadButtonsToClose(this, this.contentEl.createDiv(), "Add", "Cancel");
-    }
-}
-
-export class EditTemplatesModal extends Modal implements MathLinksModalState {
-    saved: boolean = false;
-    error: string[] = [];
-
-    templateTitle: string;
-    templates: Template[];
-
-    constructor(app: App, templateTitle: string, templates: Template[]) {
-        super(app);
-        this.templateTitle = templateTitle;
-        this.templates = templates;
-    }
-
-    onOpen() {
-        const { contentEl } = this;
-        contentEl.empty();
-
-        this.templates.every((template) => {
-            if (this.templateTitle != undefined && template.title == this.templateTitle) {
-                loadTemplateSettings(contentEl, template, this);
-                return false;
-            }
-            return true;
-        });
-
-        loadButtonsToClose(this, this.contentEl.createDiv(), "Save", "Cancel");
-    }
-}*/
-
 export class TemplatesModal extends Modal implements MathLinksModalState {
     constructor(app: App, public plugin: MathLinks) {
         super(app);
@@ -67,10 +16,26 @@ export class TemplatesModal extends Modal implements MathLinksModalState {
     async display() {
         const { contentEl } = this;
         contentEl.empty();
-        contentEl.createEl("h4", { text: "Templates" });
+        contentEl.createEl("h4", { text: "Add/Edit Templates" });
 
         new Setting(contentEl)
-            .setName("ADD DESCRIPTION HERE")
+            .setName(
+                createFragment((e) => {
+                    e.createSpan({ text: "The templates in the list below are sorted by precedence, with the top template being replaced first. Note that " });
+                    e.createEl("code", { text: "a" });
+                    e.createSpan({ text: " > " });
+                    e.createEl("code", { text: "b" });
+                    e.createSpan({ text: " and " });
+                    e.createEl("code", { text: "b" });
+                    e.createSpan({ text: " > " });
+                    e.createEl("code", { text: "c" });
+                    e.createSpan({ text: " together is equivalent to " });
+                    e.createEl("code", { text: "a" });
+                    e.createSpan({ text: " > " });
+                    e.createEl("code", { text: "c" });
+                    e.createSpan({ text: ", so sort them correctly!" });
+                })
+            )
             .addButton((btn) => {
                 btn.setTooltip("Add").setIcon("plus")
                     .onClick((event) => {
@@ -86,10 +51,15 @@ export class TemplatesModal extends Modal implements MathLinksModalState {
                 new Setting(item)
                     .setName(
                         createFragment((e) => {
-                            e.createSpan({ text: template.replaced + " > " });
+                            e.createEl("code", { text: template.replaced });
+                            e.createSpan({ text: " > " });
                             e.createEl("code", { text: template.replacement });
                         })
                     )
+                    .addExtraButton((button: ButtonComponent): ButtonComponent => {
+                        return button.setTooltip("Move up").setIcon("up-arrow-with-tail").onClick(async () => {
+                        });
+                    })
                     .addExtraButton((button: ButtonComponent): ButtonComponent => {
                         return button.setTooltip("Edit").setIcon("edit").onClick(async () => {
                             let modal = new TemplateSettingsModal(this.app, this.plugin, this, template, false);
@@ -115,13 +85,8 @@ export class TemplatesModal extends Modal implements MathLinksModalState {
 }
 
 export class TemplateSettingsModal extends Modal {
-    // titleError: null | string;
-    replacedError: null | string;
-
     constructor(app: App, public plugin: MathLinks, public modal: TemplatesModal, public template: Template, public create: boolean) {
         super(app);
-        // this.titleError = "MathLinks: Please enter a title";
-        this.replacedError = (template.replaced == "") ? "MathLinks: Please enter a non-empty string to be replaced" : null;
     }
 
     onOpen() {
@@ -132,29 +97,6 @@ export class TemplateSettingsModal extends Modal {
         const { contentEl } = this;
         contentEl.empty();
 
-        /*let titleText: TextComponent;
-        new Setting(contentEl)
-            .setName("Title")
-            .setDesc("Name of the template.")
-            .addText((text) => {
-                titleText = text;
-                titleText.setValue(this.template.title).onChange((current) => {
-                    if (current == "") {
-                        this.titleError = "MathLinks: Please enter a title";
-                    } else {
-                        this.titleError = null;
-                        this.plugin.settings.templates.every((t) => {
-                            if (current != "" && current == t.title) {
-                                this.titleError = "MathLinks: Duplicate title";
-                                return false;
-                            }
-                            return true;
-                        });
-                        this.template.title = current;
-                    }
-                });
-            });*/
-
         let replacedText: TextComponent;
         new Setting(contentEl)
             .setName("Match for...")
@@ -163,10 +105,6 @@ export class TemplateSettingsModal extends Modal {
                 replacedText = text;
                 replacedText.setValue(this.template.replaced).onChange((current) => {
                     this.template.replaced = current;
-                    this.replacedError = null;
-                    if (this.template.replaced == "") {
-                        this.replacedError = "MathLinks: Please enter a non-empty string to be replaced";
-                    }
                 });
             });
 
@@ -204,9 +142,9 @@ export class TemplateSettingsModal extends Modal {
 
         new Setting(contentEl)
             .addButton((b) => {
-                b.setTooltip("Add").setIcon("checkmark").onClick(async () => {
-                    if (this.replacedError) {
-                        new Notice(this.replacedError)
+                b.setTooltip(this.create ? "Add" : "Save").setIcon("checkmark").onClick(async () => {
+                    if (this.template.replaced == "") {
+                        new Notice("MathLinks: Please enter a non-empty string to be replaced");
                     } else {
                         if (this.create) this.plugin.settings.templates.push(this.template);
                         await this.plugin.saveSettings().then(() => {

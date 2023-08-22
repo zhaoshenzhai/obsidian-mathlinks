@@ -2,7 +2,7 @@ import { TAbstractFile } from "obsidian";
 
 export interface MathLinksSettings {
     templates: Template[];
-    excludedPaths: TAbstractFile[];
+    excludedPaths: string[];
     blockPrefix: string;
     enableFileNameBlockLinks: boolean;
     enableAPI: boolean;
