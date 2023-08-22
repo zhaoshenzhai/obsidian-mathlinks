@@ -21,11 +21,11 @@ export class TemplatesModal extends Modal implements MathLinksModalState {
         new Setting(contentEl)
             .setName(
                 createFragment((e) => {
-                    e.createSpan({ text: "The templates in the list below are sorted by precedence, with the top template being replaced first. Note that " });
+                    e.createSpan({ text: "The templates in the list below are sorted by precedence, with the top being replaced first. Note that " });
                     e.createEl("code", { text: "a" });
                     e.createSpan({ text: " > " });
                     e.createEl("code", { text: "b" });
-                    e.createSpan({ text: " and " });
+                    e.createSpan({ text: " followed by " });
                     e.createEl("code", { text: "b" });
                     e.createSpan({ text: " > " });
                     e.createEl("code", { text: "c" });
@@ -33,7 +33,7 @@ export class TemplatesModal extends Modal implements MathLinksModalState {
                     e.createEl("code", { text: "a" });
                     e.createSpan({ text: " > " });
                     e.createEl("code", { text: "c" });
-                    e.createSpan({ text: ", so sort them correctly!" });
+                    e.createSpan({ text: ", but not the other way around." });
                 })
             )
             .addButton((btn) => {
@@ -46,8 +46,10 @@ export class TemplatesModal extends Modal implements MathLinksModalState {
 
         if (this.plugin.settings.templates.length) {
             let list = contentEl.createEl("ul");
-            for (let template of this.plugin.settings.templates) {
+            for (let i = 0; i < this.plugin.settings.templates.length; i++) {
+                let template = this.plugin.settings.templates[i];
                 let item = list.createEl("li").createDiv();
+
                 new Setting(item)
                     .setName(
                         createFragment((e) => {
@@ -58,6 +60,30 @@ export class TemplatesModal extends Modal implements MathLinksModalState {
                     )
                     .addExtraButton((button: ButtonComponent): ButtonComponent => {
                         return button.setTooltip("Move up").setIcon("up-arrow-with-tail").onClick(async () => {
+                            if (i != 0) {
+                                let down = {...template};
+                                let up = this.plugin.settings.templates[i - 1];
+
+                                this.plugin.settings.templates[i] = up;
+                                this.plugin.settings.templates[i - 1] = down;
+                                await this.plugin.saveSettings().then(() => {
+                                    this.display();
+                                });
+                            }
+                        });
+                    })
+                    .addExtraButton((button: ButtonComponent): ButtonComponent => {
+                        return button.setTooltip("Move down").setIcon("down-arrow-with-tail").onClick(async () => {
+                            if (i != this.plugin.settings.templates.length - 1) {
+                                let up = {...template};
+                                let down = this.plugin.settings.templates[i + 1];
+
+                                this.plugin.settings.templates[i] = down;
+                                this.plugin.settings.templates[i+1] = up;
+                                await this.plugin.saveSettings().then(() => {
+                                    this.display();
+                                });
+                            }
                         });
                     })
                     .addExtraButton((button: ButtonComponent): ButtonComponent => {
