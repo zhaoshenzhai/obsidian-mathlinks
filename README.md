@@ -45,7 +45,6 @@ Each template has the following options, which can be configured when the templa
 
 | Field | Description | Default |
 | ----- | ----------- | ------- |
-| Title | Name of the template to refer back to when editing/deleting a template. |  |
 | Match for | String to be matched and replaced. Do not include regex. |  |
 | Replace with | String to replace matches. Do not escape backslashes. |  |
 | Global match | Match all instances (instead of just the first). | `true` |
@@ -70,6 +69,7 @@ If you would like to point out a bug, add support, or have a feature request, do
 
 ## Changelog
 ### 0.4.x: _Heading/Block Links and API Integration._
+* 0.4.4: Better setting tabs: Reworked templates to allow nesting; choose excluded files from suggestion ([#38](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/38)).
 * 0.4.3: Fix in `0.4.2` no longer prevents dynamic updating ([#35](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/35), [#36](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/36)).
 * 0.4.2: Fixed rendering delay when opening files.
 * 0.4.1: Dynamic updating and published API as an `npm` package ([#33](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/33), [#34](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/34)).

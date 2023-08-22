@@ -1,4 +1,5 @@
-import { Setting, Modal, TextComponent, ButtonComponent, Notice, TFile, TAbstractFile, TFolder, FuzzySuggestModal, App } from "obsidian";
+import { Setting, Modal, Notice, TFile, TAbstractFile, TFolder, FuzzySuggestModal, App } from "obsidian";
+import { TextComponent, ButtonComponent, ExtraButtonComponent } from "obsidian";
 import { Template } from "./settings";
 import { isEqualToOrChildOf } from "../utils";
 import MathLinks from "../main"
@@ -39,7 +40,7 @@ export class TemplatesModal extends Modal {
             .addButton((btn) => {
                 btn.setTooltip("Add").setIcon("plus")
                     .onClick((event) => {
-                        let newTemplate = { replaced: "", replacement: "", globalMatch: true, sensitive: true, word: true };
+                        let newTemplate: Template = { replaced: "", replacement: "", globalMatch: true, sensitive: true, word: true };
                         new TemplateSettingsModal(this.app, this.plugin, this, newTemplate, true).open();
                     });
             });
@@ -58,7 +59,7 @@ export class TemplatesModal extends Modal {
                             e.createEl("code", { text: template.replacement });
                         })
                     )
-                    .addExtraButton((button: ButtonComponent): ButtonComponent => {
+                    .addExtraButton((button: ExtraButtonComponent): ExtraButtonComponent => {
                         return button.setTooltip("Move up").setIcon("up-arrow-with-tail").onClick(async () => {
                             if (i != 0) {
                                 let down = {...template};
@@ -72,7 +73,7 @@ export class TemplatesModal extends Modal {
                             }
                         });
                     })
-                    .addExtraButton((button: ButtonComponent): ButtonComponent => {
+                    .addExtraButton((button: ExtraButtonComponent): ExtraButtonComponent => {
                         return button.setTooltip("Move down").setIcon("down-arrow-with-tail").onClick(async () => {
                             if (i != this.plugin.settings.templates.length - 1) {
                                 let up = {...template};
@@ -86,7 +87,7 @@ export class TemplatesModal extends Modal {
                             }
                         });
                     })
-                    .addExtraButton((button: ButtonComponent): ButtonComponent => {
+                    .addExtraButton((button: ExtraButtonComponent): ExtraButtonComponent => {
                         return button.setTooltip("Edit").setIcon("edit").onClick(async () => {
                             let modal = new TemplateSettingsModal(this.app, this.plugin, this, template, false);
                             modal.open();
@@ -97,7 +98,7 @@ export class TemplatesModal extends Modal {
                             };
                         });
                     })
-                    .addExtraButton((button: ButtonComponent): ButtonComponent => {
+                    .addExtraButton((button: ExtraButtonComponent): ExtraButtonComponent => {
                         return button.setTooltip("Remove").setIcon("x").onClick(async () => {
                             this.plugin.settings.templates.remove(template);
                             await this.plugin.saveSettings().then(() => {
@@ -110,7 +111,7 @@ export class TemplatesModal extends Modal {
     }
 }
 
-export class TemplateSettingsModal extends Modal {
+class TemplateSettingsModal extends Modal {
     constructor(app: App, public plugin: MathLinks, public modal: TemplatesModal, public template: Template, public create: boolean) {
         super(app);
     }
@@ -180,7 +181,7 @@ export class TemplateSettingsModal extends Modal {
                     }
                 });
             })
-            .addExtraButton((b) => {
+            .addExtraButton((b: ExtraButtonComponent) => {
                 b.setTooltip("Cancel").setIcon("cross").onClick(async () => {
                     this.close();
                 });
@@ -216,7 +217,7 @@ export class ExcludeModal extends Modal {
             let list = contentEl.createEl("ul");
             for (let path of this.plugin.settings.excludedPaths) {
                 let item = list.createEl("li").createDiv();
-                new Setting(item).setName(path).addExtraButton((button: ButtonComponent): ButtonComponent => {
+                new Setting(item).setName(path).addExtraButton((button: ExtraButtonComponent): ExtraButtonComponent => {
                     return button.setTooltip("Remove").setIcon("x").onClick(async () => {
                         this.plugin.settings.excludedPaths.remove(path);
                         await this.plugin.saveSettings().then(() => {
@@ -262,7 +263,7 @@ class FileExcludeSuggestModal extends FileSuggestModal {
         super(app, plugin);
     }
 
-    async onChooseItem(file: TAbstractFile, evt: MouseEvent | KeyBoardEvent) {
+    async onChooseItem(file: TAbstractFile, evt: MouseEvent | KeyboardEvent) {
         this.plugin.settings.excludedPaths.push(file.path);
         await this.plugin.saveSettings().then(() => {
             this.modal.display();

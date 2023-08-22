@@ -9,7 +9,6 @@ export interface MathLinksSettings {
 }
 
 export type Template = {
-    title: string;
     replaced: string;
     replacement: string;
     globalMatch: boolean;

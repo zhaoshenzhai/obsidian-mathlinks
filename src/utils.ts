@@ -2,12 +2,10 @@ import { TAbstractFile, TFolder } from "obsidian";
 import MathLinks from "./main";
 
 // Check if path is excluded
-export function isExcluded(plugin: MathLinks, file: string | TAbstractFile): boolean {
-    if (typeof file === "string") file = plugin.app.vault.getAbstractFileByPath(file);
-
+export function isExcluded(plugin: MathLinks, file: TAbstractFile): boolean {
     for (let i = 0; i < plugin.settings.excludedPaths.length; i++) {
         let excluded = plugin.app.vault.getAbstractFileByPath(plugin.settings.excludedPaths[i]);
-        if (isEqualToOrChildOf(file, excluded)) return false;
+        if (excluded && isEqualToOrChildOf(file, excluded)) return false;
     }
 
     return true;

@@ -16,7 +16,8 @@ export default class MathLinks extends Plugin {
 
         // Markdown Post Processor for reading view
         this.registerMarkdownPostProcessor((element, context) => {
-            if (isExcluded(this, context.sourcePath)) {
+            let file = this.app.vault.getAbstractFileByPath(context.sourcePath);
+            if (file && isExcluded(this, file)) {
                 generateMathLinks(this, element, context);
             }
         });
