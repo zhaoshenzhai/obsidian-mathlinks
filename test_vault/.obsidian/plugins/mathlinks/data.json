@@ -1,7 +1,6 @@
 {
   "templates": [
     {
-      "title": "Templates",
       "replaced": "Templates",
       "replacement": "$\\Leftrightarrow$",
       "globalMatch": true,

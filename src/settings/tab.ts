@@ -1,5 +1,5 @@
 import { Setting, PluginSettingTab, Notice, App } from "obsidian";
-import { TextComponent, DropdownComponent, ToggleComponent, ButtonComponent, ExtraButtonComponent } from "obsidian"
+import { TextComponent, DropdownComponent, ToggleComponent, ButtonComponent } from "obsidian"
 import { TemplatesModal, ExcludeModal, ConfirmModal, AddTemplatesModal, EditTemplatesModal } from "./modals"
 import MathLinks from "../main"
 

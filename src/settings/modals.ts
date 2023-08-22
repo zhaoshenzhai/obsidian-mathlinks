@@ -70,12 +70,12 @@ export class TemplatesModal extends Modal implements MathLinksModalState {
         contentEl.createEl("h4", { text: "Templates" });
 
         new Setting(contentEl)
-            .setName("Templates")
+            .setName("ADD DESCRIPTION HERE")
             .addButton((btn) => {
                 btn.setTooltip("Add").setIcon("plus")
                     .onClick((event) => {
-                        let newTemplate = { title: "", replaced: "", replacement: "", globalMatch: true, sensitive: true, word: true };
-                        new AddTemplateModal(this.app, this.plugin, this, newTemplate).open();
+                        let newTemplate = { replaced: "", replacement: "", globalMatch: true, sensitive: true, word: true };
+                        new TemplateSettingsModal(this.app, this.plugin, this, newTemplate, true).open();
                     });
             });
 
@@ -83,7 +83,24 @@ export class TemplatesModal extends Modal implements MathLinksModalState {
             let list = contentEl.createEl("ul");
             for (let template of this.plugin.settings.templates) {
                 let item = list.createEl("li").createDiv();
-                new Setting(item).setName(template.title)
+                new Setting(item)
+                    .setName(
+                        createFragment((e) => {
+                            e.createSpan({ text: template.replaced + " > " });
+                            e.createEl("code", { text: template.replacement });
+                        })
+                    )
+                    .addExtraButton((button: ButtonComponent): ButtonComponent => {
+                        return button.setTooltip("Edit").setIcon("edit").onClick(async () => {
+                            let modal = new TemplateSettingsModal(this.app, this.plugin, this, template, false);
+                            modal.open();
+                            modal.onClose = async () => {
+                                await this.plugin.saveSettings().then(() => {
+                                    this.display();
+                                });
+                            };
+                        });
+                    })
                     .addExtraButton((button: ButtonComponent): ButtonComponent => {
                         return button.setTooltip("Remove").setIcon("x").onClick(async () => {
                             this.plugin.settings.templates.remove(template);
@@ -97,14 +114,14 @@ export class TemplatesModal extends Modal implements MathLinksModalState {
     }
 }
 
-export class AddTemplateModal extends Modal {
-    titleError: null | string;
+export class TemplateSettingsModal extends Modal {
+    // titleError: null | string;
     replacedError: null | string;
 
-    constructor(app: App, public plugin: MathLinks, public modal: TemplatesModal, public template: Template) {
+    constructor(app: App, public plugin: MathLinks, public modal: TemplatesModal, public template: Template, public create: boolean) {
         super(app);
-        this.titleError = "MathLinks: Please enter a title";
-        this.replacedError = "MathLinks: Please enter a non-empty string to be replaced";
+        // this.titleError = "MathLinks: Please enter a title";
+        this.replacedError = (template.replaced == "") ? "MathLinks: Please enter a non-empty string to be replaced" : null;
     }
 
     onOpen() {
@@ -115,7 +132,7 @@ export class AddTemplateModal extends Modal {
         const { contentEl } = this;
         contentEl.empty();
 
-        let titleText: TextComponent;
+        /*let titleText: TextComponent;
         new Setting(contentEl)
             .setName("Title")
             .setDesc("Name of the template.")
@@ -136,7 +153,7 @@ export class AddTemplateModal extends Modal {
                         this.template.title = current;
                     }
                 });
-            });
+            });*/
 
         let replacedText: TextComponent;
         new Setting(contentEl)
@@ -188,11 +205,10 @@ export class AddTemplateModal extends Modal {
         new Setting(contentEl)
             .addButton((b) => {
                 b.setTooltip("Add").setIcon("checkmark").onClick(async () => {
-                    if (this.titleError || this.replacedError) {
-                        if (this.titleError) new Notice(this.titleError)
-                        if (this.replacedError) new Notice(this.replacedError)
+                    if (this.replacedError) {
+                        new Notice(this.replacedError)
                     } else {
-                        this.plugin.settings.templates.push(this.template);
+                        if (this.create) this.plugin.settings.templates.push(this.template);
                         await this.plugin.saveSettings().then(() => {
                             this.close();
                             this.modal.display();
