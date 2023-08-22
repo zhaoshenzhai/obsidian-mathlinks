@@ -1,3 +1,13 @@
+import { TAbstractFile } from "obsidian";
+
+export interface MathLinksSettings {
+    templates: Template[];
+    excludedPaths: TAbstractFile[];
+    blockPrefix: string;
+    enableFileNameBlockLinks: boolean;
+    enableAPI: boolean;
+}
+
 export type Template = {
     title: string;
     replaced: string;
@@ -7,22 +17,9 @@ export type Template = {
     word: boolean;
 }
 
-export type FilePath = {
-    path: string;
-    isFile: boolean;
-}
-
-export interface MathLinksSettings {
-    templates: Template[];
-    excludedFilePaths: FilePath[];
-    blockPrefix: string;
-    enableFileNameBlockLinks: boolean;
-    enableAPI: boolean;
-}
-
 export const DEFAULT_SETTINGS: MathLinksSettings = {
     templates: [],
-    excludedFilePaths: [],
+    excludedPaths: [],
     blockPrefix: "^",
     enableFileNameBlockLinks: true,
     enableAPI: true,

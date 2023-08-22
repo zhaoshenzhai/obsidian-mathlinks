@@ -9,11 +9,8 @@
       "word": true
     }
   ],
-  "excludedFilePaths": [
-    {
-      "path": "Tests/Excluded.md",
-      "isFile": true
-    }
+  "excludedPaths": [
+    "Tests/Excluded.md"
   ],
   "blockPrefix": "^",
   "enableFileNameBlockLinks": true,

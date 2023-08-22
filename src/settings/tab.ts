@@ -1,6 +1,6 @@
 import { Setting, PluginSettingTab, Notice, App } from "obsidian";
 import { TextComponent, DropdownComponent, ToggleComponent, ButtonComponent, ExtraButtonComponent } from "obsidian"
-import { ConfirmModal, AddExcludedModal, AddTemplatesModal, EditTemplatesModal } from "./modals"
+import { TemplatesModal, ExcludeModal, ConfirmModal, AddTemplatesModal, EditTemplatesModal } from "./modals"
 import MathLinks from "../main"
 
 export class MathLinksSettingTab extends PluginSettingTab {
@@ -17,7 +17,29 @@ export class MathLinksSettingTab extends PluginSettingTab {
         containerEl.empty();
         containerEl.createEl("h2", { text: "MathLinks Settings" });
 
-        // Add a new template
+        // Templates
+        new Setting(containerEl)
+            .setName("Templates")
+            .setDesc(
+                createFragment((e) => {
+                    e.createSpan({ text: "Generate mathLinks with a new template. Use " });
+                    e.createEl("code", { text: "mathLink: auto" });
+                    e.createSpan({ text: " to use templates in a file." });
+                })
+            )
+            .addButton((button: ButtonComponent): ButtonComponent => {
+                return button.setButtonText("Manage").onClick(async () => {
+                    let modal = new TemplatesModal(this.app, this.plugin);
+                    modal.open();
+                    modal.onClose = async () => {
+                        await this.plugin.saveSettings().then(() => {
+                            this.display();
+                        });
+                    };
+                });
+            });
+
+        /*// Add a new template
         new Setting(containerEl)
             .setName("Add a new template")
             .setDesc(
@@ -101,70 +123,21 @@ export class MathLinksSettingTab extends PluginSettingTab {
                         new Notice("MathLinks: Please select a template");
                     }
                 });
-            });
+            });*/
 
-        // Add an excluded file
+        // Excluded files
         new Setting(containerEl)
-            .setName("Add an excluded file")
-            .setDesc("MathLinks will ignore those files.")
+            .setName("Excluded files")
+            .setDesc("Manage files/paths that MathLinks will ignore.")
             .addButton((button: ButtonComponent): ButtonComponent => {
-                return button.setTooltip("Add").setIcon("plus").onClick(async () => {
-                    let modal = new AddExcludedModal(this.app, this.plugin.settings.excludedFilePaths);
+                return button.setButtonText("Manage").onClick(async () => {
+                    let modal = new ExcludeModal(this.app, this.plugin);
                     modal.open();
                     modal.onClose = async () => {
-                        if (modal.saved) {
-                            this.plugin.settings.excludedFilePaths.push(modal.newExcludedFilePath);
-                            await this.plugin.saveSettings().then(() => {
-                                this.display();
-                                if (modal.newExcludedFilePath.isFile)
-                                    new Notice("MathLinks: File excluded");
-                                else
-                                    new Notice("MathLinks: Path exclcuded");
-                            });
-                        }
+                        await this.plugin.saveSettings().then(() => {
+                            this.display();
+                        });
                     };
-                });
-            });
-
-        // Remove from excluded files
-        let excludedFilePath: string | null;
-        new Setting(containerEl)
-            .setName("Remove from excluded files")
-            .setDesc("Remove a file from the list of excluded files.")
-            .addDropdown(async (dropdown: DropdownComponent) => {
-                dropdown.addOption("__select", "Select");
-                this.plugin.settings.excludedFilePaths.forEach((excludedFilePath) => {
-                    dropdown.addOption(excludedFilePath.path, excludedFilePath.path);
-                })
-                dropdown.onChange(async (current) => {
-                    if (current != "__select")
-                        excludedFilePath = current;
-                    else
-                        excludedFilePath = null;
-                });
-            })
-            .addExtraButton((button: ExtraButtonComponent): ExtraButtonComponent => {
-                return button.setTooltip("Remove").setIcon("trash").onClick(async () => {
-                    if (excludedFilePath) {
-                        let modal = new ConfirmModal(this.app, `Are you sure you want to remove "${excludedFilePath}" from the list of excluded files/paths?`, "Yes", "No");
-                        modal.open();
-                        modal.onClose = async () => {
-                            if (modal.saved) {
-                                for (let i = 0; i < this.plugin.settings.excludedFilePaths.length; i++) {
-                                    if (this.plugin.settings.excludedFilePaths[i].path == excludedFilePath) {
-                                        this.plugin.settings.excludedFilePaths.splice(i, 1);
-                                        await this.plugin.saveSettings().then(() => {
-                                            this.display();
-                                            new Notice(`MathLinks: "${excludedFilePath}" removed from excluded files`);
-                                        });
-                                        break;
-                                    }
-                                }
-                            }
-                        };
-                    } else {
-                        new Notice("MathLinks: Please select a file");
-                    }
                 });
             });
 
@@ -191,13 +164,15 @@ export class MathLinksSettingTab extends PluginSettingTab {
                     this.plugin.settings.blockPrefix = current;
                     await this.plugin.saveSettings();
                 });
-                prefix.setPlaceholder("No prefix");
+                prefix.setPlaceholder("No prefix (default: ^)");
             })
             .addToggle((toggle: ToggleComponent) => {
                 toggle.setValue(this.plugin.settings.enableFileNameBlockLinks)
                     .onChange(async (value: boolean) => {
                         this.plugin.settings.enableFileNameBlockLinks = value;
-                        await this.plugin.saveSettings();
+                        await this.plugin.saveSettings().then(() => {
+                            this.display();
+                        });
                     });
                 toggle.setTooltip("Disable to ignore note name.");
             });
@@ -220,7 +195,9 @@ export class MathLinksSettingTab extends PluginSettingTab {
                 toggle.setValue(this.plugin.settings.enableAPI)
                     .onChange(async (value: boolean) => {
                         this.plugin.settings.enableAPI = value;
-                        await this.plugin.saveSettings();
+                        await this.plugin.saveSettings().then(() => {
+                            this.display();
+                        });
                     })
             });
     }

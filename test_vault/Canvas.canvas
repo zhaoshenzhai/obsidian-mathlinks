@@ -4,7 +4,7 @@
 		{"type":"file","file":"Tests/Formats.md","id":"764b6fe364dd2a1b","x":800,"y":-300,"width":260,"height":460},
 		{"type":"file","file":"Tests/Blocks and Headings.md","id":"b20864e3e2330c7c","x":1120,"y":-300,"width":260,"height":460},
 		{"type":"file","file":"Tests/Markdown Links.md","id":"7ce6fd7f2c2a28e7","x":160,"y":-300,"width":260,"height":186},
-		{"type":"file","file":"Tests/Wikilinks.md","id":"72af7f7e6ad41a84","x":-160,"y":-300,"width":260,"height":186},
+		{"type":"file","file":"Tests/Wikilinks.md","id":"72af7f7e6ad41a84","x":-160,"y":-300,"width":260,"height":118},
 		{"type":"file","file":"Tests/Callouts.md","id":"ce67ad19d3800d0e","x":160,"y":-70,"width":260,"height":300},
 		{"type":"file","file":"Tests/API Exposure.md","id":"83d3a4f8973194dd","x":-160,"y":-70,"width":260,"height":190},
 		{"type":"file","file":"Tests/Excluded.md","id":"dbcb2b838f398b22","x":160,"y":280,"width":260,"height":100}

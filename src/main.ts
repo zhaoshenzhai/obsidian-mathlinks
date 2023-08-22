@@ -4,7 +4,7 @@ import { MathLinksSettingTab } from "./settings/tab"
 import { MathLinksAPIAccount, informChange } from "./api/api";
 import { generateMathLinks } from "./links/reading";
 import { buildLivePreview } from "./links/preview";
-import { isValid } from "./utils";
+import { isExcluded } from "./utils";
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
@@ -16,7 +16,7 @@ export default class MathLinks extends Plugin {
 
         // Markdown Post Processor for reading view
         this.registerMarkdownPostProcessor((element, context) => {
-            if (isValid(this, context.sourcePath)) {
+            if (isExcluded(this, context.sourcePath)) {
                 generateMathLinks(this, element, context);
             }
         });
@@ -24,7 +24,7 @@ export default class MathLinks extends Plugin {
         // Live-preview; update all when Obsidian launches
         this.app.workspace.onLayoutReady(() => {
             this.app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
-                if (leaf.view instanceof FileView && leaf.view.file && isValid(this, leaf.view.file.path)) {
+                if (leaf.view instanceof FileView && leaf.view.file && isExcluded(this, leaf.view.file)) {
                     buildLivePreview(this, leaf).then((livePreview) => {
                         this.registerEditorExtension(livePreview);
                     });
@@ -34,7 +34,7 @@ export default class MathLinks extends Plugin {
 
         // Live-preview; update on leaf-change
         this.app.workspace.on("active-leaf-change", (leaf: WorkspaceLeaf) => {
-            if (leaf.view instanceof FileView && leaf.view.file && isValid(this, leaf.view.file.path)) {
+            if (leaf.view instanceof FileView && leaf.view.file && isExcluded(this, leaf.view.file)) {
                 buildLivePreview(this, leaf).then((livePreview) => {
                     this.registerEditorExtension(livePreview);
                 });

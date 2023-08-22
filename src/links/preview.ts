@@ -4,7 +4,7 @@ import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetTy
 import { FileView, MarkdownView, WorkspaceLeaf, TFile } from "obsidian";
 import { getMathLink, setMathLink } from "./helper";
 import { addSuperCharged } from "./supercharged";
-import { isValid } from "../utils";
+import { isExcluded } from "../utils";
 import MathLinks from "../main";
 
 export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin<V>>
@@ -84,7 +84,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                 this.decorations = this.destroyDecorations(view);
                 let editorView = leaf.getViewState();
 
-                if (leaf.view instanceof MarkdownView && leaf.view.file instanceof TFile && isValid(plugin, leaf.view.file.name)) {
+                if (leaf.view instanceof MarkdownView && leaf.view.file instanceof TFile && isExcluded(plugin, leaf.view.file)) {
                     let curView = leaf.view.editor.cm;
                     if (curView == view && editorView.state.mode == "source" && !editorView.state.source) {
                         this.decorations = this.buildDecorations(view);
@@ -93,7 +93,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                     }
                 } else if (leafView.canvas) {
                     for (let node of leafView.canvas.selection.values()) {
-                        if (isValid(plugin, node.filePath)) {
+                        if (isExcluded(plugin, node.file)) {
                             this.decorations = this.buildDecorations(view);
                         }
                     }

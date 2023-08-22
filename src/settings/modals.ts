@@ -1,12 +1,9 @@
-import { Setting, Modal, TextComponent, Notice, TFile, App } from "obsidian";
-import { Template, FilePath } from "./settings"
+import { Setting, Modal, TextComponent, ButtonComponent, Notice, TFile, TAbstractFile, TFolder, FuzzySuggestModal, App } from "obsidian";
+import { Template } from "./settings";
+import { isEqualToOrChildOf } from "../utils";
+import MathLinks from "../main"
 
-interface MathLinksModalState {
-    saved: boolean;
-    error: string[];
-}
-
-export class AddTemplatesModal extends Modal implements MathLinksModalState {
+/*export class AddTemplatesModal extends Modal implements MathLinksModalState {
     saved: boolean = false;
     error: string[] = ["MathLinks: Please enter a title", "MathLinks: Please enter a non-empty string to be replaced"];
 
@@ -30,7 +27,7 @@ export class AddTemplatesModal extends Modal implements MathLinksModalState {
 
 export class EditTemplatesModal extends Modal implements MathLinksModalState {
     saved: boolean = false;
-    error: string[] = ["", ""];
+    error: string[] = [];
 
     templateTitle: string;
     templates: Template[];
@@ -55,197 +52,240 @@ export class EditTemplatesModal extends Modal implements MathLinksModalState {
 
         loadButtonsToClose(this, this.contentEl.createDiv(), "Save", "Cancel");
     }
-}
+}*/
 
-export class AddExcludedModal extends Modal implements MathLinksModalState {
-    saved: boolean = false;
-    error: string[] = ["MathLinks: Please enter a valid file/path", ""];
-
-    newExcludedFilePath: FilePath;
-
-    excludedFilePaths: FilePath[];
-
-    constructor(app: App, excludedFilePaths: FilePath[]) {
+export class TemplatesModal extends Modal implements MathLinksModalState {
+    constructor(app: App, public plugin: MathLinks) {
         super(app);
-        this.excludedFilePaths = excludedFilePaths;
     }
 
     onOpen() {
+        this.display();
+    }
+
+    // Credits to RyotaUshio/obsidian-math-booster
+    async display() {
+        const { contentEl } = this;
+        contentEl.empty();
+        contentEl.createEl("h4", { text: "Templates" });
+
+        new Setting(contentEl)
+            .setName("Templates")
+            .addButton((btn) => {
+                btn.setTooltip("Add").setIcon("plus")
+                    .onClick((event) => {
+                        let newTemplate = { title: "", replaced: "", replacement: "", globalMatch: true, sensitive: true, word: true };
+                        new AddTemplateModal(this.app, this.plugin, this, newTemplate).open();
+                    });
+            });
+
+        if (this.plugin.settings.templates.length) {
+            let list = contentEl.createEl("ul");
+            for (let template of this.plugin.settings.templates) {
+                let item = list.createEl("li").createDiv();
+                new Setting(item).setName(template.title)
+                    .addExtraButton((button: ButtonComponent): ButtonComponent => {
+                        return button.setTooltip("Remove").setIcon("x").onClick(async () => {
+                            this.plugin.settings.templates.remove(template);
+                            await this.plugin.saveSettings().then(() => {
+                                this.display();
+                            });
+                        });
+                    });
+            }
+        }
+    }
+}
+
+export class AddTemplateModal extends Modal {
+    titleError: null | string;
+    replacedError: null | string;
+
+    constructor(app: App, public plugin: MathLinks, public modal: TemplatesModal, public template: Template) {
+        super(app);
+        this.titleError = "MathLinks: Please enter a title";
+        this.replacedError = "MathLinks: Please enter a non-empty string to be replaced";
+    }
+
+    onOpen() {
+        this.display();
+    }
+
+    async display() {
         const { contentEl } = this;
         contentEl.empty();
 
-        let excludedFilePathText: TextComponent;
+        let titleText: TextComponent;
         new Setting(contentEl)
-            .setName("File name/path of folder")
-            .setDesc(
-                createFragment((e) => {
-                    e.createSpan({ text: "Enter a file as" });
-                    e.createEl("code", { text: "path/name.md" });
-                    e.createSpan({ text: " and a folder as " });
-                    e.createEl("code", { text: "path" });
-                    e.createSpan({ text: "." });
-                })
-            )
+            .setName("Title")
+            .setDesc("Name of the template.")
             .addText((text) => {
-                excludedFilePathText = text;
-                let footerEl = this.contentEl.createDiv();
-                loadButtonsToClose(this, footerEl, "Add", "Cancel");
-                excludedFilePathText
-                    .onChange((current) => {
-                        let file = app.vault.getAbstractFileByPath(current);
-                        if (file != null) {
-                            this.newExcludedFilePath = {path: file.path, isFile: file instanceof TFile};
-                            this.error[0] = "";
-                        } else {
-                            this.error[0] = "MathLinks: Please enter a valid file/path";
-                        }
-
-                        this.error[1] = "";
-                        this.excludedFilePaths.every((filePath) => {
-                            if (filePath.path == current) {
-                                this.error[1] = "MathLinks: Duplicate file/path";
+                titleText = text;
+                titleText.setValue(this.template.title).onChange((current) => {
+                    if (current == "") {
+                        this.titleError = "MathLinks: Please enter a title";
+                    } else {
+                        this.titleError = null;
+                        this.plugin.settings.templates.every((t) => {
+                            if (current != "" && current == t.title) {
+                                this.titleError = "MathLinks: Duplicate title";
                                 return false;
                             }
                             return true;
                         });
+                        this.template.title = current;
+                    }
+                });
+            });
 
-                        footerEl.empty();
-                        loadButtonsToClose(this, footerEl, "Add", "Cancel");
-                    });
+        let replacedText: TextComponent;
+        new Setting(contentEl)
+            .setName("Match for...")
+            .setDesc("String to be matched and replaced. Do not include regex.")
+            .addText((text) => {
+                replacedText = text;
+                replacedText.setValue(this.template.replaced).onChange((current) => {
+                    this.template.replaced = current;
+                    this.replacedError = null;
+                    if (this.template.replaced == "") {
+                        this.replacedError = "MathLinks: Please enter a non-empty string to be replaced";
+                    }
+                });
+            });
+
+        let replacementText: TextComponent;
+        new Setting(contentEl)
+            .setName("Replace with...")
+            .setDesc("String to replace matches. Do not escape backslashes.")
+            .addText((text) => {
+                replacementText = text;
+                replacementText.setValue(this.template.replacement).onChange((current) => {
+                    this.template.replacement = current;
+                });
+            });
+
+        new Setting(contentEl)
+            .setName("Global match")
+            .setDesc("Match all instances (instead of just the first).")
+            .addToggle((toggle) => {
+                toggle.setValue(this.template.globalMatch).onChange((current) => (this.template.globalMatch = current));
+            });
+
+        new Setting(contentEl)
+            .setName("Case sensitive")
+            .setDesc("Matches will be case sensitive.")
+            .addToggle((toggle) => {
+                toggle.setValue(this.template.sensitive).onChange((current) => (this.template.sensitive = current));
+            });
+
+        new Setting(contentEl)
+            .setName("Match whole words")
+            .setDesc("Only match whole words.")
+            .addToggle((toggle) => {
+                toggle.setValue(this.template.word).onChange((current) => (this.template.word = current));
+            });
+
+        new Setting(contentEl)
+            .addButton((b) => {
+                b.setTooltip("Add").setIcon("checkmark").onClick(async () => {
+                    if (this.titleError || this.replacedError) {
+                        if (this.titleError) new Notice(this.titleError)
+                        if (this.replacedError) new Notice(this.replacedError)
+                    } else {
+                        this.plugin.settings.templates.push(this.template);
+                        await this.plugin.saveSettings().then(() => {
+                            this.close();
+                            this.modal.display();
+                        });
+                    }
+                });
+            })
+            .addExtraButton((b) => {
+                b.setTooltip("Cancel").setIcon("cross").onClick(async () => {
+                    this.close();
+                });
             });
     }
 }
 
-export class ConfirmModal extends Modal implements MathLinksModalState {
-    saved: boolean = false;
-    error: string[] = [];
-
-    areYouSure: string;
-    proceed: string;
-    noProceed: string;
-
-    constructor(app: App, areYouSure: string, proceed: string, noProceed: string) {
+export class ExcludeModal extends Modal {
+    constructor(app: App, public plugin: MathLinks) {
         super(app);
-        this.areYouSure = areYouSure;
-        this.proceed = proceed;
-        this.noProceed = noProceed;
     }
 
     onOpen() {
+        this.display();
+    }
+
+    // Credits to RyotaUshio/obsidian-math-booster
+    async display() {
         const { contentEl } = this;
         contentEl.empty();
+        contentEl.createEl("h4", { text: "Excluded files" });
 
-        contentEl.createEl("h3", { text: this.areYouSure });
-        loadButtonsToClose(this, this.contentEl.createDiv(), this.proceed, this.noProceed);
+        new Setting(contentEl)
+            .setName("The files/folders in this list will be ignored by MathLinks.")
+            .addButton((btn) => {
+                btn.setTooltip("Add").setIcon("plus")
+                    .onClick((event) => {
+                        new FileExcludeSuggestModal(this.app, this.plugin, this).open();
+                    });
+            });
+
+        if (this.plugin.settings.excludedPaths.length) {
+            let list = contentEl.createEl("ul");
+            for (let path of this.plugin.settings.excludedPaths) {
+                let item = list.createEl("li").createDiv();
+                new Setting(item).setName(path).addExtraButton((button: ButtonComponent): ButtonComponent => {
+                    return button.setTooltip("Remove").setIcon("x").onClick(async () => {
+                        this.plugin.settings.excludedPaths.remove(path);
+                        await this.plugin.saveSettings().then(() => {
+                            this.display();
+                        });
+                    });
+                });
+            }
+        }
     }
 }
 
-function loadTemplateSettings<M extends Modal & MathLinksModalState>(contentEl: HTMLElement, template: Template, modal: M) {
-    let titleText: TextComponent;
-    new Setting(contentEl)
-        .setName("Title")
-        .setDesc("Name of the template.")
-        .addText((text) => {
-            titleText = text;
-            titleText.setValue(template.title).onChange((current) => {
-                modal.error[0] = "";
-                if (modal instanceof AddTemplatesModal) {
-                    modal.templates.every((t) => {
-                        if (current != "" && current == t.title) {
-                            modal.error[0] = "MathLinks: Duplicate title";
-                            return false;
-                        }
-                        return true;
-                    });
-                }
+abstract class FileSuggestModal extends FuzzySuggestModal<TAbstractFile> {
+    constructor(app: App, public plugin: MathLinks) {
+        super(app);
+    }
 
-                if (current == "") {
-                    modal.error[0] = "MathLinks: Please enter a title";
-                } else {
-                    template.title = current;
-                }
-            });
-        });
+    getItems(): TAbstractFile[] {
+        return this.app.vault.getAllLoadedFiles().filter(this.filterCallback.bind(this));
+    }
 
-    let replacedText: TextComponent;
-    new Setting(contentEl)
-        .setName("Match for...")
-        .setDesc("String to be matched and replaced. Do not include regex.")
-        .addText((text) => {
-            replacedText = text;
-            replacedText.setValue(template.replaced).onChange((current) => {
-                template.replaced = current;
-                modal.error[1] = "";
-                if (template.replaced == "") {
-                    modal.error[1] = "MathLinks: Please enter a non-empty string to be replaced"
-                }
-            });
-        });
+    getItemText(file: TAbstractFile): string {
+        return file.path;
+    }
 
-    let replacementText: TextComponent;
-    new Setting(contentEl)
-        .setName("Replace with...")
-        .setDesc("String to replace matches. Do not escape backslashes.")
-        .addText((text) => {
-            replacementText = text;
-            replacementText.setValue(template.replacement).onChange((current) => {
-                template.replacement = current;
-            });
-        });
+    filterCallback(abstractFile: TAbstractFile): boolean {
+        if (abstractFile instanceof TFile && abstractFile.extension != "md") return false;
+        if (abstractFile instanceof TFolder && abstractFile.isRoot()) return false;
 
-    new Setting(contentEl)
-        .setName("Global match")
-        .setDesc("Match all instances (instead of just the first).")
-        .addToggle((toggle) => {
-            toggle.setValue(template.globalMatch).onChange((current) => (template.globalMatch = current));
-        });
+        for (const path of this.plugin.settings.excludedPaths) {
+            const file = this.app.vault.getAbstractFileByPath(path)
+            if (file && isEqualToOrChildOf(abstractFile, file)) {
+                return false
+            }
+        }
 
-    new Setting(contentEl)
-        .setName("Case sensitive")
-        .setDesc("Matches will be case sensitive.")
-        .addToggle((toggle) => {
-            toggle.setValue(template.sensitive).onChange((current) => (template.sensitive = current));
-        });
-
-    new Setting(contentEl)
-        .setName("Match whole words")
-        .setDesc("Only match whole words.")
-        .addToggle((toggle) => {
-            toggle.setValue(template.word).onChange((current) => (template.word = current));
-        });
+        return true;
+    }
 }
 
-function loadButtonsToClose<M extends Modal & MathLinksModalState>(modal: M, element: HTMLElement, trueToolTip: string, falseToolTip: string) {
-    let footerButtons = new Setting(element);
-    footerButtons.addButton((b) => {
-        b.setTooltip(trueToolTip)
-            .setIcon("checkmark")
-            .onClick(async () => {
-                let proceed = modal.error.every((error) => {
-                    if (error != "") {
-                        return false;
-                    }
-                    return true;
-                })
+class FileExcludeSuggestModal extends FileSuggestModal {
+    constructor(app: App, plugin: MathLinks, public modal: ExcludeModal) {
+        super(app, plugin);
+    }
 
-                if (!proceed) {
-                    modal.error.forEach((error) => {
-                        if (error != "") {
-                            new Notice(error);
-                        }
-                    })
-                } else {
-                    modal.saved = true;
-                    modal.close();
-                }
-            });
-    });
-    footerButtons.addExtraButton((b) => {
-        b.setTooltip(falseToolTip)
-            .setIcon("cross")
-            .onClick(async () => {
-                modal.saved = false;
-                modal.close();
-            });
-    });
+    async onChooseItem(file: TAbstractFile, evt: MouseEvent | KeyBoardEvent) {
+        this.plugin.settings.excludedPaths.push(file.path);
+        await this.plugin.saveSettings().then(() => {
+            this.modal.display();
+        });
+    }
 }
