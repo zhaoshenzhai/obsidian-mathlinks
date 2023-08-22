@@ -1,14 +1,11 @@
 import { Setting, PluginSettingTab, Notice, App } from "obsidian";
 import { TextComponent, DropdownComponent, ToggleComponent, ButtonComponent } from "obsidian"
-import { TemplatesModal, ExcludeModal, ConfirmModal, AddTemplatesModal, EditTemplatesModal } from "./modals"
+import { TemplatesModal, ExcludeModal, ConfirmModal } from "./modals"
 import MathLinks from "../main"
 
 export class MathLinksSettingTab extends PluginSettingTab {
-    plugin: MathLinks;
-
-    constructor(app: App, plugin: MathLinks) {
+    constructor(app: App, public plugin: MathLinks) {
         super(app, plugin);
-        this.plugin = plugin;
     }
 
     async display(): Promise<void> {

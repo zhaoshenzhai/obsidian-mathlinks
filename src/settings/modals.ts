@@ -3,7 +3,7 @@ import { Template } from "./settings";
 import { isEqualToOrChildOf } from "../utils";
 import MathLinks from "../main"
 
-export class TemplatesModal extends Modal implements MathLinksModalState {
+export class TemplatesModal extends Modal {
     constructor(app: App, public plugin: MathLinks) {
         super(app);
     }

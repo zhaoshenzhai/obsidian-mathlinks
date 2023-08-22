@@ -4,20 +4,12 @@ import { translateLink } from "../utils";
 import MathLinks from "../main"
 
 export class MathLinksRenderChild extends MarkdownRenderChild {
-    readonly plugin: MathLinks;
-    readonly sourcePath: string;
-    readonly targetLink: string;
-    readonly displayText: string;
     readonly targetFile: TFile | null;
     readonly getMathLink: () => string;
     mathLinkEl: HTMLElement;
 
-    constructor(containerEl: HTMLElement, plugin: MathLinks, sourcePath: string, targetLink: string, displayText: string) {
+    constructor(containerEl: HTMLElement, public plugin: MathLinks, public sourcePath: string, public targetLink: string, public displayText: string) {
         super(containerEl);
-        this.plugin = plugin;
-        this.sourcePath = sourcePath;
-        this.targetLink = targetLink;
-        this.displayText = displayText;
         this.targetFile = this.plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(this.targetLink), this.sourcePath);
         this.mathLinkEl = this.containerEl.cloneNode(true) as HTMLElement;
         this.mathLinkEl.textContent = "";

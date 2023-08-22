@@ -12,14 +12,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
     let leafView = leaf.view as FileView;
 
     class MathWidget extends WidgetType {
-        outLinkText: string;
-        outLinkMathLink: string;
-
-        constructor(outLinkText: string, outLinkMathLink: string) {
-            super();
-            this.outLinkText = outLinkText;
-            this.outLinkMathLink = outLinkMathLink;
-        }
+        constructor(public outLinkText: string, public outLinkMathLink: string) { super(); }
 
         toDOM() {
             let mathLink = document.createElement("span");

@@ -3,23 +3,15 @@ import MathLinks from '../main';
 
 export interface MathLinksMetadata {
     "mathLink"?: string;
-    "mathLink-blocks"?: Record<string, string>
+    "mathLink-blocks"?: Record<string, string>;
 }
 
-export type MathLinksMetadataSet = Record<string, MathLinksMetadata>; // {[path]: [metadata for the file], ...}
+export type MathLinksMetadataSet = Record<string, MathLinksMetadata>;
 
 export class MathLinksAPIAccount {
     metadataSet: MathLinksMetadataSet;
-    plugin: MathLinks;
-    manifest: Readonly<PluginManifest>;
-    blockPrefix: string;
-    enableFileNameBlockLinks: boolean;
 
-    constructor(plugin: MathLinks, manifest: Readonly<PluginManifest>, blockPrefix: string, enableFileNameBlockLinks: boolean) {
-        this.plugin = plugin;
-        this.manifest = manifest;
-        this.blockPrefix = blockPrefix;
-        this.enableFileNameBlockLinks = enableFileNameBlockLinks;
+    constructor(public plugin: MathLinks, public manifest: Readonly<PluginManifest>, public blockPrefix: string, public enableFileNameBlockLinks: boolean) {
         this.metadataSet = {};
     }
 
