@@ -1,5 +1,5 @@
 import { TFile } from "obsidian";
-import MathLinks from "./main";
+import MathLinks from "../main";
 
 export function addSuperCharged(plugin: MathLinks, span: HTMLElement, outLinkFile: TFile): void {
     if (outLinkFile && plugin.app.plugins.enabledPlugins.has("supercharged-links-obsidian")) {
