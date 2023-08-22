@@ -2,16 +2,23 @@
   "templates": [
     {
       "replaced": "Templates",
-      "replacement": "$\\Leftrightarrow$",
+      "replacement": "$\\LeftrightREPLACE$",
       "globalMatch": true,
       "sensitive": true,
       "word": true
+    },
+    {
+      "replaced": "REPLACE",
+      "replacement": "arrow",
+      "globalMatch": true,
+      "sensitive": true,
+      "word": false
     }
   ],
   "excludedPaths": [
     "Tests/Excluded.md"
   ],
-  "blockPrefix": "^",
+  "blockPrefix": "",
   "enableFileNameBlockLinks": true,
   "enableAPI": true
 }
