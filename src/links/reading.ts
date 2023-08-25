@@ -45,16 +45,21 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
 
     setMathLinkGetter(): () => string {
         let getter = () => "";
+        const targetName = this.targetFile?.basename;
+        console.log("--------------------------");
+        console.log(`this.displayText = ${this.displayText}\nthis.targetLink = ${this.targetLink}\ntargetName = ${targetName}\ntranslateLink(this.targetLink) = ${translateLink(this.targetLink)}`);
+        console.log(`A: this.displayText != this.targetLink && this.displayText != translateLink(this.targetLink) = ${this.displayText != this.targetLink} && ${this.displayText != translateLink(this.targetLink)} = ${this.displayText != this.targetLink && this.displayText != translateLink(this.targetLink)}`);
+        console.log(`B: this.displayText == targetName || this.displayText == translateLink(this.targetLink) = ${this.displayText == targetName} || ${this.displayText == translateLink(this.targetLink)} = ${this.displayText == targetName || this.displayText == translateLink(this.targetLink)}`);
         if (this.displayText != this.targetLink && this.displayText != translateLink(this.targetLink)) {
             // [[note|display]] -> use display as mathLink
             getter = () => this.displayText;
         } else {
-            const targetName = this.targetFile?.basename;
             if (this.displayText == targetName || this.displayText == translateLink(this.targetLink)) {
                 // [[note]], [[note#heading]] or [[note#^blockID]]
                 getter = () => getMathLink(this.plugin, this.targetLink, this.sourcePath);
             }
         }
+        console.log("GETTER = ", getter);
         return getter;
     }
 
@@ -83,7 +88,7 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement, conte
 
         const targetDisplay = targetEl.textContent?.trim();
         if (targetDisplay != "" && !/math-inline is-loaded/.test(targetEl.innerHTML)) {
-            const targetLink = targetEl.getAttribute("data-href")?.replace(/\.md/, "");
+            const targetLink = targetEl.getAttribute("data-href");
             if (targetLink) {
                 const targetFile = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(targetLink), context.sourcePath);
                 if (targetDisplay && targetFile) {
