@@ -7,8 +7,7 @@ import { addSuperCharged } from "./supercharged";
 import { isExcluded } from "../utils";
 import MathLinks from "../main";
 
-export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin<V>>
-{    
+export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin<V>> {
     let leafView = leaf.view as FileView;
 
     class MathWidget extends WidgetType {
@@ -36,13 +35,17 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                             outLinkFileName = node.filePath;
                             break;
                         }
-                    }    
+                    }
                 }
             }
 
-            mathLinkWrapper.onclick = ((evt: MouseEvent) => {
+            mathLinkWrapper.onclick = (async (evt: MouseEvent) => {
                 evt.preventDefault();
-                plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, evt.ctrlKey || evt.metaKey);
+                try {
+                    self.open(this.outLinkText, "_blank", "noreferrer");
+                } catch (err) {
+                    await plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, evt.ctrlKey || evt.metaKey);
+                }
             });
 
             mathLinkWrapper.onmousedown = ((evt: MouseEvent) => {
@@ -51,9 +54,14 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                 }
             });
 
-            mathLinkWrapper.onauxclick = ((evt: MouseEvent) => {
+            mathLinkWrapper.onauxclick = (async (evt: MouseEvent) => {
                 if (evt.button == 1) {
-                    plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, true);
+                    try {
+                        await plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, true);
+                    } catch (err) {
+                        console.log("??");
+                        location.href = this.outLinkText;
+                    }
                 }
             });
 
@@ -189,13 +197,13 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                 let builder = new RangeSetBuilder<Decoration>();
 
                 for (let { from, to } of view.visibleRanges) {
-                    syntaxTree(view.state).iterate({from, to, enter(node) {}});
+                    syntaxTree(view.state).iterate({ from, to, enter(node) { } });
                 }
 
                 return builder.finish();
             }
-        }, {decorations: v => v.decorations}
+        }, { decorations: v => v.decorations }
     );
 
-    return new Promise<ViewPlugin<V>> ((resolve) => {resolve(viewPlugin)});
+    return new Promise<ViewPlugin<V>>((resolve) => { resolve(viewPlugin) });
 }
