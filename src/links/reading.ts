@@ -45,16 +45,22 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
 
     setMathLinkGetter(): () => string {
         let getter = () => "";
+        const targetName = this.targetFile?.basename;
+        console.log("--------------------------");
+        console.log(`this.sourcePath = ${this.sourcePath}`);
+        console.log(`this.displayText = ${this.displayText}\nthis.targetLink = ${this.targetLink}\ntargetName = ${targetName}\ntranslateLink(this.targetLink) = ${translateLink(this.targetLink)}\nthis.targetFile?.name = ${this.targetFile?.name}`);
+        console.log(`A: this.displayText != this.targetLink && this.displayText != translateLink(this.targetLink) = ${this.displayText != this.targetLink} && ${this.displayText != translateLink(this.targetLink)} = ${this.displayText != this.targetLink && this.displayText != translateLink(this.targetLink)}`);
+        console.log(`B: this.displayText == targetName || this.displayText == translateLink(this.targetLink) = ${this.displayText == targetName} || ${this.displayText == translateLink(this.targetLink)} = ${this.displayText == targetName || this.displayText == translateLink(this.targetLink)}`);
         if (this.displayText != this.targetLink && this.displayText != translateLink(this.targetLink)) {
             // [[note|display]] -> use display as mathLink
             getter = () => this.displayText;
         } else {
-            const targetName = this.targetFile?.basename;
             if (this.displayText == targetName || this.displayText == translateLink(this.targetLink)) {
                 // [[note]], [[note#heading]] or [[note#^blockID]]
                 getter = () => getMathLink(this.plugin, this.targetLink, this.sourcePath);
             }
         }
+        console.log("GETTER = ", getter);
         return getter;
     }
 
