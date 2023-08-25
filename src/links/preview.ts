@@ -1,14 +1,13 @@
 import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType, PluginValue } from "@codemirror/view";
-import { FileView, MarkdownView, WorkspaceLeaf, TFile } from "obsidian";
+import { FileView, MarkdownView, WorkspaceLeaf, TFile, getLinkpath, Keymap } from "obsidian";
 import { getMathLink, setMathLink } from "./helper";
 import { addSuperCharged } from "./supercharged";
 import { isExcluded } from "../utils";
 import MathLinks from "../main";
 
-export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin<V>>
-{    
+export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin<V>> {
     let leafView = leaf.view as FileView;
 
     class MathWidget extends WidgetType {
@@ -27,22 +26,26 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
             mathLinkWrapper.classList.add("cm-hmd-internal-link");
             mathLinkWrapper.appendChild(mathLink);
 
-            let outLinkFileName = this.outLinkText.replace(/#.*$/, "");
-            if (!outLinkFileName) {
-                if (leafView.file) {
-                    outLinkFileName = leafView.file.path;
-                    if (outLinkFileName.endsWith(".canvas")) {
-                        for (let node of leafView.canvas.selection.values()) {
-                            outLinkFileName = node.filePath;
-                            break;
-                        }
-                    }    
+            let sourcePath = "";
+            if (leafView.file) {
+                sourcePath = leafView.file.path;
+                if (sourcePath.endsWith(".canvas")) {
+                    for (let node of leafView.canvas.selection.values()) {
+                        sourcePath = node.filePath;
+                        break;
+                    }
                 }
             }
 
+            const targetFile = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(this.outLinkText), sourcePath);
+
             mathLinkWrapper.onclick = ((evt: MouseEvent) => {
                 evt.preventDefault();
-                plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, evt.ctrlKey || evt.metaKey);
+                if (targetFile) {
+                    plugin.app.workspace.openLinkText(this.outLinkText, sourcePath, Keymap.isModEvent(evt));
+                } else {
+                    self.open(this.outLinkText, "_blank", "noreferrer");
+                }
             });
 
             mathLinkWrapper.onmousedown = ((evt: MouseEvent) => {
@@ -53,7 +56,11 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
 
             mathLinkWrapper.onauxclick = ((evt: MouseEvent) => {
                 if (evt.button == 1) {
-                    plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, true);
+                    if (targetFile) {
+                        plugin.app.workspace.openLinkText(this.outLinkText, sourcePath, true);
+                    } else {
+                        self.open(this.outLinkText, "_blank", "noreferrer");
+                    }    
                 }
             });
 
@@ -66,6 +73,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
             decorations: DecorationSet;
 
             constructor(view: EditorView) {
+                leafView = leaf.view as FileView;
                 this.tryBuildingDecorations(view);
             }
 
@@ -74,7 +82,8 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
             }
 
             tryBuildingDecorations(view: EditorView) {
-                this.decorations = this.destroyDecorations(view);
+                this.decorations = Decoration.none;
+
                 let editorView = leaf.getViewState();
 
                 if (leaf.view instanceof MarkdownView && leaf.view.file instanceof TFile && isExcluded(plugin, leaf.view.file)) {
@@ -82,7 +91,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                     if (curView == view && editorView.state.mode == "source" && !editorView.state.source) {
                         this.decorations = this.buildDecorations(view);
                     } else {
-                        this.decorations = this.destroyDecorations(view);
+                        this.decorations = Decoration.none;
                     }
                 } else if (leafView.canvas) {
                     for (let node of leafView.canvas.selection.values()) {
@@ -95,7 +104,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                         if (otherLeaf.view instanceof MarkdownView) {
                             let otherView = otherLeaf.view.editor.cm;
                             if (otherView == view) {
-                                this.decorations = this.destroyDecorations(view);
+                                this.decorations = Decoration.none;
                             }
                         }
                     });
@@ -152,7 +161,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                                 } else {
                                     end = node.to;
 
-                                    let cursorRange = view.state.selection.ranges[0];
+                                    let cursorRange = view.state.selection.main;
                                     if (start > cursorRange.to || end < cursorRange.from) {
                                         if (outLinkText && outLinkMathLink) {
                                             builder.add(
@@ -184,18 +193,8 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
 
                 return builder.finish();
             }
-
-            destroyDecorations(view: EditorView) {
-                let builder = new RangeSetBuilder<Decoration>();
-
-                for (let { from, to } of view.visibleRanges) {
-                    syntaxTree(view.state).iterate({from, to, enter(node) {}});
-                }
-
-                return builder.finish();
-            }
-        }, {decorations: v => v.decorations}
+        }, { decorations: v => v.decorations }
     );
 
-    return new Promise<ViewPlugin<V>> ((resolve) => {resolve(viewPlugin)});
+    return new Promise<ViewPlugin<V>>((resolve) => { resolve(viewPlugin) });
 }
