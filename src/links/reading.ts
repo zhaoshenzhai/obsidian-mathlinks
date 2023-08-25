@@ -82,7 +82,7 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement, conte
 
         const targetDisplay = targetEl.textContent?.trim().replace(/\.md/, "");
         if (targetDisplay != "" && !/math-inline is-loaded/.test(targetEl.innerHTML)) {
-            const targetLink = targetEl.getAttribute("data-href").replace(/\.md/, "");
+            const targetLink = targetEl.getAttribute("data-href")?.replace(/\.md/, "");
             if (targetLink) {
                 const targetFile = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(targetLink), context.sourcePath);
                 if (targetDisplay && targetFile) {
