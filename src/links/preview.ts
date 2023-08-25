@@ -26,14 +26,14 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
             mathLinkWrapper.classList.add("cm-hmd-internal-link");
             mathLinkWrapper.appendChild(mathLink);
 
-            let outLinkFileName = "";
+            let sourcePath = "";
             // let outLinkFileName = this.outLinkText.replace(/#.*$/, "");
             // if (!outLinkFileName) {
             if (leafView.file) {
-                outLinkFileName = leafView.file.path;
-                if (outLinkFileName.endsWith(".canvas")) {
+                sourcePath = leafView.file.path;
+                if (sourcePath.endsWith(".canvas")) {
                     for (let node of leafView.canvas.selection.values()) {
-                        outLinkFileName = node.filePath;
+                        sourcePath = node.filePath;
                         break;
                     }
                 }
@@ -42,8 +42,8 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
 
             mathLinkWrapper.onclick = ((evt: MouseEvent) => {
                 evt.preventDefault();
-                console.log("sourcePath =", outLinkFileName);
-                plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, evt.ctrlKey || evt.metaKey);
+                console.log("sourcePath =", sourcePath);
+                plugin.app.workspace.openLinkText(this.outLinkText, sourcePath, evt.ctrlKey || evt.metaKey);
             });
 
             mathLinkWrapper.onmousedown = ((evt: MouseEvent) => {
@@ -54,7 +54,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
 
             mathLinkWrapper.onauxclick = ((evt: MouseEvent) => {
                 if (evt.button == 1) {
-                    plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, true);
+                    plugin.app.workspace.openLinkText(this.outLinkText, sourcePath, true);
                 }
             });
 
