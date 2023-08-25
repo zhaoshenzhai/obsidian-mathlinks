@@ -9,12 +9,15 @@ mathLink-blocks:
 A block
 ^my-id
 
-Link to this note: [[Blocks and Headings]]
+`[[Blocks and Headings]]`: [[Blocks and Headings]]
+`[[Blocks and Headings.md]]`: [[Blocks and Headings.md]]
 
 Headings:
-- With title: [[Blocks and Headings#Sec $\pi$]]
-- Without title: [[#Sec $\pi$]]
+- `[[Blocks and Headings#Sec $\pi$]]`: [[Blocks and Headings#Sec $\pi$]]
+- `[[Blocks and Headings.md#Sec $\pi$]]`: [[Blocks and Headings.md#Sec $\pi$]]
+- `[[#Sec $\pi$]]`: [[#Sec $\pi$]]
 
 Blocks:
-- With title: [[Blocks and Headings#^my-id]]
-- Without title: [[#^my-id]]
+- `[[Blocks and Headings#^my-id]]`: [[Blocks and Headings#^my-id]]
+- `[[Blocks and Headings.md#^my-id]]`: [[Blocks and Headings.md#^my-id]]
+- `[[#^my-id]]`: [[#^my-id]]

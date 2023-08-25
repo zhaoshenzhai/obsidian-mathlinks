@@ -46,9 +46,6 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
     setMathLinkGetter(): () => string {
         let getter = () => "";
         if (this.displayText != this.targetLink && this.displayText != translateLink(this.targetLink)) {
-            console.log(this.displayText);
-            console.log(this.targetLink);
-            console.log(translateLink(this.targetLink));
             // [[note|display]] -> use display as mathLink
             getter = () => this.displayText;
         } else {
@@ -83,9 +80,9 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement, conte
             }
         }
 
-        const targetDisplay = targetEl.textContent?.trim();
+        const targetDisplay = targetEl.textContent?.trim().replace(/\.md/, "");
         if (targetDisplay != "" && !/math-inline is-loaded/.test(targetEl.innerHTML)) {
-            const targetLink = targetEl.getAttribute("data-href");
+            const targetLink = targetEl.getAttribute("data-href").replace(/\.md/, "");
             if (targetLink) {
                 const targetFile = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(targetLink), context.sourcePath);
                 if (targetDisplay && targetFile) {
