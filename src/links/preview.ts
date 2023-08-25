@@ -1,7 +1,7 @@
 import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType, PluginValue } from "@codemirror/view";
-import { FileView, MarkdownView, WorkspaceLeaf, TFile } from "obsidian";
+import { FileView, MarkdownView, WorkspaceLeaf, TFile, getLinkpath, Keymap } from "obsidian";
 import { getMathLink, setMathLink } from "./helper";
 import { addSuperCharged } from "./supercharged";
 import { isExcluded } from "../utils";
@@ -40,10 +40,16 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
             }
             // }
 
+            // This becomes TFile when this.outLinkText is an internal link to an existing file and null otherwise
+            const targetFile = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(this.outLinkText), sourcePath);
+
             mathLinkWrapper.onclick = ((evt: MouseEvent) => {
                 evt.preventDefault();
-                console.log("sourcePath =", sourcePath);
-                plugin.app.workspace.openLinkText(this.outLinkText, sourcePath, evt.ctrlKey || evt.metaKey);
+                if (targetFile) {
+                    plugin.app.workspace.getLeaf(Keymap.isModEvent(evt)).openFile(targetFile);
+                } else {
+                    self.open(this.outLinkText, "_blank", "noreferrer");
+                }
             });
 
             mathLinkWrapper.onmousedown = ((evt: MouseEvent) => {
@@ -54,7 +60,11 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
 
             mathLinkWrapper.onauxclick = ((evt: MouseEvent) => {
                 if (evt.button == 1) {
-                    plugin.app.workspace.openLinkText(this.outLinkText, sourcePath, true);
+                    if (targetFile) {
+                        plugin.app.workspace.getLeaf(true).openFile(targetFile);
+                    } else {
+                        self.open(this.outLinkText, "_blank", "noreferrer");
+                    }    
                 }
             });
 
