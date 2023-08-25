@@ -1,2 +1,2 @@
-Markdown links: [Main](Main.md)
-Markdown links alias: [$\alpha$ $\beta$ hi](Main.md)
+`[Main](Main)`: [Main](Main.md)
+`[$\alpha$ $\beta$ hi](Main.md)`: [$\alpha$ $\beta$ hi](Main.md)

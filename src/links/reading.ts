@@ -46,10 +46,13 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
     setMathLinkGetter(): () => string {
         let getter = () => "";
         if (this.displayText != this.targetLink && this.displayText != translateLink(this.targetLink)) {
+            console.log(this.displayText);
+            console.log(this.targetLink);
+            console.log(translateLink(this.targetLink));
             // [[note|display]] -> use display as mathLink
             getter = () => this.displayText;
         } else {
-            if (this.displayText == this.targetFile?.name || this.displayText == this.targetFile?.basename ||this.displayText == translateLink(this.targetLink)) {
+            if (this.displayText == this.targetFile?.name || this.displayText == this.targetFile?.basename || this.displayText == translateLink(this.targetLink)) {
                 // [[note]], [[note#heading]] or [[note#^blockID]]
                 getter = () => getMathLink(this.plugin, this.targetLink, this.sourcePath);
             }
