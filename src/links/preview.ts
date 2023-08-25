@@ -1,11 +1,24 @@
+import { SyntaxNodeRef } from '@lezer/common';
 import { syntaxTree } from "@codemirror/language";
-import { RangeSetBuilder } from "@codemirror/state";
+import { RangeSetBuilder, EditorState } from "@codemirror/state";
 import { Decoration, DecorationSet, ViewUpdate, EditorView, ViewPlugin, WidgetType, PluginValue } from "@codemirror/view";
 import { FileView, MarkdownView, WorkspaceLeaf, TFile } from "obsidian";
 import { getMathLink, setMathLink } from "./helper";
 import { addSuperCharged } from "./supercharged";
 import { isExcluded } from "../utils";
 import MathLinks from "../main";
+
+/** Debugging utilities taken from Math Booster */
+
+export function nodeText(node: SyntaxNodeRef, state: EditorState): string {
+    return state.sliceDoc(node.from, node.to);
+}
+
+export function printNode(node: SyntaxNodeRef, state: EditorState) {
+    console.log(
+        `${node.from}-${node.to}: "${nodeText(node, state)}" (${node.name})`
+    );
+}
 
 export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf: WorkspaceLeaf): Promise<ViewPlugin<V>>
 {    
@@ -108,10 +121,13 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                 for (let { from, to } of view.visibleRanges) {
                     let start = -1, end = -1, outLinkText = "", outLinkMathLink = "";
 
+                    console.log("---------------------------");
                     syntaxTree(view.state).iterate({
                         from,
                         to,
                         enter(node) {
+                            printNode(node, view.state);
+
                             let name = node.type.name;
                             // Start
                             if (name.contains("formatting-link_formatting-link-start")) {
