@@ -26,26 +26,24 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
             mathLinkWrapper.classList.add("cm-hmd-internal-link");
             mathLinkWrapper.appendChild(mathLink);
 
-            let outLinkFileName = this.outLinkText.replace(/#.*$/, "");
-            if (!outLinkFileName) {
-                if (leafView.file) {
-                    outLinkFileName = leafView.file.path;
-                    if (outLinkFileName.endsWith(".canvas")) {
-                        for (let node of leafView.canvas.selection.values()) {
-                            outLinkFileName = node.filePath;
-                            break;
-                        }
+            let outLinkFileName = "";
+            // let outLinkFileName = this.outLinkText.replace(/#.*$/, "");
+            // if (!outLinkFileName) {
+            if (leafView.file) {
+                outLinkFileName = leafView.file.path;
+                if (outLinkFileName.endsWith(".canvas")) {
+                    for (let node of leafView.canvas.selection.values()) {
+                        outLinkFileName = node.filePath;
+                        break;
                     }
                 }
             }
+            // }
 
-            mathLinkWrapper.onclick = (async (evt: MouseEvent) => {
+            mathLinkWrapper.onclick = ((evt: MouseEvent) => {
                 evt.preventDefault();
-                try {
-                    self.open(this.outLinkText, "_blank", "noreferrer");
-                } catch (err) {
-                    await plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, evt.ctrlKey || evt.metaKey);
-                }
+                console.log("sourcePath =", outLinkFileName);
+                plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, evt.ctrlKey || evt.metaKey);
             });
 
             mathLinkWrapper.onmousedown = ((evt: MouseEvent) => {
@@ -54,14 +52,9 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                 }
             });
 
-            mathLinkWrapper.onauxclick = (async (evt: MouseEvent) => {
+            mathLinkWrapper.onauxclick = ((evt: MouseEvent) => {
                 if (evt.button == 1) {
-                    try {
-                        await plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, true);
-                    } catch (err) {
-                        console.log("??");
-                        location.href = this.outLinkText;
-                    }
+                    plugin.app.workspace.openLinkText(this.outLinkText, outLinkFileName, true);
                 }
             });
 
