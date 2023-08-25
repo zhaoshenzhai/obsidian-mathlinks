@@ -38,9 +38,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                     }
                 }
             }
-            // }
 
-            // This becomes TFile when this.outLinkText is an internal link to an existing file and null otherwise
             const targetFile = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(this.outLinkText), sourcePath);
 
             mathLinkWrapper.onclick = ((evt: MouseEvent) => {
@@ -77,6 +75,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
             decorations: DecorationSet;
 
             constructor(view: EditorView) {
+                leafView = leaf.view as FileView;
                 this.tryBuildingDecorations(view);
             }
 
