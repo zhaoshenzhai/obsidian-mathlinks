@@ -85,7 +85,8 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
             }
 
             tryBuildingDecorations(view: EditorView) {
-                this.decorations = this.destroyDecorations(view);
+                this.decorations = Decoration.none;
+
                 let editorView = leaf.getViewState();
 
                 if (leaf.view instanceof MarkdownView && leaf.view.file instanceof TFile && isExcluded(plugin, leaf.view.file)) {
@@ -93,7 +94,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                     if (curView == view && editorView.state.mode == "source" && !editorView.state.source) {
                         this.decorations = this.buildDecorations(view);
                     } else {
-                        this.decorations = this.destroyDecorations(view);
+                        this.decorations = Decoration.none;
                     }
                 } else if (leafView.canvas) {
                     for (let node of leafView.canvas.selection.values()) {
@@ -106,7 +107,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                         if (otherLeaf.view instanceof MarkdownView) {
                             let otherView = otherLeaf.view.editor.cm;
                             if (otherView == view) {
-                                this.decorations = this.destroyDecorations(view);
+                                this.decorations = Decoration.none;
                             }
                         }
                     });
@@ -163,7 +164,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                                 } else {
                                     end = node.to;
 
-                                    let cursorRange = view.state.selection.ranges[0];
+                                    let cursorRange = view.state.selection.main;
                                     if (start > cursorRange.to || end < cursorRange.from) {
                                         if (outLinkText && outLinkMathLink) {
                                             builder.add(
@@ -191,16 +192,6 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                             }
                         }
                     });
-                }
-
-                return builder.finish();
-            }
-
-            destroyDecorations(view: EditorView) {
-                let builder = new RangeSetBuilder<Decoration>();
-
-                for (let { from, to } of view.visibleRanges) {
-                    syntaxTree(view.state).iterate({ from, to, enter(node) { } });
                 }
 
                 return builder.finish();
