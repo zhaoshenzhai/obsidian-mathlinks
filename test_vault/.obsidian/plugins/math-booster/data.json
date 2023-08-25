@@ -76,7 +76,17 @@
           "remark": "注"
         }
       }
-    }
+    },
+    "triggerSuggest": "\\ref",
+    "triggerTheoremSuggest": "\\tref",
+    "triggerEquationSuggest": "\\eqref",
+    "renderMathInSuggestion": true,
+    "searchMethod": "Fuzzy",
+    "upWeightRecent": 0.1,
+    "searchOnlyRecent": false,
+    "modifierToJump": "Mod",
+    "suggestLeafOption": "Split right",
+    "backlinkLeafOption": "Split right"
   },
   "excludedFiles": []
 }
