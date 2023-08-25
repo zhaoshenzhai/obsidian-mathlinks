@@ -49,8 +49,7 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
             // [[note|display]] -> use display as mathLink
             getter = () => this.displayText;
         } else {
-            const targetName = this.targetFile?.basename;
-            if (this.displayText == targetName || this.displayText == translateLink(this.targetLink)) {
+            if (this.displayText == this.targetFile?.name || this.displayText == this.targetFile?.basename || this.displayText == translateLink(this.targetLink)) {
                 // [[note]], [[note#heading]] or [[note#^blockID]]
                 getter = () => getMathLink(this.plugin, this.targetLink, this.sourcePath);
             }
@@ -81,9 +80,9 @@ export function generateMathLinks(plugin: MathLinks, element: HTMLElement, conte
             }
         }
 
-        const targetDisplay = targetEl.textContent?.trim();
+        const targetDisplay = targetEl.textContent?.trim().replace(/\.md/, "");
         if (targetDisplay != "" && !/math-inline is-loaded/.test(targetEl.innerHTML)) {
-            const targetLink = targetEl.getAttribute("data-href")?.replace(/\.md/, "");
+            const targetLink = targetEl.getAttribute("data-href").replace(/\.md/, "");
             if (targetLink) {
                 const targetFile = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(targetLink), context.sourcePath);
                 if (targetDisplay && targetFile) {
