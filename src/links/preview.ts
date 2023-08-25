@@ -27,8 +27,6 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
             mathLinkWrapper.appendChild(mathLink);
 
             let sourcePath = "";
-            // let outLinkFileName = this.outLinkText.replace(/#.*$/, "");
-            // if (!outLinkFileName) {
             if (leafView.file) {
                 sourcePath = leafView.file.path;
                 if (sourcePath.endsWith(".canvas")) {
@@ -44,7 +42,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
             mathLinkWrapper.onclick = ((evt: MouseEvent) => {
                 evt.preventDefault();
                 if (targetFile) {
-                    plugin.app.workspace.getLeaf(Keymap.isModEvent(evt)).openFile(targetFile);
+                    plugin.app.workspace.openLinkText(this.outLinkText, sourcePath, Keymap.isModEvent(evt));
                 } else {
                     self.open(this.outLinkText, "_blank", "noreferrer");
                 }
@@ -59,7 +57,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
             mathLinkWrapper.onauxclick = ((evt: MouseEvent) => {
                 if (evt.button == 1) {
                     if (targetFile) {
-                        plugin.app.workspace.getLeaf(true).openFile(targetFile);
+                        plugin.app.workspace.openLinkText(this.outLinkText, sourcePath, true);
                     } else {
                         self.open(this.outLinkText, "_blank", "noreferrer");
                     }    
