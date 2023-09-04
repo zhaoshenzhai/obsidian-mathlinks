@@ -1,5 +1,5 @@
 import { EditorView } from "@codemirror/view";
-import { MathLinksAPIAccount, MathLinksMetadata } from "./api/api";
+import { MathLinksAPIAccount } from "./api/api";
 import MathLinks from "./main";
 
 // Reference: 
@@ -36,7 +36,7 @@ declare module "obsidian" {
         // triggered when an API user updates its MathLinks metadata
         on(
             name: "mathlinks:updated",
-            callback: (apiAccount: MathLinksAPIAccount, path: string) => any
+            callback: (apiAccount: MathLinksAPIAccount, file: TFile) => any
         ): EventRef;
 
         // triggered when an API account is deleted
