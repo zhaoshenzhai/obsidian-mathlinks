@@ -34,20 +34,20 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
     let subpathResult = resolveSubpath(cache, subpath);
 
     let mathLink = "";
-    if (cache.frontmatter) {
-        if (subpathResult) {
-            mathLink = getMathLinkFromSubpath(path, subpathResult, cache.frontmatter, plugin.settings.blockPrefix, 
-                // If enableFileNameBlockLinks == true, pass `null` to the last parameter `prefix`, which means using the standard prefix (e.g. note > block). 
-                // Otherwise, pass an empty string to `prefix`, which means using no prefix (no prefix is a special case of custom prefixes).
-                plugin.settings.enableFileNameBlockLinks ? null : ""
-            );
-        } else if (path) {
-            mathLink = cache.frontmatter.mathLink;
-            if (mathLink == "auto") {
-                mathLink = getMathLinkFromTemplates(plugin, file);
-            }
+    if (subpathResult) {
+        mathLink = getMathLinkFromSubpath(path, subpathResult, cache.frontmatter, plugin.settings.blockPrefix,
+            // If enableFileNameBlockLinks == true, pass `null` to the last parameter `prefix`, which means using the standard prefix (e.g. note > block). 
+            // Otherwise, pass an empty string to `prefix`, which means using no prefix (no prefix is a special case of custom prefixes).
+            plugin.settings.enableFileNameBlockLinks ? null : ""
+        );
+    } else if (path) {
+        mathLink = cache.frontmatter?.mathLink;
+        if (mathLink == "auto") {
+            mathLink = getMathLinkFromTemplates(plugin, file);
         }
     }
+
+    console.log(`targetLink = "${targetLink}", mathLink = "${mathLink}"`);
 
     if (!mathLink && plugin.settings.enableAPI) {
         const sourceFile = plugin.app.vault.getAbstractFileByPath(sourcePath);
@@ -56,7 +56,7 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
                 const metadata = account.metadataSet.get(file);
                 if (metadata) {
                     if (subpathResult) {
-                        mathLink = getMathLinkFromSubpath(path, subpathResult, metadata, account.blockPrefix, 
+                        mathLink = getMathLinkFromSubpath(path, subpathResult, metadata, account.blockPrefix,
                             // An API user can specify custom prefixes depending on the source file (sourceFile) & the target file (file).
                             account.prefixer(sourceFile, file)
                         );
@@ -67,26 +67,26 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
                 if (mathLink) {
                     break;
                 }
-            }    
+            }
         }
     }
 
     return mathLink;
 }
 
-function getMathLinkFromSubpath(linkpath: string, subpathResult: HeadingSubpathResult | BlockSubpathResult, metadata: MathLinksMetadata, blockPrefix: string, prefix: string | null): string {
+function getMathLinkFromSubpath(linkpath: string, subpathResult: HeadingSubpathResult | BlockSubpathResult, metadata: MathLinksMetadata | undefined, blockPrefix: string, prefix: string | null): string {
     let subMathLink = ""
     if (subpathResult.type == "heading") {
         subMathLink = subpathResult.current.heading;
-    } else if (subpathResult.type == "block" && metadata["mathLink-blocks"] && metadata["mathLink-blocks"][subpathResult.block.id]) {
+    } else if (subpathResult.type == "block" && metadata?.["mathLink-blocks"]?.[subpathResult.block.id]) {
         subMathLink = blockPrefix + metadata["mathLink-blocks"][subpathResult.block.id];
     }
     if (subMathLink) {
         if (prefix === null) { // use standard prefix
             if (linkpath) {
-                return (metadata["mathLink"] ?? linkpath) + " > " + subMathLink;    
+                return (metadata?.["mathLink"] ?? linkpath) + " > " + subMathLink;
             } else {
-                return subMathLink;    
+                return subMathLink;
             }
         } else { // typeof prefix == 'string' => use custom prefix 
             return prefix + subMathLink;
