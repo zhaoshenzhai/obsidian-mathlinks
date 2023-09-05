@@ -47,8 +47,6 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
         }
     }
 
-    console.log(`targetLink = "${targetLink}", mathLink = "${mathLink}"`);
-
     if (!mathLink && plugin.settings.enableAPI) {
         const sourceFile = plugin.app.vault.getAbstractFileByPath(sourcePath);
         if (sourceFile instanceof TFile) {
