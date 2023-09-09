@@ -1,4 +1,4 @@
-import { App, MarkdownView, PluginManifest, TFile, WorkspaceLeaf } from 'obsidian';
+import { App, BlockSubpathResult, HeadingSubpathResult, MarkdownView, PluginManifest, TFile, WorkspaceLeaf } from 'obsidian';
 import MathLinks from '../main';
 
 export interface MathLinksMetadata {
@@ -11,7 +11,7 @@ export type MathLinksMetadataSet = Map<TFile, MathLinksMetadata>;
 export class MathLinksAPIAccount {
     metadataSet: MathLinksMetadataSet;
 
-    constructor(public plugin: MathLinks, public manifest: Readonly<PluginManifest>, public blockPrefix: string, public prefixer: (sourceFile: TFile, targetFile: TFile) => string | null) {
+    constructor(public plugin: MathLinks, public manifest: Readonly<PluginManifest>, public blockPrefix: string, public prefixer: (sourceFile: TFile, targetFile: TFile, subpathResult: HeadingSubpathResult | BlockSubpathResult) => string | null) {
         this.metadataSet = new Map();
     }
 

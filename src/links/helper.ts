@@ -56,7 +56,7 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
                     if (subpathResult) {
                         mathLink = getMathLinkFromSubpath(path, subpathResult, metadata, account.blockPrefix,
                             // An API user can specify custom prefixes depending on the source file (sourceFile) & the target file (file).
-                            account.prefixer(sourceFile, file)
+                            account.prefixer(sourceFile, file, subpathResult)
                         );
                     } else {
                         mathLink = metadata["mathLink"] ?? "";
