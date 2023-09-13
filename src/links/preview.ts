@@ -181,7 +181,7 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                             }
 
                             // Alias: MathLink
-                            else if (!name.contains("pipe") && ((name.contains("hmd-internal-link") && name.contains("alias")) || name.contains("hmd-escape") || /^link/.test(name))) {
+                            else if (!name.contains("pipe") && ((name.contains("hmd-internal-link") && name.contains("alias")) || (name.contains("hmd-escape") && name.contains("link")) || /^link/.test(name))) {
                                 outLinkMathLink += view.state.doc.sliceString(node.from, node.to);
                                 if (leafView.file && outLinkMathLink == outLinkText.replace(/\.md/, "")) {
                                     outLinkMathLink = getMathLink(plugin, outLinkText, leafView.file.path);
