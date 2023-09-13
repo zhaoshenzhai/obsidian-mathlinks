@@ -4,5 +4,6 @@
   "useMarkdownLinks": false,
   "alwaysUpdateLinks": true,
   "newFileLocation": "folder",
-  "newFileFolderPath": "Tests"
+  "newFileFolderPath": "Tests",
+  "propertiesInDocument": "hidden"
 }

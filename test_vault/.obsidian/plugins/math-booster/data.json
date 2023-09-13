@@ -1,5 +1,5 @@
 {
-  "version": "0.5.8",
+  "version": "0.6.11",
   "settings": {
     "/": {
       "profile": "English",
@@ -9,8 +9,8 @@
       "numberInit": 1,
       "numberStyle": "arabic",
       "numberDefault": "auto",
-      "refFormat": "Type + number (+ title)",
-      "noteMathLinkFormat": "Type + number (+ title)",
+      "refFormat": "[title] ([type] [number]) if title exists, [type] [number] otherwise",
+      "noteMathLinkFormat": "[type] [number] ([title])",
       "eqNumberPrefix": "",
       "eqNumberSuffix": "",
       "eqNumberInit": 1,
@@ -19,12 +19,11 @@
       "eqRefSuffix": "",
       "labelPrefix": "",
       "lineByLine": true,
-      "mathCalloutStyle": "framed",
+      "mathCalloutStyle": "Framed",
       "mathCalloutFontInherit": false,
       "beginProof": "\\begin{proof}",
       "endProof": "\\end{proof}",
-      "beginProofReplace": "Proof.",
-      "endProofReplace": "□"
+      "insertSpace": true
     }
   },
   "extraSettings": {
@@ -38,42 +37,58 @@
           ]
         },
         "body": {
-          "axiom": "Axiom",
-          "definition": "Definition",
-          "lemma": "Lemma",
-          "proposition": "Proposition",
-          "theorem": "Theorem",
-          "corollary": "Corollary",
-          "claim": "Claim",
-          "assumption": "Assumption",
-          "example": "Example",
-          "exercise": "Exercise",
-          "conjecture": "Conjecture",
-          "hypothesis": "Hypothesis",
-          "remark": "Remark"
+          "theorem": {
+            "axiom": "Axiom",
+            "definition": "Definition",
+            "lemma": "Lemma",
+            "proposition": "Proposition",
+            "theorem": "Theorem",
+            "corollary": "Corollary",
+            "claim": "Claim",
+            "assumption": "Assumption",
+            "example": "Example",
+            "exercise": "Exercise",
+            "conjecture": "Conjecture",
+            "hypothesis": "Hypothesis",
+            "remark": "Remark"
+          },
+          "proof": {
+            "begin": "Proof.",
+            "end": "□",
+            "linkedBeginPrefix": "Proof of ",
+            "linkedBeginSuffix": "."
+          }
         }
       },
-      "Japanese": {
-        "id": "Japanese",
+      "日本語": {
+        "id": "日本語",
         "meta": {
           "tags": [
             "ja"
           ]
         },
         "body": {
-          "axiom": "公理",
-          "definition": "定義",
-          "lemma": "補題",
-          "proposition": "命題",
-          "theorem": "定理",
-          "corollary": "系",
-          "claim": "主張",
-          "assumption": "仮定",
-          "example": "例",
-          "exercise": "演習問題",
-          "conjecture": "予想",
-          "hypothesis": "仮説",
-          "remark": "注"
+          "theorem": {
+            "axiom": "公理",
+            "definition": "定義",
+            "lemma": "補題",
+            "proposition": "命題",
+            "theorem": "定理",
+            "corollary": "系",
+            "claim": "主張",
+            "assumption": "仮定",
+            "example": "例",
+            "exercise": "演習問題",
+            "conjecture": "予想",
+            "hypothesis": "仮説",
+            "remark": "注"
+          },
+          "proof": {
+            "begin": "証明.",
+            "end": "□",
+            "linkedBeginPrefix": "",
+            "linkedBeginSuffix": "の証明."
+          }
         }
       }
     },
