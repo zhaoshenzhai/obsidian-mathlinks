@@ -1,4 +1,4 @@
-import { TFile, renderMath, finishRenderMath, parseLinktext, getLinkpath, resolveSubpath, BlockSubpathResult, HeadingSubpathResult } from "obsidian";
+import { TFile, renderMath, finishRenderMath, parseLinktext, resolveSubpath, BlockSubpathResult, HeadingSubpathResult } from "obsidian";
 import { MathLinksMetadata } from "../api/api";
 import MathLinks from "../main";
 
@@ -34,29 +34,37 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
     let subpathResult = resolveSubpath(cache, subpath);
 
     let mathLink = "";
-    if (cache.frontmatter) {
-        if (subpathResult) {
-            mathLink = getMathLinkFromSubpath(plugin, path, subpathResult, cache.frontmatter, plugin.settings.blockPrefix, plugin.settings.enableFileNameBlockLinks);
-        } else if (path) {
-            mathLink = cache.frontmatter.mathLink;
-            if (mathLink == "auto") {
-                mathLink = getMathLinkFromTemplates(plugin, file);
-            }
+    if (subpathResult) {
+        mathLink = getMathLinkFromSubpath(path, subpathResult, cache.frontmatter, plugin.settings.blockPrefix,
+            // If enableFileNameBlockLinks == true, pass `null` to the last parameter `prefix`, which means using the standard prefix (e.g. note > block). 
+            // Otherwise, pass an empty string to `prefix`, which means using no prefix (no prefix is a special case of custom prefixes).
+            plugin.settings.enableFileNameBlockLinks ? null : ""
+        );
+    } else if (path) {
+        mathLink = cache.frontmatter?.mathLink;
+        if (mathLink == "auto") {
+            mathLink = getMathLinkFromTemplates(plugin, file);
         }
     }
 
     if (!mathLink && plugin.settings.enableAPI) {
-        for (let account of plugin.apiAccounts) {
-            if (account.metadataSet[file.path]) {
-                let metadata = account.metadataSet[file.path];
-                if (subpathResult) {
-                    mathLink = getMathLinkFromSubpath(plugin, path, subpathResult, metadata, account.blockPrefix, account.enableFileNameBlockLinks);
-                } else {
-                    mathLink = metadata["mathLink"] ?? "";
+        const sourceFile = plugin.app.vault.getAbstractFileByPath(sourcePath);
+        if (sourceFile instanceof TFile) {
+            for (let account of plugin.apiAccounts) {
+                const metadata = account.metadataSet.get(file);
+                if (metadata) {
+                    if (subpathResult) {
+                        mathLink = getMathLinkFromSubpath(path, subpathResult, metadata, account.blockPrefix,
+                            // An API user can specify custom prefixes depending on the source file (sourceFile) & the target file (file).
+                            account.prefixer(sourceFile, file, subpathResult)
+                        );
+                    } else {
+                        mathLink = metadata["mathLink"] ?? "";
+                    }
                 }
-            }
-            if (mathLink) {
-                break;
+                if (mathLink) {
+                    break;
+                }
             }
         }
     }
@@ -64,18 +72,22 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
     return mathLink;
 }
 
-function getMathLinkFromSubpath(plugin: MathLinks, linkpath: string, subpathResult: HeadingSubpathResult | BlockSubpathResult, metadata: MathLinksMetadata, blockPrefix: string, enableFileNameBlockLinks: boolean): string {
+function getMathLinkFromSubpath(linkpath: string, subpathResult: HeadingSubpathResult | BlockSubpathResult, metadata: MathLinksMetadata | undefined, blockPrefix: string, prefix: string | null): string {
     let subMathLink = ""
     if (subpathResult.type == "heading") {
         subMathLink = subpathResult.current.heading;
-    } else if (subpathResult.type == "block" && metadata["mathLink-blocks"] && metadata["mathLink-blocks"][subpathResult.block.id]) {
+    } else if (subpathResult.type == "block" && metadata?.["mathLink-blocks"]?.[subpathResult.block.id]) {
         subMathLink = blockPrefix + metadata["mathLink-blocks"][subpathResult.block.id];
     }
     if (subMathLink) {
-        if (linkpath && enableFileNameBlockLinks) {
-            return (metadata["mathLink"] ?? linkpath) + " > " + subMathLink;
-        } else {
-            return subMathLink;
+        if (prefix === null) { // use standard prefix
+            if (linkpath) {
+                return (metadata?.["mathLink"] ?? linkpath) + " > " + subMathLink;
+            } else {
+                return subMathLink;
+            }
+        } else { // typeof prefix == 'string' => use custom prefix 
+            return prefix + subMathLink;
         }
     } else {
         return "";
