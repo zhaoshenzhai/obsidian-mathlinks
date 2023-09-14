@@ -67,6 +67,7 @@ If you would like to point out a bug, add support, or have a feature request, do
 
 ## Changelog
 ### 0.4.x: _Heading/Block Links and API Integration._
+* 0.4.6: Fixed bugs regarding heading links ([#45](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/45)) and block links with custom display names containing escaped square brackets ([#46](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/46)).
 * 0.4.5: Fixed bugs regarding external links and links with extensions ([#41](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/41), [#42](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/42), [#43](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/43), [#44](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/44)).
 * 0.4.4: Better setting tabs: Reworked templates to allow nesting; choose excluded files from suggestion ([#38](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/38)).
 * 0.4.3: Fix in `0.4.2` no longer prevents dynamic updating ([#35](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/35), [#36](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/36)).
