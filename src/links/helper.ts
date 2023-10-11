@@ -43,7 +43,7 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
     plugin.iterateProviders((provider) => {
         const provided = provider.provide({ path, subpath }, file, subpathResult, sourceFile);
         if (provided) {
-            if (provider instanceof NativeProvider && subpathResult.type == 'heading') {
+            if (provider instanceof NativeProvider && subpathResult?.type == 'heading') {
                 if (provided == (path ? path + ' > ' : '') + subpathResult.current.heading) {
                     return;
                 }
