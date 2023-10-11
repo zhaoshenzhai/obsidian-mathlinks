@@ -31,14 +31,14 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
         }));
 
         // 2. when an API user updates its metadata
-        this.plugin.registerEvent(this.plugin.app.metadataCache.on("mathlinks:updated", (apiAccount, changedFile) => {
+        this.plugin.registerEvent(this.plugin.app.metadataCache.on("mathlinks:update", (changedFile) => {
             if (!this.targetFile || this.targetFile == changedFile) {
                 this.update();
             }
         }));
 
         // 3. when an API account is deleted
-        this.plugin.registerEvent(this.plugin.app.metadataCache.on("mathlinks:account-deleted", (apiAccount) => {
+        this.plugin.registerEvent(this.plugin.app.metadataCache.on("mathlinks:update-all", () => {
             this.update();
         }));
     }

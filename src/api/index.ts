@@ -1,17 +1,55 @@
-export type { MathLinksMetadata, MathLinksMetadataSet, MathLinksAPIAccount} from "./api";
+export type { MathLinksMetadata, MathLinksMetadataSet, MathLinksAPIAccount } from "./api";
+export { Provider } from './provider';
 
-import type { App, Plugin } from "obsidian";
+import { TFile, type App, type Plugin } from "obsidian";
 import { MathLinksAPIAccount, informChange } from "./api";
+import { Provider } from "./provider";
+import MathLinks from "../main";
+
+
+export function addProvider(app: App, providerFactory: (mathLinks: MathLinks) => Provider): Provider {
+    if (!isPluginEnabled(app)) throw Error("MathLinks API: MathLinks is not enabled.");
+    const mathLinks = app.plugins.plugins.mathlinks as MathLinks;
+    const provider = providerFactory(mathLinks);
+    mathLinks.registerProvider(provider);
+    return provider;
+}
+
+export function isPluginEnabled(app: App) {
+    return app.plugins.enabledPlugins.has("mathlinks");
+}
+
+/**
+ * Inform MathLinks that it should update the display text of links.
+ * If `file` is given, MathLinks will only update the notes affected by changes in that file.
+ * Otherwise, MathLinks will update all notes currently open.
+ */
+export function update(app: App, file?: TFile) {
+    if (file) {
+        informChange(app, "mathlinks:update", file);
+    } else {
+        informChange(app, "mathlinks:update-all");
+    }
+}
+
+
+/**
+ * Obsolete & Deprecated API
+ */
 
 /**
  * When called for the first time, register userPlugin as a user of MathLinks API and returns its account.
  * From the second time on, returns the existing account of userPlugin.
+ * @deprecated Use {@link registerProvider} instead.
  */
-export function getAPIAccount<UserPlugin extends Plugin>(userPlugin: Readonly<UserPlugin>): MathLinksAPIAccount | undefined {
-    return userPlugin.app.plugins.plugins.mathlinks?.getAPIAccount<UserPlugin>(userPlugin);
+export function getAPIAccount(userPlugin: Readonly<Plugin>): MathLinksAPIAccount | undefined {
+    return userPlugin.app.plugins.plugins.mathlinks?.getAPIAccount(userPlugin);
 }
 
-export const deleteAPIAccount = <UserPlugin extends Plugin>(userPlugin: Readonly<UserPlugin>): void => {
+/**
+ * Previously, a user plugin had to call this when unloading, but now it has no effect.
+ */
+export const deleteAPIAccount = (userPlugin: Readonly<Plugin>): void => {
     let accounts = userPlugin.app.plugins.plugins.mathlinks?.apiAccounts;
     if (accounts) {
         let index = accounts.findIndex(
@@ -19,8 +57,6 @@ export const deleteAPIAccount = <UserPlugin extends Plugin>(userPlugin: Readonly
         );
         let account = accounts[index];
         accounts.splice(index, 1);
-        informChange(userPlugin.app, "mathlinks:account-deleted", account);
+        informChange(userPlugin.app, "mathlinks:update-all");
     }
 }
-
-export const isPluginEnabled = (app: App) => app.plugins.enabledPlugins.has("mathlinks");

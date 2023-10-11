@@ -2,6 +2,7 @@ import { FileView, Plugin, WorkspaceLeaf, loadMathJax } from "obsidian";
 import { MathLinksSettings, DEFAULT_SETTINGS } from "./settings/settings";
 import { MathLinksSettingTab } from "./settings/tab"
 import { MathLinksAPIAccount } from "./api/api";
+import { DeprecatedAPIProvider, NativeProvider, Provider } from "./api/provider";
 import { generateMathLinks } from "./links/reading";
 import { buildLivePreview } from "./links/preview";
 import { isExcluded } from "./utils";
@@ -9,10 +10,13 @@ import { isExcluded } from "./utils";
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
     apiAccounts: MathLinksAPIAccount[];
+    providers: { provider: Provider, sortOrder: number }[] = [];
 
     async onload() {
         await this.loadSettings();
         await loadMathJax();
+
+        this.registerProvider(new NativeProvider(this), Infinity);
 
         // Markdown Post Processor for reading view
         this.registerMarkdownPostProcessor((element, context) => {
@@ -45,12 +49,15 @@ export default class MathLinks extends Plugin {
         this.apiAccounts = [];
     }
 
-    getAPIAccount<UserPlugin extends Plugin>(userPlugin: Readonly<UserPlugin>): MathLinksAPIAccount {
+    getAPIAccount(userPlugin: Readonly<Plugin>): MathLinksAPIAccount {
         let account = this.apiAccounts.find((account) => account.manifest.id == userPlugin.manifest.id);
         if (account) return account;
 
         account = new MathLinksAPIAccount(this, userPlugin.manifest, DEFAULT_SETTINGS.blockPrefix, () => null);
         this.apiAccounts.push(account);
+
+        this.registerProvider(new DeprecatedAPIProvider(account));
+
         return account;
     }
 
@@ -61,5 +68,20 @@ export default class MathLinks extends Plugin {
 
     async saveSettings() {
         await this.saveData(this.settings);
+    }
+
+    /**
+     * @param provider 
+     * @param sortOrder - An optional integer sort order. Defaults to 0. Lower number runs before higher numbers.
+     */
+    registerProvider(provider: Provider, sortOrder?: number) {
+        this.providers.find(another => another.provider === provider)
+            ?? this.providers.push({ provider, sortOrder: sortOrder ?? 0 });
+    }
+
+    iterateProviders(callback: (provider: Provider) => any) {
+        this.providers
+            .sort((p1, p2) => p1.sortOrder - p2.sortOrder)
+            .forEach(({ provider }) => callback(provider));
     }
 }

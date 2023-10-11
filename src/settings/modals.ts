@@ -1,5 +1,5 @@
 import { Setting, Modal, Notice, TFile, TAbstractFile, TFolder, FuzzySuggestModal, App } from "obsidian";
-import { TextComponent, ButtonComponent, ExtraButtonComponent } from "obsidian";
+import { TextComponent, ExtraButtonComponent } from "obsidian";
 import { Template } from "./settings";
 import { isEqualToOrChildOf } from "../utils";
 import MathLinks from "../main"

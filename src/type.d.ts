@@ -33,13 +33,29 @@ declare module "obsidian" {
     interface MetadataCache {
         /** Custom events */
 
-        // triggered when an API user updates its MathLinks metadata
+        on(
+            name: "mathlinks:update",
+            callback: (file: TFile) => any
+        ): EventRef;
+
+        on(
+            name: "mathlinks:update-all",
+            callback: () => any
+        ): EventRef;
+
+        /** 
+         * triggered when an API user updates its MathLinks metadata 
+         * @deprecated
+         */
         on(
             name: "mathlinks:updated",
             callback: (apiAccount: MathLinksAPIAccount, file: TFile) => any
         ): EventRef;
 
-        // triggered when an API account is deleted
+        /** 
+         * triggered when an API account is deleted
+         * @deprecated
+         */
         on(
             name: "mathlinks:account-deleted",
             callback: (apiAccount: MathLinksAPIAccount) => any

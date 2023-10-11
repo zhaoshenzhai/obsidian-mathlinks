@@ -1,5 +1,5 @@
-import { Setting, PluginSettingTab, Notice, App } from "obsidian";
-import { TextComponent, DropdownComponent, ToggleComponent, ButtonComponent } from "obsidian"
+import { Setting, PluginSettingTab, App } from "obsidian";
+import { TextComponent, ToggleComponent, ButtonComponent } from "obsidian"
 import { TemplatesModal, ExcludeModal } from "./modals"
 import MathLinks from "../main"
 
@@ -86,30 +86,6 @@ export class MathLinksSettingTab extends PluginSettingTab {
                         });
                     });
                 toggle.setTooltip("Disable to ignore note name.");
-            });
-
-        // Enable API
-        new Setting(containerEl)
-            .setName("Enable MathLinks API")
-            .setDesc(
-                createFragment((e) => {
-                    let accounts = this.plugin.apiAccounts;
-                    e.createSpan({ text: "Allow other community plugins to use MathLinks." });
-                    if (accounts.length) {
-                        let list = e.createEl("ul");
-                        for (let account of accounts) {
-                            list.createEl("li", { text: account.manifest.name });
-                        }
-                    }
-                })
-            ).addToggle((toggle: ToggleComponent) => {
-                toggle.setValue(this.plugin.settings.enableAPI)
-                    .onChange(async (value: boolean) => {
-                        this.plugin.settings.enableAPI = value;
-                        await this.plugin.saveSettings().then(() => {
-                            this.display();
-                        });
-                    })
             });
     }
 }

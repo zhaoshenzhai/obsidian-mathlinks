@@ -33,7 +33,7 @@ export class MathLinksAPIAccount {
     update(file: TFile, newMetadata: MathLinksMetadata): void {
         if (file.extension == "md") {
             this.metadataSet.set(file, Object.assign({}, this.metadataSet.get(file), newMetadata));
-            informChange(this.plugin.app, "mathlinks:updated", this, file);
+            informChange(this.plugin.app, "mathlinks:update", file);
         } else {
             throw Error(`MathLinks API: ${this.manifest.name} passed a non-markdown file ${file.path} to update().`);
         }
@@ -65,12 +65,12 @@ export class MathLinksAPIAccount {
         } else {
             throw Error(`MathLinks API: ${this.manifest.name} attempted to delete the MathLinks metadata of ${file.path}, but it does not exist.`);
         }
-        informChange(this.plugin.app, "mathlinks:updated", this, file);
+        informChange(this.plugin.app, "mathlinks:update", file);
     }
 }
 
-// eventName: "mathlinks:updated" | "mathlinks:account-deleted"
-export function informChange(app: App, eventName: string, ...callbackArgs: [apiAccount: MathLinksAPIAccount, file?: TFile]) {
+// eventName: see src/type.d.ts
+export function informChange(app: App, eventName: string, ...callbackArgs: [file?: TFile]) {
     // trigger an event informing this update
     app.metadataCache.trigger(eventName, ...callbackArgs);
 
