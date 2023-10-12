@@ -124,9 +124,6 @@ export function buildLivePreview<V extends PluginValue>(plugin: MathLinks, leaf:
                         enter(node) {
                             let name = node.type.name;
 
-                            console.log(
-                                `"${view.state.sliceDoc(node.from, node.to)}" (${node.name}): ${node.from}-${node.to}`,
-                            );
                             // Start
                             if (name.contains("formatting-link_formatting-link-start")) {
                                 if (view.state.sliceDoc(node.from, node.to) == "[[" && node.node.nextSibling) {

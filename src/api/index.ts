@@ -7,7 +7,7 @@ import { Provider } from "./provider";
 import MathLinks from "../main";
 
 
-export function addProvider(app: App, providerFactory: (mathLinks: MathLinks) => Provider): Provider {
+export function addProvider<CustomProvider extends Provider>(app: App, providerFactory: (mathLinks: MathLinks) => CustomProvider): CustomProvider {
     if (!isPluginEnabled(app)) throw Error("MathLinks API: MathLinks is not enabled.");
     const mathLinks = app.plugins.plugins.mathlinks as MathLinks;
     const provider = providerFactory(mathLinks);

@@ -91,10 +91,10 @@ export class MathLinksSettingTab extends PluginSettingTab {
         // Source mode
         new Setting(containerEl)
             .setName("Enable in Source mode")
-            .setName("Currently, only wikilinks are supported in Source mode.")
+            .setDesc("Currently, only wikilinks are supported in Source mode.")
             .addToggle((toggle: ToggleComponent) => {
                 toggle.setValue(this.plugin.nativeProvider.enableInSourceMode)
-                    .onChange(async (value: boolean) => {
+                    .onChange((value: boolean) => {
                         this.plugin.nativeProvider.enableInSourceMode = value;
                     });
             });
