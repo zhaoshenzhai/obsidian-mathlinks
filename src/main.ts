@@ -59,7 +59,9 @@ export default class MathLinks extends Plugin {
         account = new MathLinksAPIAccount(this, userPlugin.manifest, DEFAULT_SETTINGS.blockPrefix, () => null);
         this.apiAccounts.push(account);
 
-        this.registerProvider(new DeprecatedAPIProvider(account));
+        const provider = new DeprecatedAPIProvider(account);
+        userPlugin.addChild(provider);
+        this.registerProvider(provider);
 
         return account;
     }

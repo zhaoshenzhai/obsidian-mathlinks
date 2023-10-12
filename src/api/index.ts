@@ -47,7 +47,8 @@ export function getAPIAccount(userPlugin: Readonly<Plugin>): MathLinksAPIAccount
 }
 
 /**
- * Previously, a user plugin had to call this when unloading, but now it has no effect.
+ * This function is obsolete and You don't call this function no more.
+ * It will be removed in a future version.
  */
 export const deleteAPIAccount = (userPlugin: Readonly<Plugin>): void => {
     let accounts = userPlugin.app.plugins.plugins.mathlinks?.apiAccounts;
@@ -55,7 +56,6 @@ export const deleteAPIAccount = (userPlugin: Readonly<Plugin>): void => {
         let index = accounts.findIndex(
             (account) => account.manifest.id == userPlugin.manifest.id
         );
-        let account = accounts[index];
         accounts.splice(index, 1);
         informChange(userPlugin.app, "mathlinks:update-all");
     }
