@@ -1,14 +1,26 @@
 import { MathLinksAPIAccount, informChange } from './api';
 import { BlockSubpathResult, Component, HeadingSubpathResult, TFile } from 'obsidian';
 import { getMathLinkFromSubpath, getMathLinkFromTemplates } from '../links/helper';
+import { update } from './index';
 import MathLinks from '../main';
 
 /**
  * A class that provides a displayed text for a given link.
  */
 export abstract class Provider extends Component {
+    _enableInSourceMode: boolean = false;
+
     constructor(public mathLinks: MathLinks) {
         super();
+    }
+
+    get enableInSourceMode() {
+        return this._enableInSourceMode;
+    }
+
+    set enableInSourceMode(enable: boolean) {
+        this._enableInSourceMode = enable;
+        update(this.mathLinks.app);
     }
 
     public abstract provide(
@@ -27,6 +39,16 @@ export abstract class Provider extends Component {
 }
 
 export class NativeProvider extends Provider {
+    get enableInSourceMode() {
+        return this.mathLinks.settings.enableInSourceMode;
+    }
+
+    set enableInSourceMode(enable: boolean) {
+        this.mathLinks.settings.enableInSourceMode = enable;
+        update(this.mathLinks.app);
+        this.mathLinks.saveSettings();
+    }
+
     public provide(
         parsedLinktext: { path: string, subpath: string },
         targetFile: TFile | null,

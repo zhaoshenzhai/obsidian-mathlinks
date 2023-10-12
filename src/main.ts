@@ -11,12 +11,15 @@ export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
     apiAccounts: MathLinksAPIAccount[];
     providers: { provider: Provider, sortOrder: number }[] = [];
+    nativeProvider: NativeProvider;
 
     async onload() {
         await this.loadSettings();
         await loadMathJax();
 
-        this.registerProvider(new NativeProvider(this), Infinity);
+        this.nativeProvider = new NativeProvider(this);
+        this.addChild(this.nativeProvider);
+        this.registerProvider(this.nativeProvider, Infinity);
 
         // Markdown Post Processor for reading view
         this.registerMarkdownPostProcessor((element, context) => {
@@ -83,5 +86,9 @@ export default class MathLinks extends Plugin {
         this.providers
             .sort((p1, p2) => p1.sortOrder - p2.sortOrder)
             .forEach(({ provider }) => callback(provider));
+    }
+
+    enableInSourceMode(): boolean {
+        return this.providers.some(({provider}) => provider.enableInSourceMode);
     }
 }

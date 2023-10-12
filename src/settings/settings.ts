@@ -3,6 +3,7 @@ export interface MathLinksSettings {
     excludedPaths: string[];
     blockPrefix: string;
     enableFileNameBlockLinks: boolean;
+    enableInSourceMode: boolean;
 }
 
 export type Template = {
@@ -17,5 +18,6 @@ export const DEFAULT_SETTINGS: MathLinksSettings = {
     templates: [],
     excludedPaths: [],
     blockPrefix: "^",
-    enableFileNameBlockLinks: true
+    enableFileNameBlockLinks: true,
+    enableInSourceMode: false,
 }

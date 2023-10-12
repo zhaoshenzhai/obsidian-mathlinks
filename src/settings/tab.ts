@@ -87,5 +87,15 @@ export class MathLinksSettingTab extends PluginSettingTab {
                     });
                 toggle.setTooltip("Disable to ignore note name.");
             });
+
+        // Source mode
+        new Setting(containerEl)
+            .setName("Enable in source mode")
+            .addToggle((toggle: ToggleComponent) => {
+                toggle.setValue(this.plugin.nativeProvider.enableInSourceMode)
+                    .onChange(async (value: boolean) => {
+                        this.plugin.nativeProvider.enableInSourceMode = value;
+                    });
+            });
     }
 }

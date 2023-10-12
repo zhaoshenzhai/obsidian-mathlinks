@@ -23,7 +23,7 @@ export function setMathLink(source: string, mathLinkEl: HTMLElement) {
     if (textFrom < source.length) mathLinkEl.createSpan().replaceWith(source.slice(textFrom));
 }
 
-export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: string): string {
+export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: string, isSourceMode?: boolean): string {
     let { path, subpath } = parseLinktext(targetLink);
 
     let file = plugin.app.metadataCache.getFirstLinkpathDest(path, sourcePath);
@@ -41,6 +41,8 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
 
     let mathLink = "";
     plugin.iterateProviders((provider) => {
+        if (isSourceMode && !provider.enableInSourceMode) return;
+
         const provided = provider.provide({ path, subpath }, file, subpathResult, sourceFile);
         if (provided) {
             if (provider instanceof NativeProvider && subpathResult?.type == 'heading') {
