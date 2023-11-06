@@ -2,9 +2,10 @@ export type { MathLinksMetadata, MathLinksMetadataSet, MathLinksAPIAccount } fro
 export { Provider } from './provider';
 
 import { TFile, type App, type Plugin } from "obsidian";
-import { MathLinksAPIAccount, informChange } from "./api";
+import { MathLinksAPIAccount } from "./api";
 import { Provider } from "./provider";
 import MathLinks from "../main";
+import { informChange } from "src/utils";
 
 
 export function addProvider<CustomProvider extends Provider>(app: App, providerFactory: (mathLinks: MathLinks) => CustomProvider): CustomProvider {
@@ -32,7 +33,6 @@ export function update(app: App, file?: TFile) {
     }
 }
 
-
 /**
  * Obsolete & Deprecated API
  */
@@ -57,6 +57,6 @@ export const deleteAPIAccount = (userPlugin: Readonly<Plugin>): void => {
             (account) => account.manifest.id == userPlugin.manifest.id
         );
         accounts.splice(index, 1);
-        informChange(userPlugin.app, "mathlinks:update-all");
+        update(userPlugin.app);
     }
 }

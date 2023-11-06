@@ -1,5 +1,6 @@
-import { App, BlockSubpathResult, HeadingSubpathResult, MarkdownView, PluginManifest, TFile, WorkspaceLeaf } from 'obsidian';
+import { BlockSubpathResult, HeadingSubpathResult, PluginManifest, TFile } from 'obsidian';
 import MathLinks from '../main';
+import { informChange } from 'src/utils';
 
 export interface MathLinksMetadata {
     "mathLink"?: string;
@@ -67,17 +68,4 @@ export class MathLinksAPIAccount {
         }
         informChange(this.plugin.app, "mathlinks:update", file);
     }
-}
-
-// eventName: see src/type.d.ts
-export function informChange(app: App, eventName: string, ...callbackArgs: [file?: TFile]) {
-    // trigger an event informing this update
-    app.metadataCache.trigger(eventName, ...callbackArgs);
-
-    // refresh mathLinks display based on the new metadata
-    app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
-        if (leaf.view instanceof MarkdownView && leaf.view.getMode() == 'source') {
-            leaf.view.editor.cm?.dispatch();
-        }
-    });
 }

@@ -1,4 +1,4 @@
-import { MathLinksAPIAccount, informChange } from './api';
+import { MathLinksAPIAccount } from './api';
 import { BlockSubpathResult, Component, HeadingSubpathResult, TFile } from 'obsidian';
 import { getMathLinkFromSubpath, getMathLinkFromTemplates } from '../links/helper';
 import { update } from './index';
@@ -27,14 +27,14 @@ export abstract class Provider extends Component {
         parsedLinktext: { path: string, subpath: string },
         targetFile: TFile | null,
         targetSubpathResult: HeadingSubpathResult | BlockSubpathResult | null,
-        sourceFile: TFile
+        sourceFile: TFile | null,
     ): string | null;
 
     onunload() {
         const providers = this.mathLinks.providers;
         let index = providers.findIndex(({ provider }) => provider === this);
         providers.splice(index, 1);
-        informChange(this.mathLinks.app, "mathlinks:update-all");
+        update(this.mathLinks.app);
     }
 }
 
@@ -52,8 +52,7 @@ export class NativeProvider extends Provider {
     public provide(
         parsedLinktext: { path: string, subpath: string },
         targetFile: TFile | null,
-        targetSubpathResult: HeadingSubpathResult | BlockSubpathResult | null,
-        sourceFile: TFile
+        targetSubpathResult: HeadingSubpathResult | BlockSubpathResult | null
     ): string | null {
         const { mathLinks } = this;
         const { app } = mathLinks;
@@ -93,9 +92,9 @@ export class DeprecatedAPIProvider extends Provider {
         parsedLinktext: { path: string, subpath: string },
         targetFile: TFile | null,
         targetSubpathResult: HeadingSubpathResult | BlockSubpathResult | null,
-        sourceFile: TFile
+        sourceFile: TFile | null,
     ): string | null {
-        if (targetFile === null) {
+        if (targetFile === null || sourceFile === null) {
             return null;
         }
 

@@ -23,22 +23,15 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
     onload(): void {
         this.update();
 
-        // 1. when user updates the YAML frontmatter
-        this.plugin.registerEvent(this.plugin.app.metadataCache.on("changed", (changedFile) => {
+        // 1. when an API user updates its metadata
+        this.registerEvent(this.plugin.app.metadataCache.on("mathlinks:update", (changedFile) => {
             if (!this.targetFile || this.targetFile == changedFile) {
                 this.update();
             }
         }));
 
-        // 2. when an API user updates its metadata
-        this.plugin.registerEvent(this.plugin.app.metadataCache.on("mathlinks:update", (changedFile) => {
-            if (!this.targetFile || this.targetFile == changedFile) {
-                this.update();
-            }
-        }));
-
-        // 3. when an API account is deleted
-        this.plugin.registerEvent(this.plugin.app.metadataCache.on("mathlinks:update-all", () => {
+        // 2. when an API account is deleted
+        this.registerEvent(this.plugin.app.metadataCache.on("mathlinks:update-all", () => {
             this.update();
         }));
     }
@@ -57,7 +50,7 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
         return getter;
     }
 
-    async update(): Promise<void> {
+    update(): void {
         const mathLink = this.getMathLink();
 
         if (mathLink) {

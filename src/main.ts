@@ -1,11 +1,12 @@
-import { FileView, Plugin, WorkspaceLeaf, loadMathJax } from "obsidian";
+import { createEditorExtensions } from './links/preview';
+import { Plugin, loadMathJax } from "obsidian";
 import { MathLinksSettings, DEFAULT_SETTINGS } from "./settings/settings";
 import { MathLinksSettingTab } from "./settings/tab"
 import { MathLinksAPIAccount } from "./api/api";
 import { DeprecatedAPIProvider, NativeProvider, Provider } from "./api/provider";
 import { generateMathLinks } from "./links/reading";
-import { buildLivePreview } from "./links/preview";
 import { isExcluded } from "./utils";
+import { update } from './api';
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
@@ -29,25 +30,11 @@ export default class MathLinks extends Plugin {
             }
         });
 
-        // Live-preview; update all when Obsidian launches
-        this.app.workspace.onLayoutReady(() => {
-            this.app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
-                if (leaf.view instanceof FileView && leaf.view.file && isExcluded(this, leaf.view.file)) {
-                    buildLivePreview(this, leaf).then((livePreview) => {
-                        this.registerEditorExtension(livePreview);
-                    });
-                }
-            });
-        });
+        this.registerEditorExtension(createEditorExtensions(this));
 
-        // Live-preview; update on leaf-change
-        this.app.workspace.on("active-leaf-change", (leaf: WorkspaceLeaf) => {
-            if (leaf.view instanceof FileView && leaf.view.file && isExcluded(this, leaf.view.file)) {
-                buildLivePreview(this, leaf).then((livePreview) => {
-                    this.registerEditorExtension(livePreview);
-                });
-            }
-        });
+        this.registerEvent(this.app.metadataCache.on('changed', file => update(this.app, file)));
+        // Force-update when switching between Reading & Editing views
+        this.registerEvent(this.app.workspace.on('layout-change', () => update(this.app)));
 
         this.apiAccounts = [];
     }
