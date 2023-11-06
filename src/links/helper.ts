@@ -1,6 +1,6 @@
 import { NativeProvider } from './../api/provider';
 import { TFile, renderMath, finishRenderMath, parseLinktext, resolveSubpath, BlockSubpathResult, HeadingSubpathResult } from "obsidian";
-import { MathLinksMetadata } from "../api/api";
+import { MathLinksMetadata } from "../api/deprecated";
 import MathLinks from "../main";
 
 export function setMathLink(source: string, mathLinkEl: HTMLElement) {

@@ -1,8 +1,8 @@
-export type { MathLinksMetadata, MathLinksMetadataSet, MathLinksAPIAccount } from "./api";
+export type { MathLinksMetadata, MathLinksMetadataSet, MathLinksAPIAccount } from "./deprecated";
 export { Provider } from './provider';
 
 import { TFile, type App, type Plugin } from "obsidian";
-import { MathLinksAPIAccount } from "./api";
+import { MathLinksAPIAccount } from "./deprecated";
 import { Provider } from "./provider";
 import MathLinks from "../main";
 import { informChange } from "src/utils";
