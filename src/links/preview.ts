@@ -1,3 +1,32 @@
+/**
+ * Inspired by & adapted from Dataview's inline fields rendering feature:
+ * https://github.com/blacksmithgu/obsidian-dataview/blob/b00beb7596f9926ca9579c6f319341ceae4f5b5e/src/ui/views/inline-field-live-preview.ts
+ * 
+ * The original work is licensed under the MIT License:
+ * 
+ * MIT License
+ * 
+ * Copyright (c) 2021 Michael Brenan
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 import { Keymap, editorInfoField, editorLivePreviewField, getLinkpath } from "obsidian";
 import { Transaction, EditorState, RangeSet, RangeSetBuilder, RangeValue, StateEffect, StateEffectType, StateField, EditorSelection, Extension } from "@codemirror/state";
 import {
