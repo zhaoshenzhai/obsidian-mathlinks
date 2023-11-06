@@ -1,9 +1,0 @@
-{
-  "vimMode": true,
-  "promptDelete": false,
-  "useMarkdownLinks": false,
-  "alwaysUpdateLinks": true,
-  "newFileLocation": "folder",
-  "newFileFolderPath": "Tests",
-  "propertiesInDocument": "hidden"
-}
