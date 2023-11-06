@@ -1,5 +1,5 @@
 /**
- * This files the obsolete API. Use the new API in provider.ts instead.
+ * This files contains the obsolete API. Use the new API in provider.ts instead.
  */
 
 import { BlockSubpathResult, HeadingSubpathResult, PluginManifest, TFile } from 'obsidian';
