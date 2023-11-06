@@ -4,4 +4,8 @@ lib
 ./main.js
 
 test_vault/.obsidian/workspace.json
+test_vault/.obsidian/app.json
+test_vault/.obsidian/appearance.json
+test_vault/.obsidian/hotkeys.json
+test_vault/.obsidian/page-preview.json
 test_vault/.obsidian/snippets/supercharged-links-gen.css
