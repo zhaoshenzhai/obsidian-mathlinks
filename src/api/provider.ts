@@ -1,4 +1,4 @@
-import { MathLinksAPIAccount } from './api';
+import { MathLinksAPIAccount } from './deprecated';
 import { BlockSubpathResult, Component, HeadingSubpathResult, TFile } from 'obsidian';
 import { getMathLinkFromSubpath, getMathLinkFromTemplates } from '../links/helper';
 import { update } from './index';

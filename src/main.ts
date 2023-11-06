@@ -2,7 +2,7 @@ import { createEditorExtensions } from './links/preview';
 import { Plugin, loadMathJax } from "obsidian";
 import { MathLinksSettings, DEFAULT_SETTINGS } from "./settings/settings";
 import { MathLinksSettingTab } from "./settings/tab"
-import { MathLinksAPIAccount } from "./api/api";
+import { MathLinksAPIAccount } from "./api/deprecated";
 import { DeprecatedAPIProvider, NativeProvider, Provider } from "./api/provider";
 import { generateMathLinks } from "./links/reading";
 import { isExcluded } from "./utils";
