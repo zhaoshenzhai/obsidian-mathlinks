@@ -1,18 +1,26 @@
-import { FileView, Plugin, WorkspaceLeaf, loadMathJax } from "obsidian";
+import { createEditorExtensions } from './links/preview';
+import { Plugin, loadMathJax } from "obsidian";
 import { MathLinksSettings, DEFAULT_SETTINGS } from "./settings/settings";
 import { MathLinksSettingTab } from "./settings/tab"
-import { MathLinksAPIAccount } from "./api/api";
+import { MathLinksAPIAccount } from "./api/deprecated";
+import { DeprecatedAPIProvider, NativeProvider, Provider } from "./api/provider";
 import { generateMathLinks } from "./links/reading";
-import { buildLivePreview } from "./links/preview";
 import { isExcluded } from "./utils";
+import { update } from './api';
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
     apiAccounts: MathLinksAPIAccount[];
+    providers: { provider: Provider, sortOrder: number }[] = [];
+    nativeProvider: NativeProvider;
 
     async onload() {
         await this.loadSettings();
         await loadMathJax();
+
+        this.nativeProvider = new NativeProvider(this);
+        this.addChild(this.nativeProvider);
+        this.registerProvider(this.nativeProvider, Infinity);
 
         // Markdown Post Processor for reading view
         this.registerMarkdownPostProcessor((element, context) => {
@@ -22,35 +30,26 @@ export default class MathLinks extends Plugin {
             }
         });
 
-        // Live-preview; update all when Obsidian launches
-        this.app.workspace.onLayoutReady(() => {
-            this.app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
-                if (leaf.view instanceof FileView && leaf.view.file && isExcluded(this, leaf.view.file)) {
-                    buildLivePreview(this, leaf).then((livePreview) => {
-                        this.registerEditorExtension(livePreview);
-                    });
-                }
-            });
-        });
+        this.registerEditorExtension(createEditorExtensions(this));
 
-        // Live-preview; update on leaf-change
-        this.app.workspace.on("active-leaf-change", (leaf: WorkspaceLeaf) => {
-            if (leaf.view instanceof FileView && leaf.view.file && isExcluded(this, leaf.view.file)) {
-                buildLivePreview(this, leaf).then((livePreview) => {
-                    this.registerEditorExtension(livePreview);
-                });
-            }
-        });
+        this.registerEvent(this.app.metadataCache.on('changed', file => update(this.app, file)));
+        // Force-update when switching between Reading & Editing views
+        this.registerEvent(this.app.workspace.on('layout-change', () => update(this.app)));
 
         this.apiAccounts = [];
     }
 
-    getAPIAccount<UserPlugin extends Plugin>(userPlugin: Readonly<UserPlugin>): MathLinksAPIAccount {
+    getAPIAccount(userPlugin: Readonly<Plugin>): MathLinksAPIAccount {
         let account = this.apiAccounts.find((account) => account.manifest.id == userPlugin.manifest.id);
         if (account) return account;
 
         account = new MathLinksAPIAccount(this, userPlugin.manifest, DEFAULT_SETTINGS.blockPrefix, () => null);
         this.apiAccounts.push(account);
+
+        const provider = new DeprecatedAPIProvider(account);
+        userPlugin.addChild(provider);
+        this.registerProvider(provider);
+
         return account;
     }
 
@@ -61,5 +60,24 @@ export default class MathLinks extends Plugin {
 
     async saveSettings() {
         await this.saveData(this.settings);
+    }
+
+    /**
+     * @param provider 
+     * @param sortOrder - An optional integer sort order. Defaults to 0. Lower number runs before higher numbers.
+     */
+    registerProvider(provider: Provider, sortOrder?: number) {
+        this.providers.find(another => another.provider === provider)
+            ?? this.providers.push({ provider, sortOrder: sortOrder ?? 0 });
+    }
+
+    iterateProviders(callback: (provider: Provider) => any) {
+        this.providers
+            .sort((p1, p2) => p1.sortOrder - p2.sortOrder)
+            .forEach(({ provider }) => callback(provider));
+    }
+
+    enableInSourceMode(): boolean {
+        return this.providers.some(({provider}) => provider.enableInSourceMode);
     }
 }

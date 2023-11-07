@@ -59,8 +59,10 @@ MathLinks supports links to blocks and headings like `[[note#^block-id]]` and `[
 * Editing the prefix for block links: By default, block links are prefixed by `^`. This can be changed (or removed).
 * Toggling whether to render `note`: If disabled, the links will be rendered as `[[^block-id]]` and `[[section]]`.
 
-### Enable API
-Expose some of `MathLinks`' features to other community plugins. Enabled by default.
+## MathLinks API
+
+MathLinks exposes an API, allowing other community plugins to utilize its powerful "dynamic aliases" feature.
+You can find more information & a simple sample plugin at this repo: https://github.com/RyotaUshio/obsidian-mathlinks-api-sample-plugin
 
 ## Contributing
 If you would like to point out a bug, add support, or have a feature request, don't hesitate to open an issue/pull request! Thank you to all who have contributed.

@@ -1,5 +1,10 @@
-import { App, BlockSubpathResult, HeadingSubpathResult, MarkdownView, PluginManifest, TFile, WorkspaceLeaf } from 'obsidian';
+/**
+ * This files contains the obsolete API. Use the new API in provider.ts instead.
+ */
+
+import { BlockSubpathResult, HeadingSubpathResult, PluginManifest, TFile } from 'obsidian';
 import MathLinks from '../main';
+import { informChange } from 'src/utils';
 
 export interface MathLinksMetadata {
     "mathLink"?: string;
@@ -33,7 +38,7 @@ export class MathLinksAPIAccount {
     update(file: TFile, newMetadata: MathLinksMetadata): void {
         if (file.extension == "md") {
             this.metadataSet.set(file, Object.assign({}, this.metadataSet.get(file), newMetadata));
-            informChange(this.plugin.app, "mathlinks:updated", this, file);
+            informChange(this.plugin.app, "mathlinks:update", file);
         } else {
             throw Error(`MathLinks API: ${this.manifest.name} passed a non-markdown file ${file.path} to update().`);
         }
@@ -65,19 +70,6 @@ export class MathLinksAPIAccount {
         } else {
             throw Error(`MathLinks API: ${this.manifest.name} attempted to delete the MathLinks metadata of ${file.path}, but it does not exist.`);
         }
-        informChange(this.plugin.app, "mathlinks:updated", this, file);
+        informChange(this.plugin.app, "mathlinks:update", file);
     }
-}
-
-// eventName: "mathlinks:updated" | "mathlinks:account-deleted"
-export function informChange(app: App, eventName: string, ...callbackArgs: [apiAccount: MathLinksAPIAccount, file?: TFile]) {
-    // trigger an event informing this update
-    app.metadataCache.trigger(eventName, ...callbackArgs);
-
-    // refresh mathLinks display based on the new metadata
-    app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
-        if (leaf.view instanceof MarkdownView && leaf.view.getMode() == 'source') {
-            leaf.view.editor.cm?.dispatch();
-        }
-    });
 }

@@ -43,7 +43,7 @@
     width: 200px;
 }
 
-.math-booster-profile-button-container {
+.math-booster-button-container {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
@@ -77,8 +77,9 @@
                 
 /* Unlike in callouts, Obsidian natively renders MathJax in blockquotes. But it is rather buggy 
 (see https://forum.obsidian.md/t/live-preview-support-math-block-in-quotes/32564/2), 
-so we need to replace it with this plugin's editor extension. */
-.cm-line:has( .math.math-block.cm-embed-block > mjx-container.MathJax:not(.math-booster-preview) > mjx-math[display="true"]) {
+so we need to replace it with this plugin's editor extension. 
+*/
+.HyperMD-quote.cm-line .math.math-block.cm-embed-block:has(> mjx-container.MathJax[display="true"]:not(.math-booster-preview)) {
     display: none;
 }
 
@@ -109,54 +110,34 @@ so we need to replace it with this plugin's editor extension. */
     width: 300px;
 }
 
-.theorem-callout-plain.theorem-callout {
-    --callout-color: var(--text-normal);
-    font-family: CMU Serif;
-    background-color: rgb(0, 0, 0, 0);
-    padding-left: 0;
-    padding-right: 0;
-    border: none;
-    box-shadow: none;
+
+/* Taken from the Latex Suite plugin (https://github.com/artisticat1/obsidian-latex-suite/blob/a5914c70c16d5763a182ec51d9716110b40965cf/styles.css) */
+.math-booster-dependency-validation {
+    color: white;
+    display: inline-block;
+    border-radius: 1em;
+    margin-right: var(--size-3);
+    cursor: default;
+    pointer-events: none;
 }
 
-.theorem-callout-plain.theorem-callout .callout-icon {
-    display: none;
+.math-booster-dependency-validation svg {
+    width: 16px !important;
+    height: 16px !important;
 }
 
-.theorem-callout-plain.theorem-callout .callout-title-inner {
-    font-style: bold;
+.math-booster-dependency-validation.valid {
+    background-color: #7dc535;
+    visibility: visible;
 }
 
-.theorem-callout-plain .theorem-callout-subtitle {
-    font-weight: 400;
+.theme-dark .math-booster-dependency-validation.valid {
+    background-color: #588b24;
 }
 
-.theorem-callout-plain.theorem-callout-en .callout-content {
-    font-style: italic;
-}
-
-.theorem-callout-framed.theorem-callout {
-    --callout-color: var(--text-normal);
-    font-family: Times;
-    background-color: rgb(0, 0, 0, 0);
-    border: solid;
-    border-radius: 6px;
-}
-
-.theorem-callout-framed.theorem-callout .callout-icon {
-    display: none;
-}
-
-.theorem-callout-framed.theorem-callout .callout-title-inner {
-    font-style: bold;
-}
-
-.theorem-callout-framed .theorem-callout-subtitle {
-    font-weight: 400;
-}
-
-.theorem-callout-framed.theorem-callout-en .callout-content {
-    font-style: italic;
+.math-booster-dependency-validation.invalid {
+    background-color: #ea5555;
+    visibility: visible;
 }
 
 .theorem-callout-vivid.theorem-callout {
@@ -195,6 +176,56 @@ so we need to replace it with this plugin's editor extension. */
     padding: 1px 20px 2px 20px;
 }
 
+.theorem-callout-framed.theorem-callout {
+    --callout-color: var(--text-normal);
+    font-family: Times;
+    background-color: rgb(0, 0, 0, 0);
+    border: solid;
+    border-radius: 6px;
+}
+
+.theorem-callout-framed.theorem-callout .callout-icon {
+    display: none;
+}
+
+.theorem-callout-framed.theorem-callout .callout-title-inner {
+    font-style: bold;
+}
+
+.theorem-callout-framed .theorem-callout-subtitle {
+    font-weight: 400;
+}
+
+.theorem-callout-framed.theorem-callout-en .callout-content {
+    font-style: italic;
+}
+
+.theorem-callout-plain.theorem-callout {
+    --callout-color: var(--text-normal);
+    font-family: CMU Serif;
+    background-color: rgb(0, 0, 0, 0);
+    padding-left: 0;
+    padding-right: 0;
+    border: none;
+    box-shadow: none;
+}
+
+.theorem-callout-plain.theorem-callout .callout-icon {
+    display: none;
+}
+
+.theorem-callout-plain.theorem-callout .callout-title-inner {
+    font-style: bold;
+}
+
+.theorem-callout-plain .theorem-callout-subtitle {
+    font-weight: 400;
+}
+
+.theorem-callout-plain.theorem-callout-en .callout-content {
+    font-style: italic;
+}
+
 .theorem-callout-mathwiki.theorem-callout {
     --callout-color: 248, 248, 255;
     font-family: CMU Serif;
@@ -202,6 +233,10 @@ so we need to replace it with this plugin's editor extension. */
 
 .theorem-callout-mathwiki.theorem-callout .callout-title-inner {
     padding-left: 5px;
+}
+
+.theorem-callout-mathwiki .theorem-callout-subtitle {
+    font-weight: 400;
 }
 
 .theorem-callout-mathwiki.theorem-callout-en .callout-content {

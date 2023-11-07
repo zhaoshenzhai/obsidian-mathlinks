@@ -1,5 +1,6 @@
+import { NativeProvider } from './../api/provider';
 import { TFile, renderMath, finishRenderMath, parseLinktext, resolveSubpath, BlockSubpathResult, HeadingSubpathResult } from "obsidian";
-import { MathLinksMetadata } from "../api/api";
+import { MathLinksMetadata } from "../api/deprecated";
 import MathLinks from "../main";
 
 export function setMathLink(source: string, mathLinkEl: HTMLElement) {
@@ -22,7 +23,7 @@ export function setMathLink(source: string, mathLinkEl: HTMLElement) {
     if (textFrom < source.length) mathLinkEl.createSpan().replaceWith(source.slice(textFrom));
 }
 
-export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: string): string {
+export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: string, isSourceMode?: boolean): string {
     let { path, subpath } = parseLinktext(targetLink);
 
     let file = plugin.app.metadataCache.getFirstLinkpathDest(path, sourcePath);
@@ -33,46 +34,30 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
 
     let subpathResult = resolveSubpath(cache, subpath);
 
-    let mathLink = "";
-    if (subpathResult) {
-        mathLink = getMathLinkFromSubpath(path, subpathResult, cache.frontmatter, plugin.settings.blockPrefix,
-            // If enableFileNameBlockLinks == true, pass `null` to the last parameter `prefix`, which means using the standard prefix (e.g. note > block). 
-            // Otherwise, pass an empty string to `prefix`, which means using no prefix (no prefix is a special case of custom prefixes).
-            plugin.settings.enableFileNameBlockLinks ? null : ""
-        );
-    } else if (path) {
-        mathLink = cache.frontmatter?.mathLink;
-        if (mathLink == "auto") {
-            mathLink = getMathLinkFromTemplates(plugin, file);
-        }
+    const sourceFile = plugin.app.vault.getAbstractFileByPath(sourcePath);
+    if (!(sourceFile instanceof TFile)) {
+        return "";
     }
 
-    if (!mathLink && plugin.settings.enableAPI) {
-        const sourceFile = plugin.app.vault.getAbstractFileByPath(sourcePath);
-        if (sourceFile instanceof TFile) {
-            for (let account of plugin.apiAccounts) {
-                const metadata = account.metadataSet.get(file);
-                if (metadata) {
-                    if (subpathResult) {
-                        mathLink = getMathLinkFromSubpath(path, subpathResult, metadata, account.blockPrefix,
-                            // An API user can specify custom prefixes depending on the source file (sourceFile) & the target file (file).
-                            account.prefixer(sourceFile, file, subpathResult)
-                        );
-                    } else {
-                        mathLink = metadata["mathLink"] ?? "";
-                    }
-                }
-                if (mathLink) {
-                    break;
+    let mathLink = "";
+    plugin.iterateProviders((provider) => {
+        if (isSourceMode && !provider.enableInSourceMode) return;
+
+        const provided = provider.provide({ path, subpath }, file, subpathResult, sourceFile);
+        if (provided) {
+            if (provider instanceof NativeProvider && subpathResult?.type == 'heading') {
+                if (mathLink && provided == (path ? path + ' > ' : '') + subpathResult.current.heading) {
+                    return;
                 }
             }
+            mathLink = provided;
         }
-    }
+    });
 
     return mathLink;
 }
 
-function getMathLinkFromSubpath(linkpath: string, subpathResult: HeadingSubpathResult | BlockSubpathResult, metadata: MathLinksMetadata | undefined, blockPrefix: string, prefix: string | null): string {
+export function getMathLinkFromSubpath(linkpath: string, subpathResult: HeadingSubpathResult | BlockSubpathResult, metadata: MathLinksMetadata | undefined, blockPrefix: string, prefix: string | null): string {
     let subMathLink = ""
     if (subpathResult.type == "heading") {
         subMathLink = subpathResult.current.heading;
@@ -94,7 +79,7 @@ function getMathLinkFromSubpath(linkpath: string, subpathResult: HeadingSubpathR
     }
 }
 
-function getMathLinkFromTemplates(plugin: MathLinks, file: TFile): string {
+export function getMathLinkFromTemplates(plugin: MathLinks, file: TFile): string {
     let templates = plugin.settings.templates;
     let mathLink = file.name.replace(/\.md$/, "");
     for (let i = 0; i < templates.length; i++) {

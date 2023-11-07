@@ -1,11 +1,9 @@
-import { TAbstractFile } from "obsidian";
-
 export interface MathLinksSettings {
     templates: Template[];
     excludedPaths: string[];
     blockPrefix: string;
     enableFileNameBlockLinks: boolean;
-    enableAPI: boolean;
+    enableInSourceMode: boolean;
 }
 
 export type Template = {
@@ -21,5 +19,5 @@ export const DEFAULT_SETTINGS: MathLinksSettings = {
     excludedPaths: [],
     blockPrefix: "^",
     enableFileNameBlockLinks: true,
-    enableAPI: true,
+    enableInSourceMode: false,
 }
