@@ -1,9 +1,14 @@
 {
-  "version": "0.6.11",
+  "version": "1.0.4",
   "settings": {
     "/": {
       "profile": "English",
       "titleSuffix": ".",
+      "inferNumberPrefix": true,
+      "inferNumberPrefixFromProperty": "",
+      "inferNumberPrefixParseSep": "-.",
+      "inferNumberPrefixPrintSep": ".",
+      "inferNumberPrefixUseFirstN": 1,
       "numberPrefix": "",
       "numberSuffix": "",
       "numberInit": 1,
@@ -11,6 +16,11 @@
       "numberDefault": "auto",
       "refFormat": "[title] ([type] [number]) if title exists, [type] [number] otherwise",
       "noteMathLinkFormat": "[type] [number] ([title])",
+      "inferEqNumberPrefix": true,
+      "inferEqNumberPrefixFromProperty": "",
+      "inferEqNumberPrefixParseSep": "-.",
+      "inferEqNumberPrefixPrintSep": ".",
+      "inferEqNumberPrefixUseFirstN": 1,
       "eqNumberPrefix": "",
       "eqNumberSuffix": "",
       "eqNumberInit": 1,
@@ -19,8 +29,8 @@
       "eqRefSuffix": "",
       "labelPrefix": "",
       "lineByLine": true,
-      "mathCalloutStyle": "Framed",
-      "mathCalloutFontInherit": false,
+      "theoremCalloutStyle": "Framed",
+      "theoremCalloutFontInherit": false,
       "beginProof": "\\begin{proof}",
       "endProof": "\\end{proof}",
       "insertSpace": true
@@ -96,12 +106,18 @@
     "triggerTheoremSuggest": "\\tref",
     "triggerEquationSuggest": "\\eqref",
     "renderMathInSuggestion": true,
+    "suggestNumber": 20,
     "searchMethod": "Fuzzy",
     "upWeightRecent": 0.1,
     "searchOnlyRecent": false,
     "modifierToJump": "Mod",
+    "modifierToNoteLink": "Shift",
+    "showModifierInstruction": true,
     "suggestLeafOption": "Split right",
-    "backlinkLeafOption": "Split right"
+    "backlinkLeafOption": "Split right",
+    "projectInfix": " > ",
+    "projectSep": "/"
   },
-  "excludedFiles": []
+  "excludedFiles": [],
+  "dumpedProjects": []
 }
