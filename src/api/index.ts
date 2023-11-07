@@ -5,7 +5,7 @@ import { TFile, type App, type Plugin } from "obsidian";
 import { MathLinksAPIAccount } from "./deprecated";
 import { Provider } from "./provider";
 import MathLinks from "../main";
-import { informChange } from "src/utils";
+import { informChange } from "../utils";
 
 
 export function addProvider<CustomProvider extends Provider>(app: App, providerFactory: (mathLinks: MathLinks) => CustomProvider): CustomProvider {
