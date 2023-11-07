@@ -16,6 +16,7 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
         this.containerEl.parentNode?.insertBefore(this.mathLinkEl, this.containerEl.nextSibling);
         this.mathLinkEl.classList.add("mathLink-internal-link");
         this.containerEl.classList.add("original-internal-link");
+        this.containerEl.classList.remove("internal-link"); // #51: this is to fix the incompatibility with Strange New Worlds
         this.containerEl.style.display = "none";
         this.getMathLink = this.setMathLinkGetter();
     }
