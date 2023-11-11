@@ -102,7 +102,7 @@ export class MathLinksSettingTab extends PluginSettingTab {
         // Outline
         new Setting(containerEl)
             .setName("Render MathJax in Outline")
-            .setDesc("Render headings with MathJax in the core Outline view. You need to reload the app to take effect.")
+            .setDesc("Render headings with MathJax in the core Outline view. You need to reload the app for this option to take effect.")
             .addToggle((toggle: ToggleComponent) => {
                 toggle.setValue(this.plugin.settings.renderOutline)
                     .onChange(async (value: boolean) => {
