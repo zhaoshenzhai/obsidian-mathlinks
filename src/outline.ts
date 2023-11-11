@@ -22,6 +22,6 @@ export const patchOutline = (plugin: MathLinks): boolean => {
             },
         })
     )
-    console.log('patched Outline');
+    
     return true;
 }
