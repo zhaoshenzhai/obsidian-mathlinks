@@ -40,7 +40,7 @@ export default class MathLinks extends Plugin {
         this.apiAccounts = [];
 
         // https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/55
-        // Patch the core Outline view to render MathJax in it
+        // Patch the core Outline view to render MathJax in it; try until successful
         this.app.workspace.onLayoutReady(() => {
             const success = patchOutline(this);
             if (!success) {
