@@ -42,13 +42,15 @@ export default class MathLinks extends Plugin {
         // https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/55
         // Patch the core Outline view to render MathJax in it; try until successful
         this.app.workspace.onLayoutReady(() => {
-            const success = patchOutline(this);
-            if (!success) {
-                const eventRef = this.app.workspace.on('layout-change', () => {
-                    const success = patchOutline(this);
-                    if (success) this.app.workspace.offref(eventRef);
-                });
-                this.registerEvent(eventRef);
+            if (this.settings.renderOutline && (this.app as any).internalPlugins.plugins.outline.enabled) {
+                const success = patchOutline(this);
+                if (!success) {
+                    const eventRef = this.app.workspace.on('layout-change', () => {
+                        const success = patchOutline(this);
+                        if (success) this.app.workspace.offref(eventRef);
+                    });
+                    this.registerEvent(eventRef);
+                }
             }
         });
     }
