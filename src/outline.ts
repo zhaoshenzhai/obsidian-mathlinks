@@ -14,7 +14,9 @@ export const patchOutline = (plugin: MathLinks): boolean => {
             getItemDom(old) {
                 return function (arg) {
                     const ret = old.call(this, arg);
-                    setTimeout(() => setMathLink(ret.heading.heading, ret.innerEl), 10);
+                    // Wait for the ret.innerEl (div.tree-item-inner) to be fully rendered 
+                    // by the core Outline plugin
+                    setTimeout(() => setMathLink(ret.heading.heading, ret.innerEl));
                     return ret;
                 }
             },
