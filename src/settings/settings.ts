@@ -4,6 +4,7 @@ export interface MathLinksSettings {
     blockPrefix: string;
     enableFileNameBlockLinks: boolean;
     enableInSourceMode: boolean;
+    renderOutline: boolean;
 }
 
 export type Template = {
@@ -20,4 +21,5 @@ export const DEFAULT_SETTINGS: MathLinksSettings = {
     blockPrefix: "^",
     enableFileNameBlockLinks: true,
     enableInSourceMode: false,
+    renderOutline: true,
 }

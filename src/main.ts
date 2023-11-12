@@ -7,6 +7,7 @@ import { DeprecatedAPIProvider, NativeProvider, Provider } from "./api/provider"
 import { generateMathLinks } from "./links/reading";
 import { isExcluded } from "./utils";
 import { update } from './api';
+import { patchOutline } from './outline';
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
@@ -37,6 +38,21 @@ export default class MathLinks extends Plugin {
         this.registerEvent(this.app.workspace.on('layout-change', () => update(this.app)));
 
         this.apiAccounts = [];
+
+        // https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/55
+        // Patch the core Outline view to render MathJax in it; try until successful
+        this.app.workspace.onLayoutReady(() => {
+            if (this.settings.renderOutline && (this.app as any).internalPlugins.plugins.outline.enabled) {
+                const success = patchOutline(this);
+                if (!success) {
+                    const eventRef = this.app.workspace.on('layout-change', () => {
+                        const success = patchOutline(this);
+                        if (success) this.app.workspace.offref(eventRef);
+                    });
+                    this.registerEvent(eventRef);
+                }
+            }
+        });
     }
 
     getAPIAccount(userPlugin: Readonly<Plugin>): MathLinksAPIAccount {
@@ -78,6 +94,6 @@ export default class MathLinks extends Plugin {
     }
 
     enableInSourceMode(): boolean {
-        return this.providers.some(({provider}) => provider.enableInSourceMode);
+        return this.providers.some(({ provider }) => provider.enableInSourceMode);
     }
 }

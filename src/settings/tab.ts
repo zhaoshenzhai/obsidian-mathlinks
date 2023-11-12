@@ -98,5 +98,17 @@ export class MathLinksSettingTab extends PluginSettingTab {
                         this.plugin.nativeProvider.enableInSourceMode = value;
                     });
             });
+
+        // Outline
+        new Setting(containerEl)
+            .setName("Render MathJax in Outline")
+            .setDesc("Render headings with MathJax in the core Outline view. You need to reload the app for this option to take effect.")
+            .addToggle((toggle: ToggleComponent) => {
+                toggle.setValue(this.plugin.settings.renderOutline)
+                    .onChange(async (value: boolean) => {
+                        this.plugin.settings.renderOutline = value;
+                        await this.plugin.saveSettings();
+                    });
+            });
     }
 }
