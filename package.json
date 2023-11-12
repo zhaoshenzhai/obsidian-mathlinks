@@ -1,6 +1,6 @@
 {
     "name": "obsidian-mathlinks",
-    "version": "0.5.0",
+    "version": "0.4.7",
     "description": "Render MathJax in your links",
     "main": "lib/api/index.js",
     "types": "lib/api/index.d.ts",
