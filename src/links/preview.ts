@@ -28,7 +28,7 @@
  */
 
 import { Keymap, editorInfoField, editorLivePreviewField, getLinkpath } from "obsidian";
-import { Transaction, EditorState, RangeSet, RangeSetBuilder, RangeValue, StateEffect, StateEffectType, StateField, EditorSelection, Extension } from "@codemirror/state";
+import { Transaction, EditorState, RangeSet, RangeSetBuilder, RangeValue, StateEffectType, StateField, EditorSelection, Extension } from "@codemirror/state";
 import {
     Decoration,
     DecorationSet,
@@ -56,8 +56,6 @@ function selectionAndRangeOverlap(selection: EditorSelection, rangeFrom: number,
 function hasEffect<T>(tr: Transaction, effectType: StateEffectType<T>): boolean {
     return tr.effects.some(effect => effect.is(effectType));
 }
-
-export const forceUpdateEffect = StateEffect.define<null>();
 
 class MathLinkInfo extends RangeValue {
     constructor(public linkText: string, public mathLink: string) {
@@ -173,7 +171,7 @@ export const createEditorExtensions = (plugin: MathLinks): Extension[] => {
     const mathLinkInfoField = StateField.define<RangeSet<MathLinkInfo>>({
         create: buildField,
         update(oldFields, tr) {
-            return tr.docChanged || hasEffect(tr, forceUpdateEffect) ? buildField(tr.state) : oldFields;
+            return tr.docChanged || hasEffect(tr, plugin.forceUpdateEffect) ? buildField(tr.state) : oldFields;
         }
     });
 
@@ -272,7 +270,7 @@ export const createEditorExtensions = (plugin: MathLinks): Extension[] => {
                     this.decorations = Decoration.none;
                 }
 
-                if (update.transactions.some(tr => hasEffect(tr, forceUpdateEffect))) {
+                if (update.transactions.some(tr => hasEffect(tr, plugin.forceUpdateEffect))) {
                     this.decorations = this.buildDecorations(update.view);
                 } else if (update.docChanged) {
                     this.decorations = this.decorations.map(update.changes);

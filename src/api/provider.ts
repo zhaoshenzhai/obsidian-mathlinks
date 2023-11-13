@@ -1,7 +1,6 @@
 import { MathLinksAPIAccount } from './deprecated';
 import { BlockSubpathResult, Component, HeadingSubpathResult, TFile } from 'obsidian';
 import { getMathLinkFromSubpath, getMathLinkFromTemplates } from '../links/helper';
-import { update } from './index';
 import MathLinks from '../main';
 
 /**
@@ -20,7 +19,7 @@ export abstract class Provider extends Component {
 
     set enableInSourceMode(enable: boolean) {
         this._enableInSourceMode = enable;
-        update(this.mathLinks.app);
+        this.mathLinks.update();
     }
 
     public abstract provide(
@@ -34,7 +33,7 @@ export abstract class Provider extends Component {
         const providers = this.mathLinks.providers;
         let index = providers.findIndex(({ provider }) => provider === this);
         providers.splice(index, 1);
-        update(this.mathLinks.app);
+        this.mathLinks.update();
     }
 }
 
@@ -45,7 +44,7 @@ export class NativeProvider extends Provider {
 
     set enableInSourceMode(enable: boolean) {
         this.mathLinks.settings.enableInSourceMode = enable;
-        update(this.mathLinks.app);
+        this.mathLinks.update();
         this.mathLinks.saveSettings();
     }
 

@@ -1,12 +1,12 @@
+import { MarkdownView, Plugin, TFile, loadMathJax } from "obsidian";
+import { StateEffect } from '@codemirror/state';
 import { createEditorExtensions } from './links/preview';
-import { Plugin, loadMathJax } from "obsidian";
 import { MathLinksSettings, DEFAULT_SETTINGS } from "./settings/settings";
 import { MathLinksSettingTab } from "./settings/tab"
 import { MathLinksAPIAccount } from "./api/deprecated";
 import { DeprecatedAPIProvider, NativeProvider, Provider } from "./api/provider";
 import { generateMathLinks } from "./links/reading";
 import { isExcluded } from "./utils";
-import { update } from './api';
 import { patchOutline } from './outline';
 
 export default class MathLinks extends Plugin {
@@ -14,6 +14,7 @@ export default class MathLinks extends Plugin {
     apiAccounts: MathLinksAPIAccount[];
     providers: { provider: Provider, sortOrder: number }[] = [];
     nativeProvider: NativeProvider;
+    forceUpdateEffect = StateEffect.define<null>();
 
     async onload() {
         await this.loadSettings();
@@ -33,9 +34,9 @@ export default class MathLinks extends Plugin {
 
         this.registerEditorExtension(createEditorExtensions(this));
 
-        this.registerEvent(this.app.metadataCache.on('changed', file => update(this.app, file)));
+        this.registerEvent(this.app.metadataCache.on('changed', file => this.update(file)));
         // Force-update when switching between Reading & Editing views
-        this.registerEvent(this.app.workspace.on('layout-change', () => update(this.app)));
+        this.registerEvent(this.app.workspace.on('layout-change', () => this.update()));
 
         this.apiAccounts = [];
 
@@ -96,4 +97,38 @@ export default class MathLinks extends Plugin {
     enableInSourceMode(): boolean {
         return this.providers.some(({ provider }) => provider.enableInSourceMode);
     }
+
+    update(file?: TFile) {
+        if (file) {
+            this._update("mathlinks:update", file);
+        } else {
+            this._update("mathlinks:update-all");
+        }
+    }
+
+    // eventName: see src/type.d.ts
+    private _update(...args: [eventName: "mathlinks:update", file: TFile] | [eventName: "mathlinks:update-all"]) {
+        // trigger an event informing this update
+        const [eventName, file] = args;
+        this.app.metadataCache.trigger(eventName, file);
+
+        // refresh mathLinks display based on the new metadata
+        this.app.workspace.iterateAllLeaves((leaf) => {
+            if (leaf.view instanceof MarkdownView && leaf.view.getMode() === 'source') {
+                const editorView = leaf.view.editor.cm;
+                if (!editorView) return; // ignore the legacy editor
+
+                // Should dispatch if no file is specified (i.e. "update-all")
+                let shouldDispatch = !file;
+                if (file && leaf.view.file) {
+                    // Should dispatch if the opened file (leaf.view.file) links to the changed file (file)
+                    shouldDispatch = file.path in this.app.metadataCache.resolvedLinks[leaf.view.file.path];
+                }
+                if (shouldDispatch) {
+                    editorView.dispatch({ effects: this.forceUpdateEffect.of(null) });
+                }
+            }
+        });
+    }
+
 }
