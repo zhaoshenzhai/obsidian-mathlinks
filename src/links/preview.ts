@@ -90,7 +90,7 @@ export const createEditorExtensions = (plugin: MathLinks): Extension[] => {
                             start = node.node.nextSibling.from;
                         } else {
                             return;
-                        }    
+                        }
                     } else {
                         start = node.from;
                     }
@@ -140,16 +140,14 @@ export const createEditorExtensions = (plugin: MathLinks): Extension[] => {
                             end = node.to;
                         }
 
-                        let cursorRange = state.selection.main;
-                        if (start > cursorRange.to || end < cursorRange.from) {
-                            if (outLinkText && outLinkMathLink) {
-                                builder.add(
-                                    start,
-                                    end,
-                                    new MathLinkInfo(outLinkText, outLinkMathLink.replace(/\\\$/, "$")),
-                                );
-                            }
+                        if (outLinkText && outLinkMathLink) {
+                            builder.add(
+                                start,
+                                end,
+                                new MathLinkInfo(outLinkText, outLinkMathLink.replace(/\\\$/, "$")),
+                            );
                         }
+
                         start = -1;
                         end = -1;
                         outLinkText = "";
