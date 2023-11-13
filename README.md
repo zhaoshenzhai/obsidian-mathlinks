@@ -25,7 +25,7 @@ Content starts here.
 This plugin also makes Wikilinks and Markdown Links compatible with MathJax, so links like `[[note|yourAlias]]` and `[yourAlias](note.md)` will be displayed as the rendered MathJax of `yourAlias`. A `mathLink` in `note`, if present, will be overridden by `yourAlias`.
 
 ### Links to Blocks/Headings
-Additionally, Obsidian also supports links to blocks `[[note#^block-id]]` and headings like `[[note#section]]`. Any `MathJax` in `#section` will be rendered, and you can associate a `mathLink` to `^block-id` as well by adding a YAML frontmatter like so:
+Additionally, Obsidian also supports links to blocks `[[note#^block-id]]` and headings like `[[note#section]]`. Any `MathJax` in `#section` will be rendered (both in the note and in the [Outline](https://help.obsidian.md/Plugins/Outline) view), and you can associate a `mathLink` to `^block-id` as well by adding a YAML frontmatter like so:
 
 ```
 ---
@@ -59,15 +59,19 @@ MathLinks supports links to blocks and headings like `[[note#^block-id]]` and `[
 * Editing the prefix for block links: By default, block links are prefixed by `^`. This can be changed (or removed).
 * Toggling whether to render `note`: If disabled, the links will be rendered as `[[^block-id]]` and `[[section]]`.
 
-## MathLinks API
+### Source Mode
+Enable MathLinks in Source Mode (Default: `false`). Currently, only Wikilinks are supported.
 
+## MathLinks API
 MathLinks exposes an API, allowing other community plugins to utilize its powerful "dynamic aliases" feature.
-You can find more information & a simple sample plugin at this repo: https://github.com/RyotaUshio/obsidian-mathlinks-api-sample-plugin
+You can find more information and a simple sample plugin at this repo: https://github.com/RyotaUshio/obsidian-mathlinks-api-sample-plugin.
 
 ## Contributing
 If you would like to point out a bug, add support, or have a feature request, don't hesitate to open an issue/pull request! Thank you to all who have contributed.
 
 ## Changelog
+### 0.5.x: _Source Mode and Outline support._
+* 0.5.0: Render MathJax in [outline](https://help.obsidian.md/Plugins/Outline) ([#55](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/55), [#57](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/57)).
 ### 0.4.x: _Heading/Block Links and API Integration._
 * 0.4.7: Fixed the incompatibility issue with [Strange New Worlds](https://github.com/TfTHacker/obsidian42-strange-new-worlds) ([#51](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/51), [#52](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/52)); added Source mode support ([#53](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/53), [#54](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/54)); improved the performance in Live preview ([#53](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/53)); introduced the new API with much more flexibility and the [API sample plugin](https://github.com/RyotaUshio/obsidian-mathlinks-api-sample-plugin) ([#53](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/53)).
 * 0.4.6: Fixed bugs regarding heading links ([#45](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/45)) and block links with custom display names containing escaped square brackets ([#46](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/46)).
