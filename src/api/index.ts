@@ -5,7 +5,6 @@ import { TFile, type App, type Plugin } from "obsidian";
 import { MathLinksAPIAccount } from "./deprecated";
 import { Provider } from "./provider";
 import MathLinks from "../main";
-import { informChange } from "../utils";
 
 
 export function addProvider<CustomProvider extends Provider>(app: App, providerFactory: (mathLinks: MathLinks) => CustomProvider): CustomProvider {
@@ -26,11 +25,9 @@ export function isPluginEnabled(app: App) {
  * Otherwise, MathLinks will update all notes currently open.
  */
 export function update(app: App, file?: TFile) {
-    if (file) {
-        informChange(app, "mathlinks:update", file);
-    } else {
-        informChange(app, "mathlinks:update-all");
-    }
+    if (!isPluginEnabled(app)) throw Error("MathLinks API: MathLinks is not enabled.");
+    const mathlinks = app.plugins.plugins.mathlinks as MathLinks;
+    mathlinks.update(file);
 }
 
 /**
