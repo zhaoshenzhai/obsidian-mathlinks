@@ -7,15 +7,25 @@ import { Provider } from "./provider";
 import MathLinks from "../main";
 
 
+/** 
+ * Create a provider instance using the given factory function and register it with MathLinks.
+ * You have accesss to the MathLinks plugin instance inside the factory function. 
+ * @returns The created provider instance.
+ */
 export function addProvider<CustomProvider extends Provider>(app: App, providerFactory: (mathLinks: MathLinks) => CustomProvider): CustomProvider {
     if (!isPluginEnabled(app)) throw Error("MathLinks API: MathLinks is not enabled.");
-    const mathLinks = app.plugins.plugins.mathlinks as MathLinks;
+    const mathLinks = app.plugins.plugins.mathlinks as MathLinks | undefined;
+    if (!mathLinks) throw Error("MathLinks API: MathLinks has not been loaded yet.");
     const provider = providerFactory(mathLinks);
     mathLinks.registerProvider(provider);
     return provider;
 }
 
-export function isPluginEnabled(app: App) {
+/**
+ * Check if MathLinks is enabled. Even if it returns true, it doesn't mean 
+ * MathLinks has already been loaded at the moment.
+ */
+export function isPluginEnabled(app: App): boolean {
     return app.plugins.enabledPlugins.has("mathlinks");
 }
 
@@ -26,8 +36,9 @@ export function isPluginEnabled(app: App) {
  */
 export function update(app: App, file?: TFile) {
     if (!isPluginEnabled(app)) throw Error("MathLinks API: MathLinks is not enabled.");
-    const mathlinks = app.plugins.plugins.mathlinks as MathLinks;
-    mathlinks.update(file);
+    const mathLinks = app.plugins.plugins.mathlinks as MathLinks | undefined;
+    if (!mathLinks) throw Error("MathLinks API: MathLinks has not been loaded yet.");
+    mathLinks.update(file);
 }
 
 /**
