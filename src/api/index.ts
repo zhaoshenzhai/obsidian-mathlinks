@@ -10,6 +10,10 @@ import MathLinks from "../main";
 /** 
  * Create a provider instance using the given factory function and register it with MathLinks.
  * You have accesss to the MathLinks plugin instance inside the factory function. 
+ * 
+ * If you call this function in the `onload` method of your plugin, you will need to wrap it in
+ * `this.app.workspace.onLayoutReady(() => { ... })` to ensure that MathLinks has been loaded.
+ * 
  * @returns The created provider instance.
  */
 export function addProvider<CustomProvider extends Provider>(app: App, providerFactory: (mathLinks: MathLinks) => CustomProvider): CustomProvider {
