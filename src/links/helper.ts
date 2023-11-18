@@ -39,11 +39,15 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
         return "";
     }
 
+    return _getMathLink(plugin, path, subpath, file, subpathResult, sourceFile, isSourceMode);
+}
+
+export function _getMathLink(plugin: MathLinks, path: string, subpath: string, targetFile: TFile | null, subpathResult: HeadingSubpathResult | BlockSubpathResult | null, sourceFile: TFile | null, isSourceMode?: boolean) {
     let mathLink = "";
     plugin.iterateProviders((provider) => {
         if (isSourceMode && !provider.enableInSourceMode) return;
 
-        const provided = provider.provide({ path, subpath }, file, subpathResult, sourceFile);
+        const provided = provider.provide({ path, subpath }, targetFile, subpathResult, sourceFile);
         if (provided) {
             if (provider instanceof NativeProvider && subpathResult?.type == 'heading') {
                 if (mathLink && provided == (path ? path + ' > ' : '') + subpathResult.current.heading) {

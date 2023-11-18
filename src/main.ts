@@ -7,7 +7,7 @@ import { MathLinksAPIAccount } from "./api/deprecated";
 import { DeprecatedAPIProvider, NativeProvider, Provider } from "./api/provider";
 import { generateMathLinks } from "./links/reading";
 import { isExcluded } from "./utils";
-import { patchOutline } from './outline';
+import { patchOutline, patchLinkAutocompletion } from './patchers';
 
 export default class MathLinks extends Plugin {
     settings: MathLinksSettings;
@@ -44,16 +44,21 @@ export default class MathLinks extends Plugin {
         // Patch the core Outline view to render MathJax in it; try until successful
         this.app.workspace.onLayoutReady(() => {
             if (this.settings.renderOutline && (this.app as any).internalPlugins.plugins.outline.enabled) {
-                const success = patchOutline(this);
-                if (!success) {
-                    const eventRef = this.app.workspace.on('layout-change', () => {
-                        const success = patchOutline(this);
-                        if (success) this.app.workspace.offref(eventRef);
-                    });
-                    this.registerEvent(eventRef);
-                }
+                this.patch(patchOutline);
             }
+            this.patch(patchLinkAutocompletion);
         });
+    }
+
+    patch(patcher: (plugin: MathLinks) => boolean) {
+        const success = patcher(this);
+        if (!success) {
+            const eventRef = this.app.workspace.on('layout-change', () => {
+                const success = patcher(this);
+                if (success) this.app.workspace.offref(eventRef);
+            });
+            this.registerEvent(eventRef);
+        }
     }
 
     getAPIAccount(userPlugin: Readonly<Plugin>): MathLinksAPIAccount {
