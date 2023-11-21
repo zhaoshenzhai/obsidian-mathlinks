@@ -300,14 +300,14 @@ var require_lib = __commonJS({
       }
     };
     var singleton$1 = null;
-    var SystemZone = class extends Zone {
+    var SystemZone = class _SystemZone extends Zone {
       /**
        * Get a singleton instance of the local zone
        * @return {SystemZone}
        */
       static get instance() {
         if (singleton$1 === null) {
-          singleton$1 = new SystemZone();
+          singleton$1 = new _SystemZone();
         }
         return singleton$1;
       }
@@ -389,14 +389,14 @@ var require_lib = __commonJS({
       return filled;
     }
     var ianaZoneCache = {};
-    var IANAZone = class extends Zone {
+    var IANAZone = class _IANAZone extends Zone {
       /**
        * @param {string} name - Zone name
        * @return {IANAZone}
        */
       static create(name) {
         if (!ianaZoneCache[name]) {
-          ianaZoneCache[name] = new IANAZone(name);
+          ianaZoneCache[name] = new _IANAZone(name);
         }
         return ianaZoneCache[name];
       }
@@ -441,7 +441,7 @@ var require_lib = __commonJS({
       constructor(name) {
         super();
         this.zoneName = name;
-        this.valid = IANAZone.isValidZone(name);
+        this.valid = _IANAZone.isValidZone(name);
       }
       /** @override **/
       get type() {
@@ -701,16 +701,16 @@ var require_lib = __commonJS({
         }
       }
     };
-    var Locale = class {
+    var Locale = class _Locale {
       static fromOpts(opts) {
-        return Locale.create(opts.locale, opts.numberingSystem, opts.outputCalendar, opts.defaultToEN);
+        return _Locale.create(opts.locale, opts.numberingSystem, opts.outputCalendar, opts.defaultToEN);
       }
       static create(locale, numberingSystem, outputCalendar, defaultToEN = false) {
         const specifiedLocale = locale || Settings.defaultLocale;
         const localeR = specifiedLocale || (defaultToEN ? "en-US" : systemLocale());
         const numberingSystemR = numberingSystem || Settings.defaultNumberingSystem;
         const outputCalendarR = outputCalendar || Settings.defaultOutputCalendar;
-        return new Locale(localeR, numberingSystemR, outputCalendarR, specifiedLocale);
+        return new _Locale(localeR, numberingSystemR, outputCalendarR, specifiedLocale);
       }
       static resetCache() {
         sysLocaleCache = null;
@@ -719,7 +719,7 @@ var require_lib = __commonJS({
         intlRelCache = {};
       }
       static fromObject({ locale, numberingSystem, outputCalendar } = {}) {
-        return Locale.create(locale, numberingSystem, outputCalendar);
+        return _Locale.create(locale, numberingSystem, outputCalendar);
       }
       constructor(locale, numbering, outputCalendar, specifiedLocale) {
         const [parsedLocale, parsedNumberingSystem, parsedOutputCalendar] = parseLocaleString(locale);
@@ -749,7 +749,7 @@ var require_lib = __commonJS({
         if (!alts || Object.getOwnPropertyNames(alts).length === 0) {
           return this;
         } else {
-          return Locale.create(
+          return _Locale.create(
             alts.locale || this.specifiedLocale,
             alts.numberingSystem || this.numberingSystem,
             alts.outputCalendar || this.outputCalendar,
@@ -835,14 +835,14 @@ var require_lib = __commonJS({
       }
     };
     var singleton = null;
-    var FixedOffsetZone = class extends Zone {
+    var FixedOffsetZone = class _FixedOffsetZone extends Zone {
       /**
        * Get a singleton instance of UTC
        * @return {FixedOffsetZone}
        */
       static get utcInstance() {
         if (singleton === null) {
-          singleton = new FixedOffsetZone(0);
+          singleton = new _FixedOffsetZone(0);
         }
         return singleton;
       }
@@ -852,7 +852,7 @@ var require_lib = __commonJS({
        * @return {FixedOffsetZone}
        */
       static instance(offset2) {
-        return offset2 === 0 ? FixedOffsetZone.utcInstance : new FixedOffsetZone(offset2);
+        return offset2 === 0 ? _FixedOffsetZone.utcInstance : new _FixedOffsetZone(offset2);
       }
       /**
        * Get an instance of FixedOffsetZone from a UTC offset string, like "UTC+6"
@@ -866,7 +866,7 @@ var require_lib = __commonJS({
         if (s2) {
           const r = s2.match(/^utc(?:([+-]\d{1,2})(?::(\d{2}))?)?$/i);
           if (r) {
-            return new FixedOffsetZone(signedOffset(r[1], r[2]));
+            return new _FixedOffsetZone(signedOffset(r[1], r[2]));
           }
         }
         return null;
@@ -1446,9 +1446,9 @@ var require_lib = __commonJS({
       FFF: DATETIME_FULL_WITH_SECONDS,
       FFFF: DATETIME_HUGE_WITH_SECONDS
     };
-    var Formatter = class {
+    var Formatter = class _Formatter {
       static create(locale, opts = {}) {
-        return new Formatter(locale, opts);
+        return new _Formatter(locale, opts);
       }
       static parseFormat(fmt) {
         let current = null, currentFull = "", bracketed = false;
@@ -1530,7 +1530,7 @@ var require_lib = __commonJS({
           standalone ? { weekday: length } : { weekday: length, month: "long", day: "numeric" },
           "weekday"
         ), maybeMacro = (token) => {
-          const formatOpts = Formatter.macroTokenToFormatOpts(token);
+          const formatOpts = _Formatter.macroTokenToFormatOpts(token);
           if (formatOpts) {
             return this.formatWithSystemDefault(dt, formatOpts);
           } else {
@@ -1655,7 +1655,7 @@ var require_lib = __commonJS({
               return maybeMacro(token);
           }
         };
-        return stringifyTokens(Formatter.parseFormat(fmt), tokenToString);
+        return stringifyTokens(_Formatter.parseFormat(fmt), tokenToString);
       }
       formatDurationFromString(dur, fmt) {
         const tokenToField = (token) => {
@@ -1686,7 +1686,7 @@ var require_lib = __commonJS({
           } else {
             return token;
           }
-        }, tokens = Formatter.parseFormat(fmt), realTokens = tokens.reduce(
+        }, tokens = _Formatter.parseFormat(fmt), realTokens = tokens.reduce(
           (found, { literal, val }) => literal ? found : found.concat(val),
           []
         ), collapsed = dur.shiftTo(...realTokens.map(tokenToField).filter((t) => t));
@@ -2071,7 +2071,7 @@ var require_lib = __commonJS({
       }
       return newVals;
     }
-    var Duration = class {
+    var Duration = class _Duration {
       /**
        * @private
        */
@@ -2098,7 +2098,7 @@ var require_lib = __commonJS({
        * @return {Duration}
        */
       static fromMillis(count, opts) {
-        return Duration.fromObject({ milliseconds: count }, opts);
+        return _Duration.fromObject({ milliseconds: count }, opts);
       }
       /**
        * Create a Duration from a JavaScript object with keys like 'years' and 'hours'.
@@ -2126,8 +2126,8 @@ var require_lib = __commonJS({
             `Duration.fromObject: argument expected to be an object, got ${obj === null ? "null" : typeof obj}`
           );
         }
-        return new Duration({
-          values: normalizeObject(obj, Duration.normalizeUnit),
+        return new _Duration({
+          values: normalizeObject(obj, _Duration.normalizeUnit),
           loc: Locale.fromObject(opts),
           conversionAccuracy: opts.conversionAccuracy,
           matrix: opts.matrix
@@ -2145,11 +2145,11 @@ var require_lib = __commonJS({
        */
       static fromDurationLike(durationLike) {
         if (isNumber(durationLike)) {
-          return Duration.fromMillis(durationLike);
-        } else if (Duration.isDuration(durationLike)) {
+          return _Duration.fromMillis(durationLike);
+        } else if (_Duration.isDuration(durationLike)) {
           return durationLike;
         } else if (typeof durationLike === "object") {
-          return Duration.fromObject(durationLike);
+          return _Duration.fromObject(durationLike);
         } else {
           throw new InvalidArgumentError(
             `Unknown duration argument ${durationLike} of type ${typeof durationLike}`
@@ -2173,9 +2173,9 @@ var require_lib = __commonJS({
       static fromISO(text, opts) {
         const [parsed] = parseISODuration(text);
         if (parsed) {
-          return Duration.fromObject(parsed, opts);
+          return _Duration.fromObject(parsed, opts);
         } else {
-          return Duration.invalid("unparsable", `the input "${text}" can't be parsed as ISO 8601`);
+          return _Duration.invalid("unparsable", `the input "${text}" can't be parsed as ISO 8601`);
         }
       }
       /**
@@ -2197,9 +2197,9 @@ var require_lib = __commonJS({
       static fromISOTime(text, opts) {
         const [parsed] = parseISOTimeOnly(text);
         if (parsed) {
-          return Duration.fromObject(parsed, opts);
+          return _Duration.fromObject(parsed, opts);
         } else {
-          return Duration.invalid("unparsable", `the input "${text}" can't be parsed as ISO 8601`);
+          return _Duration.invalid("unparsable", `the input "${text}" can't be parsed as ISO 8601`);
         }
       }
       /**
@@ -2216,7 +2216,7 @@ var require_lib = __commonJS({
         if (Settings.throwOnInvalid) {
           throw new InvalidDurationError(invalid);
         } else {
-          return new Duration({ invalid });
+          return new _Duration({ invalid });
         }
       }
       /**
@@ -2445,7 +2445,7 @@ var require_lib = __commonJS({
       plus(duration) {
         if (!this.isValid)
           return this;
-        const dur = Duration.fromDurationLike(duration), result = {};
+        const dur = _Duration.fromDurationLike(duration), result = {};
         for (const k of orderedUnits$1) {
           if (hasOwnProperty(dur.values, k) || hasOwnProperty(this.values, k)) {
             result[k] = dur.get(k) + this.get(k);
@@ -2461,7 +2461,7 @@ var require_lib = __commonJS({
       minus(duration) {
         if (!this.isValid)
           return this;
-        const dur = Duration.fromDurationLike(duration);
+        const dur = _Duration.fromDurationLike(duration);
         return this.plus(dur.negate());
       }
       /**
@@ -2489,7 +2489,7 @@ var require_lib = __commonJS({
        * @return {number}
        */
       get(unit) {
-        return this[Duration.normalizeUnit(unit)];
+        return this[_Duration.normalizeUnit(unit)];
       }
       /**
        * "Set" the values of specified units. Return a newly-constructed Duration.
@@ -2501,7 +2501,7 @@ var require_lib = __commonJS({
       set(values) {
         if (!this.isValid)
           return this;
-        const mixed = { ...this.values, ...normalizeObject(values, Duration.normalizeUnit) };
+        const mixed = { ...this.values, ...normalizeObject(values, _Duration.normalizeUnit) };
         return clone$1(this, { values: mixed });
       }
       /**
@@ -2560,7 +2560,7 @@ var require_lib = __commonJS({
         if (units.length === 0) {
           return this;
         }
-        units = units.map((u) => Duration.normalizeUnit(u));
+        units = units.map((u) => _Duration.normalizeUnit(u));
         const built = {}, accumulated = {}, vals = this.toObject();
         let lastUnit;
         for (const k of orderedUnits$1) {
@@ -2752,7 +2752,7 @@ var require_lib = __commonJS({
         return null;
       }
     }
-    var Interval = class {
+    var Interval = class _Interval {
       /**
        * @private
        */
@@ -2776,7 +2776,7 @@ var require_lib = __commonJS({
         if (Settings.throwOnInvalid) {
           throw new InvalidIntervalError(invalid);
         } else {
-          return new Interval({ invalid });
+          return new _Interval({ invalid });
         }
       }
       /**
@@ -2789,7 +2789,7 @@ var require_lib = __commonJS({
         const builtStart = friendlyDateTime(start), builtEnd = friendlyDateTime(end);
         const validateError = validateStartEnd(builtStart, builtEnd);
         if (validateError == null) {
-          return new Interval({
+          return new _Interval({
             start: builtStart,
             end: builtEnd
           });
@@ -2805,7 +2805,7 @@ var require_lib = __commonJS({
        */
       static after(start, duration) {
         const dur = Duration.fromDurationLike(duration), dt = friendlyDateTime(start);
-        return Interval.fromDateTimes(dt, dt.plus(dur));
+        return _Interval.fromDateTimes(dt, dt.plus(dur));
       }
       /**
        * Create an Interval from an end DateTime and a Duration to extend backwards to.
@@ -2815,7 +2815,7 @@ var require_lib = __commonJS({
        */
       static before(end, duration) {
         const dur = Duration.fromDurationLike(duration), dt = friendlyDateTime(end);
-        return Interval.fromDateTimes(dt.minus(dur), dt);
+        return _Interval.fromDateTimes(dt.minus(dur), dt);
       }
       /**
        * Create an Interval from an ISO 8601 string.
@@ -2843,21 +2843,21 @@ var require_lib = __commonJS({
             endIsValid = false;
           }
           if (startIsValid && endIsValid) {
-            return Interval.fromDateTimes(start, end);
+            return _Interval.fromDateTimes(start, end);
           }
           if (startIsValid) {
             const dur = Duration.fromISO(e, opts);
             if (dur.isValid) {
-              return Interval.after(start, dur);
+              return _Interval.after(start, dur);
             }
           } else if (endIsValid) {
             const dur = Duration.fromISO(s2, opts);
             if (dur.isValid) {
-              return Interval.before(end, dur);
+              return _Interval.before(end, dur);
             }
           }
         }
-        return Interval.invalid("unparsable", `the input "${text}" can't be parsed as ISO 8601`);
+        return _Interval.invalid("unparsable", `the input "${text}" can't be parsed as ISO 8601`);
       }
       /**
        * Check if an object is an Interval. Works across context boundaries
@@ -2978,7 +2978,7 @@ var require_lib = __commonJS({
       set({ start, end } = {}) {
         if (!this.isValid)
           return this;
-        return Interval.fromDateTimes(start || this.s, end || this.e);
+        return _Interval.fromDateTimes(start || this.s, end || this.e);
       }
       /**
        * Split this Interval at each of the specified DateTimes
@@ -2992,7 +2992,7 @@ var require_lib = __commonJS({
         let { s: s2 } = this, i = 0;
         while (s2 < this.e) {
           const added = sorted[i] || this.e, next = +added > +this.e ? this.e : added;
-          results.push(Interval.fromDateTimes(s2, next));
+          results.push(_Interval.fromDateTimes(s2, next));
           s2 = next;
           i += 1;
         }
@@ -3014,7 +3014,7 @@ var require_lib = __commonJS({
         while (s2 < this.e) {
           const added = this.start.plus(dur.mapUnits((x) => x * idx));
           next = +added > +this.e ? this.e : added;
-          results.push(Interval.fromDateTimes(s2, next));
+          results.push(_Interval.fromDateTimes(s2, next));
           s2 = next;
           idx += 1;
         }
@@ -3093,7 +3093,7 @@ var require_lib = __commonJS({
         if (s2 >= e) {
           return null;
         } else {
-          return Interval.fromDateTimes(s2, e);
+          return _Interval.fromDateTimes(s2, e);
         }
       }
       /**
@@ -3106,7 +3106,7 @@ var require_lib = __commonJS({
         if (!this.isValid)
           return this;
         const s2 = this.s < other.s ? this.s : other.s, e = this.e > other.e ? this.e : other.e;
-        return Interval.fromDateTimes(s2, e);
+        return _Interval.fromDateTimes(s2, e);
       }
       /**
        * Merge an array of Intervals into a equivalent minimal set of Intervals.
@@ -3149,12 +3149,12 @@ var require_lib = __commonJS({
             start = i.time;
           } else {
             if (start && +start !== +i.time) {
-              results.push(Interval.fromDateTimes(start, i.time));
+              results.push(_Interval.fromDateTimes(start, i.time));
             }
             start = null;
           }
         }
-        return Interval.merge(results);
+        return _Interval.merge(results);
       }
       /**
        * Return an Interval representing the span of time in this Interval that doesn't overlap with any of the specified Intervals.
@@ -3162,7 +3162,7 @@ var require_lib = __commonJS({
        * @return {Array}
        */
       difference(...intervals) {
-        return Interval.xor([this].concat(intervals)).map((i) => this.intersection(i)).filter((i) => i && !i.isEmpty());
+        return _Interval.xor([this].concat(intervals)).map((i) => this.intersection(i)).filter((i) => i && !i.isEmpty());
       }
       /**
        * Returns a string representation of this Interval appropriate for debugging.
@@ -3270,7 +3270,7 @@ var require_lib = __commonJS({
        * @example Interval.fromDateTimes(dt1, dt2).mapEndpoints(endpoint => endpoint.plus({ hours: 2 }))
        */
       mapEndpoints(mapFn) {
-        return Interval.fromDateTimes(mapFn(this.s), mapFn(this.e));
+        return _Interval.fromDateTimes(mapFn(this.s), mapFn(this.e));
       }
     };
     var Info = class {
@@ -4261,7 +4261,7 @@ var require_lib = __commonJS({
       }
       return [opts, args];
     }
-    var DateTime = class {
+    var DateTime = class _DateTime {
       /**
        * @access private
        */
@@ -4299,7 +4299,7 @@ var require_lib = __commonJS({
        * @return {DateTime}
        */
       static now() {
-        return new DateTime({});
+        return new _DateTime({});
       }
       /**
        * Create a local DateTime
@@ -4365,13 +4365,13 @@ var require_lib = __commonJS({
       static fromJSDate(date, options = {}) {
         const ts = isDate(date) ? date.valueOf() : NaN;
         if (Number.isNaN(ts)) {
-          return DateTime.invalid("invalid input");
+          return _DateTime.invalid("invalid input");
         }
         const zoneToUse = normalizeZone(options.zone, Settings.defaultZone);
         if (!zoneToUse.isValid) {
-          return DateTime.invalid(unsupportedZone(zoneToUse));
+          return _DateTime.invalid(unsupportedZone(zoneToUse));
         }
-        return new DateTime({
+        return new _DateTime({
           ts,
           zone: zoneToUse,
           loc: Locale.fromObject(options)
@@ -4393,9 +4393,9 @@ var require_lib = __commonJS({
             `fromMillis requires a numerical input, but received a ${typeof milliseconds} with value ${milliseconds}`
           );
         } else if (milliseconds < -MAX_DATE || milliseconds > MAX_DATE) {
-          return DateTime.invalid("Timestamp out of range");
+          return _DateTime.invalid("Timestamp out of range");
         } else {
-          return new DateTime({
+          return new _DateTime({
             ts: milliseconds,
             zone: normalizeZone(options.zone, Settings.defaultZone),
             loc: Locale.fromObject(options)
@@ -4416,7 +4416,7 @@ var require_lib = __commonJS({
         if (!isNumber(seconds)) {
           throw new InvalidArgumentError("fromSeconds requires a numerical input");
         } else {
-          return new DateTime({
+          return new _DateTime({
             ts: seconds * 1e3,
             zone: normalizeZone(options.zone, Settings.defaultZone),
             loc: Locale.fromObject(options)
@@ -4455,7 +4455,7 @@ var require_lib = __commonJS({
         obj = obj || {};
         const zoneToUse = normalizeZone(opts.zone, Settings.defaultZone);
         if (!zoneToUse.isValid) {
-          return DateTime.invalid(unsupportedZone(zoneToUse));
+          return _DateTime.invalid(unsupportedZone(zoneToUse));
         }
         const tsNow = Settings.now(), offsetProvis = !isUndefined(opts.specificOffset) ? opts.specificOffset : zoneToUse.offset(tsNow), normalized = normalizeObject(obj, normalizeUnit), containsOrdinal = !isUndefined(normalized.ordinal), containsGregorYear = !isUndefined(normalized.year), containsGregorMD = !isUndefined(normalized.month) || !isUndefined(normalized.day), containsGregor = containsGregorYear || containsGregorMD, definiteWeekDef = normalized.weekYear || normalized.weekNumber, loc = Locale.fromObject(opts);
         if ((containsGregor || containsOrdinal) && definiteWeekDef) {
@@ -4493,16 +4493,16 @@ var require_lib = __commonJS({
         }
         const higherOrderInvalid = useWeekData ? hasInvalidWeekData(normalized) : containsOrdinal ? hasInvalidOrdinalData(normalized) : hasInvalidGregorianData(normalized), invalid = higherOrderInvalid || hasInvalidTimeData(normalized);
         if (invalid) {
-          return DateTime.invalid(invalid);
+          return _DateTime.invalid(invalid);
         }
-        const gregorian = useWeekData ? weekToGregorian(normalized) : containsOrdinal ? ordinalToGregorian(normalized) : normalized, [tsFinal, offsetFinal] = objToTS(gregorian, offsetProvis, zoneToUse), inst = new DateTime({
+        const gregorian = useWeekData ? weekToGregorian(normalized) : containsOrdinal ? ordinalToGregorian(normalized) : normalized, [tsFinal, offsetFinal] = objToTS(gregorian, offsetProvis, zoneToUse), inst = new _DateTime({
           ts: tsFinal,
           zone: zoneToUse,
           o: offsetFinal,
           loc
         });
         if (normalized.weekday && containsGregor && obj.weekday !== inst.weekday) {
-          return DateTime.invalid(
+          return _DateTime.invalid(
             "mismatched weekday",
             `you can't specify both a weekday of ${normalized.weekday} and a date of ${inst.toISO()}`
           );
@@ -4589,7 +4589,7 @@ var require_lib = __commonJS({
           defaultToEN: true
         }), [vals, parsedZone, specificOffset, invalid] = parseFromTokens(localeToUse, text, fmt);
         if (invalid) {
-          return DateTime.invalid(invalid);
+          return _DateTime.invalid(invalid);
         } else {
           return parseDataToDateTime(vals, parsedZone, opts, `format ${fmt}`, text, specificOffset);
         }
@@ -4598,7 +4598,7 @@ var require_lib = __commonJS({
        * @deprecated use fromFormat instead
        */
       static fromString(text, fmt, opts = {}) {
-        return DateTime.fromFormat(text, fmt, opts);
+        return _DateTime.fromFormat(text, fmt, opts);
       }
       /**
        * Create a DateTime from a SQL date, time, or datetime
@@ -4638,7 +4638,7 @@ var require_lib = __commonJS({
         if (Settings.throwOnInvalid) {
           throw new InvalidDateTimeError(invalid);
         } else {
-          return new DateTime({ invalid });
+          return new _DateTime({ invalid });
         }
       }
       /**
@@ -5020,7 +5020,7 @@ var require_lib = __commonJS({
         if (zone.equals(this.zone)) {
           return this;
         } else if (!zone.isValid) {
-          return DateTime.invalid(unsupportedZone(zone));
+          return _DateTime.invalid(unsupportedZone(zone));
         } else {
           let newTS = this.ts;
           if (keepLocalTime || keepCalendarTime) {
@@ -5494,7 +5494,7 @@ var require_lib = __commonJS({
        * @return {Duration}
        */
       diffNow(unit = "milliseconds", opts = {}) {
-        return this.diff(DateTime.now(), unit, opts);
+        return this.diff(_DateTime.now(), unit, opts);
       }
       /**
        * Return an Interval spanning between this DateTime and another DateTime
@@ -5551,7 +5551,7 @@ var require_lib = __commonJS({
       toRelative(options = {}) {
         if (!this.isValid)
           return null;
-        const base = options.base || DateTime.fromObject({}, { zone: this.zone }), padding = options.padding ? this < base ? -options.padding : options.padding : 0;
+        const base = options.base || _DateTime.fromObject({}, { zone: this.zone }), padding = options.padding ? this < base ? -options.padding : options.padding : 0;
         let units = ["years", "months", "days", "hours", "minutes", "seconds"];
         let unit = options.unit;
         if (Array.isArray(options.unit)) {
@@ -5581,7 +5581,7 @@ var require_lib = __commonJS({
       toRelativeCalendar(options = {}) {
         if (!this.isValid)
           return null;
-        return diffRelative(options.base || DateTime.fromObject({}, { zone: this.zone }), this, {
+        return diffRelative(options.base || _DateTime.fromObject({}, { zone: this.zone }), this, {
           ...options,
           numeric: "auto",
           units: ["years", "months", "days"],
@@ -5594,7 +5594,7 @@ var require_lib = __commonJS({
        * @return {DateTime} the min DateTime, or undefined if called with no argument
        */
       static min(...dateTimes) {
-        if (!dateTimes.every(DateTime.isDateTime)) {
+        if (!dateTimes.every(_DateTime.isDateTime)) {
           throw new InvalidArgumentError("min requires all arguments be DateTimes");
         }
         return bestBy(dateTimes, (i) => i.valueOf(), Math.min);
@@ -5605,7 +5605,7 @@ var require_lib = __commonJS({
        * @return {DateTime} the max DateTime, or undefined if called with no argument
        */
       static max(...dateTimes) {
-        if (!dateTimes.every(DateTime.isDateTime)) {
+        if (!dateTimes.every(_DateTime.isDateTime)) {
           throw new InvalidArgumentError("max requires all arguments be DateTimes");
         }
         return bestBy(dateTimes, (i) => i.valueOf(), Math.max);
@@ -5630,7 +5630,7 @@ var require_lib = __commonJS({
        * @deprecated use fromFormatExplain instead
        */
       static fromStringExplain(text, fmt, options = {}) {
-        return DateTime.fromFormatExplain(text, fmt, options);
+        return _DateTime.fromFormatExplain(text, fmt, options);
       }
       // FORMAT PRESETS
       /**
@@ -5835,13 +5835,13 @@ var require_lib = __commonJS({
         dataviewJsKeyword: "dataviewjs"
       }
     });
-    var Success = class {
+    var Success = class _Success {
       constructor(value) {
         this.value = value;
         this.successful = true;
       }
       map(f) {
-        return new Success(f(this.value));
+        return new _Success(f(this.value));
       }
       flatMap(f) {
         return f(this.value);
@@ -5862,7 +5862,7 @@ var require_lib = __commonJS({
         return this.value;
       }
     };
-    var Failure = class {
+    var Failure = class _Failure {
       constructor(error) {
         this.error = error;
         this.successful = false;
@@ -5874,7 +5874,7 @@ var require_lib = __commonJS({
         return this;
       }
       mapErr(f) {
-        return new Failure(f(this.error));
+        return new _Failure(f(this.error));
       }
       bimap(_succ, fail) {
         return this.mapErr(fail);
@@ -6878,13 +6878,13 @@ var require_lib = __commonJS({
       }
       Groupings2.count = count;
     })(Groupings || (Groupings = {}));
-    var Link = class {
+    var Link = class _Link {
       constructor(fields) {
         Object.assign(this, fields);
       }
       /** Create a link to a specific file. */
       static file(path, embed = false, display) {
-        return new Link({
+        return new _Link({
           path,
           embed,
           display,
@@ -6895,16 +6895,16 @@ var require_lib = __commonJS({
       static infer(linkpath, embed = false, display) {
         if (linkpath.includes("#^")) {
           let split = linkpath.split("#^");
-          return Link.block(split[0], split[1], embed, display);
+          return _Link.block(split[0], split[1], embed, display);
         } else if (linkpath.includes("#")) {
           let split = linkpath.split("#");
-          return Link.header(split[0], split[1], embed, display);
+          return _Link.header(split[0], split[1], embed, display);
         } else
-          return Link.file(linkpath, embed, display);
+          return _Link.file(linkpath, embed, display);
       }
       /** Create a link to a specific file and header in that file. */
       static header(path, header, embed, display) {
-        return new Link({
+        return new _Link({
           path,
           embed,
           display,
@@ -6914,7 +6914,7 @@ var require_lib = __commonJS({
       }
       /** Create a link to a specific file and block in that file. */
       static block(path, blockId, embed, display) {
-        return new Link({
+        return new _Link({
           path,
           embed,
           display,
@@ -6923,7 +6923,7 @@ var require_lib = __commonJS({
         });
       }
       static fromObject(object) {
-        return new Link(object);
+        return new _Link(object);
       }
       /** Checks for link equality (i.e., that the links are pointing to the same exact location). */
       equals(other) {
@@ -6942,26 +6942,26 @@ var require_lib = __commonJS({
       /** Update this link with a new path. */
       //@ts-ignore; error appeared after updating Obsidian to 0.15.4; it also updated other packages but didn't say which
       withPath(path) {
-        return new Link(Object.assign({}, this, { path }));
+        return new _Link(Object.assign({}, this, { path }));
       }
       /** Return a new link which points to the same location but with a new display value. */
       withDisplay(display) {
-        return new Link(Object.assign({}, this, { display }));
+        return new _Link(Object.assign({}, this, { display }));
       }
       /** Convert a file link into a link to a specific header. */
       withHeader(header) {
-        return Link.header(this.path, header, this.embed, this.display);
+        return _Link.header(this.path, header, this.embed, this.display);
       }
       /** Convert any link into a link to its file. */
       toFile() {
-        return Link.file(this.path, this.embed, this.display);
+        return _Link.file(this.path, this.embed, this.display);
       }
       /** Convert this link into an embedded link. */
       toEmbed() {
         if (this.embed) {
           return this;
         } else {
-          let link = new Link(this);
+          let link = new _Link(this);
           link.embed = true;
           return link;
         }
@@ -6971,7 +6971,7 @@ var require_lib = __commonJS({
         if (!this.embed) {
           return this;
         } else {
-          let link = new Link(this);
+          let link = new _Link(this);
           link.embed = false;
           return link;
         }
@@ -7502,14 +7502,14 @@ var require_lib = __commonJS({
       else
         return window.DataviewAPI;
     };
-    var isPluginEnabled3 = (app2) => app2.plugins.enabledPlugins.has("dataview");
+    var isPluginEnabled = (app2) => app2.plugins.enabledPlugins.has("dataview");
     exports.DATE_SHORTHANDS = DATE_SHORTHANDS;
     exports.DURATION_TYPES = DURATION_TYPES;
     exports.EXPRESSION = EXPRESSION;
     exports.KEYWORDS = KEYWORDS;
     exports.QUERY_LANGUAGE = QUERY_LANGUAGE;
     exports.getAPI = getAPI3;
-    exports.isPluginEnabled = isPluginEnabled3;
+    exports.isPluginEnabled = isPluginEnabled;
     exports.parseField = parseField;
   }
 });
@@ -7521,9 +7521,9 @@ __export(main_exports, {
   default: () => MathBooster3
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian15 = require("obsidian");
+var import_obsidian17 = require("obsidian");
 
-// node_modules/obsidian-mathlinks/lib/api.js
+// node_modules/obsidian-mathlinks/lib/api/api.js
 var import_obsidian = require("obsidian");
 function informChange(app2, eventName, ...callbackArgs) {
   app2.metadataCache.trigger(eventName, ...callbackArgs);
@@ -7535,7 +7535,7 @@ function informChange(app2, eventName, ...callbackArgs) {
   });
 }
 
-// node_modules/obsidian-mathlinks/lib/index.js
+// node_modules/obsidian-mathlinks/lib/api/index.js
 function getAPIAccount(userPlugin) {
   var _a;
   return (_a = userPlugin.app.plugins.plugins.mathlinks) === null || _a === void 0 ? void 0 : _a.getAPIAccount(userPlugin);
@@ -7550,7 +7550,6 @@ var deleteAPIAccount = (userPlugin) => {
     informChange(userPlugin.app, "mathlinks:account-deleted", account);
   }
 };
-var isPluginEnabled = (app2) => app2.plugins.enabledPlugins.has("mathlinks");
 
 // src/main.ts
 var Dataview = __toESM(require_lib());
@@ -7806,7 +7805,7 @@ var ConfirmProfileDeletionModal = class extends import_obsidian2.Modal {
     contentEl.empty();
     contentEl.createEl("h3", { text: "Delete profile" });
     contentEl.createDiv({ text: `Are you sure you want to delete the profile "${this.id}"?` });
-    const buttonContainerEl = contentEl.createDiv({ cls: "math-booster-profile-button-container" });
+    const buttonContainerEl = contentEl.createDiv({ cls: "math-booster-button-container" });
     new import_obsidian2.ButtonComponent(buttonContainerEl).setButtonText("Delete").setCta().onClick(() => {
       const affected = getAffectedFiles(this.parent.plugin, this.id);
       if (affected.length) {
@@ -7840,7 +7839,7 @@ var AddProfileModal = class extends import_obsidian2.Modal {
     new import_obsidian2.TextComponent(addProfileEl).setPlaceholder("Enter name...").onChange((value) => {
       id = value;
     });
-    const buttonContainerEl = addProfileEl.createDiv({ cls: "math-booster-profile-button-container" });
+    const buttonContainerEl = addProfileEl.createDiv({ cls: "math-booster-button-container" });
     new import_obsidian2.ButtonComponent(buttonContainerEl).setButtonText("Add").setCta().onClick(() => {
       const newBody = { theorem: {} };
       for (const envID of THEOREM_LIKE_ENV_IDs) {
@@ -7879,7 +7878,7 @@ var UpdateProfileModal = class extends import_obsidian2.Modal {
     const profiles = this.parent.parent.plugin.extraSettings.profiles;
     const ids = Object.keys(profiles);
     let newProfileID;
-    const buttonContainerEl = contentEl.createDiv({ cls: "math-booster-profile-button-container" });
+    const buttonContainerEl = contentEl.createDiv({ cls: "math-booster-button-container" });
     const dropdown = new import_obsidian2.DropdownComponent(buttonContainerEl);
     dropdown.addOption("", "");
     for (const id of ids) {
@@ -7952,14 +7951,14 @@ var NUMBER_STYLES = [
   "roman",
   "Roman"
 ];
-var MATH_CALLOUT_STYLES = [
+var THEOREM_CALLOUT_STYLES = [
   "Custom",
   "Plain",
   "Framed",
   "MathWiki",
   "Vivid"
 ];
-var MATH_CALLOUT_REF_FORMATS = [
+var THEOREM_REF_FORMATS = [
   "[type] [number] ([title])",
   "[type] [number]",
   "[title] ([type] [number]) if title exists, [type] [number] otherwise",
@@ -7983,10 +7982,10 @@ var SEARCH_METHODS = [
 ];
 var UNION_TYPE_MATH_CONTEXT_SETTING_KEYS = {
   "numberStyle": NUMBER_STYLES,
-  "refFormat": MATH_CALLOUT_REF_FORMATS,
-  "noteMathLinkFormat": MATH_CALLOUT_REF_FORMATS,
+  "refFormat": THEOREM_REF_FORMATS,
+  "noteMathLinkFormat": THEOREM_REF_FORMATS,
   "eqNumberStyle": NUMBER_STYLES,
-  "mathCalloutStyle": MATH_CALLOUT_STYLES
+  "theoremCalloutStyle": THEOREM_CALLOUT_STYLES
 };
 var UNION_TYPE_EXTRA_SETTING_KEYS = {
   "searchMethod": SEARCH_METHODS,
@@ -7996,13 +7995,23 @@ var UNION_TYPE_EXTRA_SETTING_KEYS = {
 var DEFAULT_SETTINGS = {
   profile: Object.keys(DEFAULT_PROFILES)[0],
   titleSuffix: ".",
+  inferNumberPrefix: true,
+  inferNumberPrefixFromProperty: "",
+  inferNumberPrefixParseSep: "-.",
+  inferNumberPrefixPrintSep: ".",
+  inferNumberPrefixUseFirstN: 1,
   numberPrefix: "",
   numberSuffix: "",
   numberInit: 1,
   numberStyle: "arabic",
   numberDefault: "auto",
-  refFormat: "[title] ([type] [number]) if title exists, [type] [number] otherwise",
+  refFormat: "[type] [number] ([title])",
   noteMathLinkFormat: "[type] [number] ([title])",
+  inferEqNumberPrefix: true,
+  inferEqNumberPrefixFromProperty: "",
+  inferEqNumberPrefixParseSep: "-.",
+  inferEqNumberPrefixPrintSep: ".",
+  inferEqNumberPrefixUseFirstN: 1,
   eqNumberPrefix: "",
   eqNumberSuffix: "",
   eqNumberInit: 1,
@@ -8011,8 +8020,8 @@ var DEFAULT_SETTINGS = {
   eqRefSuffix: "",
   labelPrefix: "",
   lineByLine: true,
-  mathCalloutStyle: "Framed",
-  mathCalloutFontInherit: false,
+  theoremCalloutStyle: "Framed",
+  theoremCalloutFontInherit: false,
   beginProof: "\\begin{proof}",
   endProof: "\\end{proof}",
   insertSpace: true
@@ -8024,22 +8033,28 @@ var DEFAULT_EXTRA_SETTINGS = {
   triggerTheoremSuggest: "\\tref",
   triggerEquationSuggest: "\\eqref",
   renderMathInSuggestion: true,
+  suggestNumber: 20,
   searchMethod: "Fuzzy",
   upWeightRecent: 0.1,
   searchOnlyRecent: false,
   modifierToJump: "Mod",
+  modifierToNoteLink: "Shift",
+  showModifierInstruction: true,
   suggestLeafOption: "Split right",
-  backlinkLeafOption: "Split right"
+  backlinkLeafOption: "Split right",
+  projectInfix: " > ",
+  projectSep: "/"
 };
 
 // src/settings/tab.ts
-var import_obsidian8 = require("obsidian");
+var import_obsidian10 = require("obsidian");
 
 // src/settings/helper.ts
-var import_obsidian6 = require("obsidian");
+var import_obsidian8 = require("obsidian");
 
 // src/utils.ts
 var import_obsidian4 = require("obsidian");
+var import_obsidian5 = require("obsidian");
 var import_obsidian_dataview = __toESM(require_lib());
 var import_view = require("@codemirror/view");
 
@@ -8078,6 +8093,11 @@ var ActiveNoteIO = class extends FileIO {
   async setLine(lineNumber, text) {
     this.editor.setLine(lineNumber, text);
   }
+  async setRange(position, text) {
+    const from = locToEditorPosition(position.start);
+    const to = locToEditorPosition(position.end);
+    this.editor.replaceRange(text, from, to);
+  }
   async insertLine(lineNumber, text) {
     this.editor.replaceRange(text + "\n", { line: lineNumber, ch: 0 });
   }
@@ -8105,6 +8125,11 @@ var NonActiveNoteIO = class extends FileIO {
       const lines = splitIntoLines(data);
       lines[lineNumber] = text;
       return lines.join("\n");
+    });
+  }
+  async setRange(position, text) {
+    this.plugin.app.vault.process(this.file, (data) => {
+      return data.slice(0, position.start.offset) + text + data.slice(position.end.offset + 1, data.length);
     });
   }
   async insertLine(lineNumber, text) {
@@ -8214,8 +8239,8 @@ async function renderTextWithMath(source) {
       elements.push(source.slice(textFrom, textTo));
     }
     textFrom = mathPattern.lastIndex;
-    const mathJaxEl = (0, import_obsidian4.renderMath)(mathString, false);
-    await (0, import_obsidian4.finishRenderMath)();
+    const mathJaxEl = (0, import_obsidian5.renderMath)(mathString, false);
+    await (0, import_obsidian5.finishRenderMath)();
     const mathSpan = createSpan({ cls: ["math", "math-inline", "is-loaded"] });
     mathSpan.replaceChildren(mathJaxEl);
     elements.push(mathSpan);
@@ -8227,7 +8252,7 @@ async function renderTextWithMath(source) {
 }
 async function renderMarkdown(markdown, sourcePath, component) {
   const el = createSpan();
-  await import_obsidian4.MarkdownRenderer.renderMarkdown(markdown, el, sourcePath, component);
+  await import_obsidian5.MarkdownRenderer.renderMarkdown(markdown, el, sourcePath, component);
   for (const child of el.children) {
     if (child.tagName == "P") {
       return child.childNodes;
@@ -8238,7 +8263,7 @@ function isEqualToOrChildOf(file1, file2) {
   if (file1 == file2) {
     return true;
   }
-  if (file2 instanceof import_obsidian4.TFolder && file2.isRoot()) {
+  if (file2 instanceof import_obsidian5.TFolder && file2.isRoot()) {
     return true;
   }
   let ancestor = file1.parent;
@@ -8257,6 +8282,10 @@ function isEqualToOrChildOf(file1, file2) {
 function locToEditorPosition(loc) {
   return { ch: loc.col, line: loc.line };
 }
+function trimMathText(text) {
+  var _a, _b;
+  return (_b = (_a = text.match(/\$\$([\s\S]*)\$\$/)) == null ? void 0 : _a[1].trim()) != null ? _b : text;
+}
 function getMathCache(cache, lineStart) {
   if (cache.sections) {
     const sectionCache = Object.values(cache.sections).find(
@@ -8272,9 +8301,6 @@ function getSectionCacheFromPos(cache, pos, type) {
     );
     return sectionCache;
   }
-}
-function getMathCacheFromPos(cache, pos) {
-  return getSectionCacheFromPos(cache, pos, "math");
 }
 function findSectionCache(cache, callback) {
   if (cache.sections) {
@@ -8298,10 +8324,10 @@ function getBacklinks(app2, plugin, file, cache, pick) {
     for (const backlink of backlinksToNote) {
       const sourceCache = app2.metadataCache.getCache(backlink);
       (_a = sourceCache == null ? void 0 : sourceCache.links) == null ? void 0 : _a.forEach((link) => {
-        const { subpath } = (0, import_obsidian4.parseLinktext)(link.link);
-        const subpathResult = (0, import_obsidian4.resolveSubpath)(cache, subpath);
+        const { subpath } = (0, import_obsidian5.parseLinktext)(link.link);
+        const subpathResult = (0, import_obsidian5.resolveSubpath)(cache, subpath);
         if ((subpathResult == null ? void 0 : subpathResult.type) == "block" && pick(subpathResult.block)) {
-          backlinks.push({ sourcePath: backlink, position: link.position });
+          backlinks.push({ sourcePath: backlink, link });
         }
       });
     }
@@ -8332,7 +8358,7 @@ async function insertBlockIdIfNotExist(plugin, targetFile, cache, sec, length = 
   return { id, lineAdded: 2 };
 }
 function isLivePreview(state) {
-  return state.field(import_obsidian4.editorLivePreviewField);
+  return state.field(import_obsidian5.editorLivePreviewField);
 }
 function isSourceMode(state) {
   return !isLivePreview(state);
@@ -8380,15 +8406,15 @@ function getDataviewAPI(plugin) {
   if (dv) {
     return dv;
   }
-  new import_obsidian4.Notice(`${plugin.manifest.name}: Cannot load Dataview API. Make sure that Dataview is installed & enabled.`);
+  new import_obsidian5.Notice(`${plugin.manifest.name}: Cannot load Dataview API. Make sure that Dataview is installed & enabled.`);
 }
-function getBlockIdsWithBacklink(path, plugin) {
+function getBlockIdsWithBacklink(file, plugin) {
   var _a;
   const dv = getDataviewAPI(plugin);
-  const cache = plugin.app.metadataCache.getCache(path);
+  const cache = plugin.app.metadataCache.getFileCache(file);
   const ids = [];
   if (dv && cache) {
-    const page = dv.page(path);
+    const page = dv.page(file.path);
     if (page) {
       for (const inlink of page.file.inlinks) {
         const sourcePath = inlink.path;
@@ -8397,12 +8423,12 @@ function getBlockIdsWithBacklink(path, plugin) {
           (_a = sourceCache.links) == null ? void 0 : _a.forEach(
             (item) => {
               const linktext = item.link;
-              const parseResult = (0, import_obsidian4.parseLinktext)(linktext);
+              const parseResult = (0, import_obsidian5.parseLinktext)(linktext);
               const linkpath = parseResult.path;
               const subpath = parseResult.subpath;
               const targetFile = plugin.app.metadataCache.getFirstLinkpathDest(linkpath, sourcePath);
-              if (targetFile && targetFile.path == path) {
-                const subpathResult = (0, import_obsidian4.resolveSubpath)(cache, subpath);
+              if (targetFile && targetFile.path == file.path) {
+                const subpathResult = (0, import_obsidian5.resolveSubpath)(cache, subpath);
                 if (subpathResult && subpathResult.type == "block") {
                   const blockCache = subpathResult.block;
                   ids.push(blockCache.id);
@@ -8422,31 +8448,42 @@ function splitIntoLines(text) {
 function insertAt(array, item, index) {
   array.splice(index, 0, item);
 }
-var MATH_CALLOUT_PATTERN = /\> *\[\! *math *\|(.*)\](.*)/;
-function matchMathCallout(line) {
+var THEOREM_CALLOUT_PATTERN = /\> *\[\! *math *\|(.*?)\](.*)/;
+function matchTheoremCallout(line) {
   if (line) {
-    return MATH_CALLOUT_PATTERN.exec(line);
+    return THEOREM_CALLOUT_PATTERN.exec(line);
   }
   return null;
 }
-function readMathCalloutSettingsAndTitle(line) {
-  const matchResult = matchMathCallout(line);
+function readTheoremCalloutSettingsAndTitle(line) {
+  const matchResult = matchTheoremCallout(line);
   if (matchResult) {
     const settings = JSON.parse(matchResult[1]);
     const title = matchResult[2].trim();
     return { settings, title };
   }
 }
-function readMathCalloutSettings(line) {
-  const result = readMathCalloutSettingsAndTitle(line);
+function readTheoremCalloutSettings(line) {
+  const result = readTheoremCalloutSettingsAndTitle(line);
   if (result) {
     return result.settings;
   }
 }
+function pathToName(path) {
+  return path.slice(path.lastIndexOf("/") + 1);
+}
+function pathToBaseName(path) {
+  const name = pathToName(path);
+  const index = name.lastIndexOf(".");
+  if (index >= 0) {
+    return name.slice(0, index);
+  }
+  return name;
+}
 function iterDescendantFiles(file, callback, extension) {
-  if (file instanceof import_obsidian4.TFile && (extension === void 0 ? true : file.extension == extension)) {
+  if (file instanceof import_obsidian5.TFile && (extension === void 0 ? true : file.extension == extension)) {
     callback(file);
-  } else if (file instanceof import_obsidian4.TFolder) {
+  } else if (file instanceof import_obsidian5.TFolder) {
     for (const child of file.children) {
       iterDescendantFiles(child, callback, extension);
     }
@@ -8457,7 +8494,7 @@ function getAncestors(file) {
   let ancestor = file;
   while (ancestor) {
     ancestors.push(ancestor);
-    if (file instanceof import_obsidian4.TFolder && file.isRoot()) {
+    if (file instanceof import_obsidian5.TFolder && file.isRoot()) {
       break;
     }
     ancestor = ancestor.parent;
@@ -8479,33 +8516,29 @@ function getProfile(plugin, file) {
   const profile = plugin.extraSettings.profiles[settings.profile];
   return profile;
 }
-function formatMathCalloutType(plugin, settings) {
+function formatTheoremCalloutType(plugin, settings) {
   const profile = plugin.extraSettings.profiles[settings.profile];
   return profile.body.theorem[settings.type];
 }
-function formatTitleWithoutSubtitle(plugin, settings) {
+function formatTitleWithoutSubtitle(plugin, file, settings) {
   var _a, _b;
-  let title = formatMathCalloutType(plugin, settings);
+  let title = formatTheoremCalloutType(plugin, settings);
   if (settings.number) {
-    let numberString = "";
     if (settings.number == "auto") {
       if (settings._index !== void 0) {
         settings.numberInit = (_a = settings.numberInit) != null ? _a : 1;
         const num = +settings._index + +settings.numberInit;
         const style = (_b = settings.numberStyle) != null ? _b : DEFAULT_SETTINGS.numberStyle;
-        numberString = CONVERTER[style](num);
+        title += ` ${getNumberPrefix(plugin.app, file, settings)}${CONVERTER[style](num)}${settings.numberSuffix}`;
       }
     } else {
-      numberString = settings.number;
-    }
-    if (numberString) {
-      title += ` ${settings.numberPrefix}${numberString}${settings.numberSuffix}`;
+      title += ` ${settings.number}`;
     }
   }
   return title;
 }
-function formatTitle(plugin, settings, noTitleSuffix = false) {
-  let title = formatTitleWithoutSubtitle(plugin, settings);
+function formatTitle(plugin, file, settings, noTitleSuffix = false) {
+  let title = formatTitleWithoutSubtitle(plugin, file, settings);
   if (settings.title) {
     title += ` (${settings.title})`;
   }
@@ -8514,15 +8547,115 @@ function formatTitle(plugin, settings, noTitleSuffix = false) {
   }
   return title;
 }
+function getProperty(app2, file, name) {
+  var _a, _b;
+  return (_b = (_a = app2.metadataCache.getFileCache(file)) == null ? void 0 : _a.frontmatter) == null ? void 0 : _b[name];
+}
+function getPropertyLink(app2, file, name) {
+  const cache = app2.metadataCache.getFileCache(file);
+  if (cache == null ? void 0 : cache.frontmatterLinks) {
+    for (const link of cache.frontmatterLinks) {
+      if (link.key == name) {
+        return link;
+      }
+    }
+  }
+}
+function getPropertyOrLinkTextInProperty(app2, file, name) {
+  var _a, _b;
+  return (_b = (_a = getPropertyLink(app2, file, name)) == null ? void 0 : _a.link) != null ? _b : getProperty(app2, file, name);
+}
+function inferNumberPrefix(source, parseSep, printSep, useFirstN) {
+  var _a, _b;
+  const head = source.slice(0, (_b = (_a = source.match(/\s/)) == null ? void 0 : _a.index) != null ? _b : source.length);
+  const labels = head.split(new RegExp(`[${parseSep}]`));
+  if (areValidLabels(labels)) {
+    const usedLabels = labels.slice(0, useFirstN);
+    let prefix = usedLabels.join(printSep);
+    if (!prefix.endsWith(printSep)) {
+      prefix += printSep;
+    }
+    return prefix;
+  }
+}
+function areValidLabels(labels) {
+  function isValidLabel(label) {
+    if (label.match(/^[0-9]+$/)) {
+      return true;
+    }
+    if (label.match(/^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/i)) {
+      return true;
+    }
+    if (label.match(/^[a-z]$/i)) {
+      return true;
+    }
+    return false;
+  }
+  const blankRemoved = labels.filter((label) => label);
+  if (blankRemoved.length >= 2) {
+    return blankRemoved.every((label) => isValidLabel(label));
+  }
+  if (blankRemoved.length == 1) {
+    return labels.length == 2 && isValidLabel(labels[0]);
+  }
+  return false;
+}
+function getNumberPrefix(app2, file, settings) {
+  var _a;
+  if (settings.numberPrefix) {
+    return settings.numberPrefix;
+  }
+  const source = settings.inferNumberPrefixFromProperty ? getPropertyOrLinkTextInProperty(app2, file, settings.inferNumberPrefixFromProperty) : file.basename;
+  if (settings.inferNumberPrefix && source) {
+    return (_a = inferNumberPrefix(
+      source,
+      settings.inferNumberPrefixParseSep,
+      settings.inferNumberPrefixPrintSep,
+      settings.inferNumberPrefixUseFirstN
+    )) != null ? _a : "";
+  }
+  return "";
+}
+function getEqNumberPrefix(app2, file, settings) {
+  var _a;
+  if (settings.eqNumberPrefix) {
+    return settings.eqNumberPrefix;
+  }
+  const source = settings.inferEqNumberPrefixFromProperty ? getPropertyOrLinkTextInProperty(app2, file, settings.inferEqNumberPrefixFromProperty) : file.basename;
+  if (settings.inferEqNumberPrefix && source) {
+    return (_a = inferNumberPrefix(
+      source,
+      settings.inferEqNumberPrefixParseSep,
+      settings.inferEqNumberPrefixPrintSep,
+      settings.inferEqNumberPrefixUseFirstN
+    )) != null ? _a : "";
+  }
+  return "";
+}
 function formatLabel(settings) {
   if (settings.label) {
     return settings.labelPrefix + THEOREM_LIKE_ENVs[settings.type].prefix + ":" + settings.label;
   }
 }
+function staticifyEqNumber(plugin, file) {
+  const index = plugin.index.getNoteIndex(file);
+  const io = getIO(plugin, file);
+  console.log(io);
+  index.equation.forEach((item) => {
+    if (item.type == "equation" && item.printName && item.mathText) {
+      io.setRange(
+        item.cache.position,
+        `$$
+${item.mathText} \\tag{${item.printName.slice(1, -1)}}
+$$`
+      );
+    }
+  });
+}
 async function openFileAndSelectPosition(file, position, ...leafArgs) {
   const leaf = this.app.workspace.getLeaf(...leafArgs);
   await leaf.openFile(file);
-  if (leaf.view instanceof import_obsidian4.MarkdownView) {
+  if (leaf.view instanceof import_obsidian5.MarkdownView) {
     leaf.view.editor.setSelection(
       locToEditorPosition(position.start),
       locToEditorPosition(position.end)
@@ -8540,13 +8673,124 @@ async function openFileAndSelectPosition(file, position, ...leafArgs) {
 function hasOverlap(range1, range2) {
   return range1.from <= range2.to && range2.from <= range1.to;
 }
+function isPluginOlderThan(plugin, version) {
+  return plugin.manifest.version.localeCompare(version, void 0, { numeric: true }) < 0;
+}
+function getModifierNameInPlatform(mod) {
+  if (mod == "Mod") {
+    return import_obsidian4.Platform.isMacOS || import_obsidian4.Platform.isIosApp ? "\u2318" : "ctrl";
+  }
+  if (mod == "Shift") {
+    return "shift";
+  }
+  if (mod == "Alt") {
+    return import_obsidian4.Platform.isMacOS || import_obsidian4.Platform.isIosApp ? "\u2325" : "alt";
+  }
+  if (mod == "Meta") {
+    return import_obsidian4.Platform.isMacOS || import_obsidian4.Platform.isIosApp ? "\u2318" : import_obsidian4.Platform.isWin ? "win" : "meta";
+  }
+  return "ctrl";
+}
 
 // src/indexer.ts
-var import_obsidian5 = require("obsidian");
+var import_obsidian6 = require("obsidian");
+var AbstractFileIndex = class {
+  constructor(file, plugin) {
+    this.file = file;
+    this.plugin = plugin;
+  }
+};
+var FolderIndex = class extends AbstractFileIndex {
+  // alias for this.file
+  constructor(file, plugin) {
+    super(file, plugin);
+    this.file = file;
+    this.folder = file;
+  }
+};
+var NoteIndex = class extends AbstractFileIndex {
+  constructor(file, plugin) {
+    super(file, plugin);
+    this.file = file;
+    this.theorem = /* @__PURE__ */ new Set();
+    this.equation = /* @__PURE__ */ new Set();
+    this.idItemMap = {};
+  }
+  add(newItem) {
+    this[newItem.type].add(newItem);
+    if (newItem.cache.id) {
+      this.idItemMap[newItem.cache.id] = newItem;
+    }
+    return this;
+  }
+  clear(which) {
+    this[which].clear();
+    for (const id in this.idItemMap) {
+      if (this.idItemMap[id].type == which) {
+        delete this.idItemMap[id];
+      }
+    }
+    return this;
+  }
+  size(which) {
+    return this[which].size;
+  }
+  getItemById(id) {
+    return this.idItemMap[id];
+  }
+  getItemByPos(pos, which) {
+    var _a;
+    if (which) {
+      return Array.from(this[which]).find((item) => item.cache.position.start.offset == pos || item.cache.position.end.offset == pos);
+    }
+    return (_a = this.getItemByPos(pos, "theorem")) != null ? _a : this.getItemByPos(pos, "equation");
+  }
+  setMathLink() {
+    var _a;
+    const mathLinkBlocks = {};
+    for (const id in this.idItemMap) {
+      const item = this.idItemMap[id];
+      if (item.refName) {
+        mathLinkBlocks[id] = item.refName;
+      }
+    }
+    (_a = this.plugin.getMathLinksAPI()) == null ? void 0 : _a.update(this.file, { "mathLink-blocks": mathLinkBlocks });
+  }
+};
+var VaultIndex = class {
+  constructor(app2, plugin) {
+    this.app = app2;
+    this.plugin = plugin;
+    this.getFolderIndex = (folder) => this.getNoteIndex(folder);
+    this.data = /* @__PURE__ */ new Map();
+  }
+  getNoteIndex(file) {
+    const note = this.data.get(file);
+    if (note) {
+      return note;
+    }
+    if (file instanceof import_obsidian6.TFile) {
+      const index = new NoteIndex(file, this.plugin);
+      this.data.set(file, index);
+      return index;
+    } else if (file instanceof import_obsidian6.TFolder) {
+      const index = new FolderIndex(file, this.plugin);
+      this.data.set(file, index);
+      return index;
+    }
+  }
+  getNoteIndexByPath(path) {
+    const file = this.app.vault.getAbstractFileByPath(path);
+    if (file instanceof import_obsidian6.TFile) {
+      return this.getNoteIndex(file);
+    } else if (file instanceof import_obsidian6.TFolder) {
+      return this.getFolderIndex(file);
+    }
+  }
+};
 var BlockIndexer = class {
   constructor(noteIndexer) {
     this.noteIndexer = noteIndexer;
-    this.mathLinkBlocks = {};
   }
   async getBlocks(cache) {
     var _a;
@@ -8575,17 +8819,17 @@ var BlockIndexer = class {
   }
   async run(cache) {
     const blocks = await this.sorted(cache);
-    await this.setMathLinks(blocks);
+    await this.runImpl(blocks);
   }
 };
-var MathCalloutIndexer = class extends BlockIndexer {
+var TheoremCalloutIndexer = class extends BlockIndexer {
   constructor() {
     super(...arguments);
     this.blockType = "callout";
   }
   async addSection(sections, sectionCache) {
     const line = await this.noteIndexer.io.getLine(sectionCache.position.start.line);
-    const settings = readMathCalloutSettings(line);
+    const settings = readTheoremCalloutSettings(line);
     if (settings) {
       sections.push(
         { cache: sectionCache, settings: this.removeDeprecated(settings) }
@@ -8595,7 +8839,7 @@ var MathCalloutIndexer = class extends BlockIndexer {
   resolveSettings(callout) {
     return resolveSettings(callout.settings, this.noteIndexer.plugin, this.noteIndexer.file);
   }
-  async setMathLinks(callouts) {
+  async runImpl(callouts) {
     const note = this.noteIndexer.plugin.index.getNoteIndex(this.noteIndexer.file).clear("theorem");
     let index = 0;
     for (let i = 0; i < callouts.length; i++) {
@@ -8608,8 +8852,8 @@ var MathCalloutIndexer = class extends BlockIndexer {
       if (autoNumber) {
         callout.settings._index = index++;
       }
-      const newTitle = formatTitle(this.noteIndexer.plugin, resolvedSettings);
-      const oldSettingsAndTitle = readMathCalloutSettingsAndTitle(
+      const newTitle = formatTitle(this.noteIndexer.plugin, this.noteIndexer.file, resolvedSettings);
+      const oldSettingsAndTitle = readTheoremCalloutSettingsAndTitle(
         await this.noteIndexer.io.getLine(callout.cache.position.start.line)
       );
       let refName = "";
@@ -8622,9 +8866,6 @@ var MathCalloutIndexer = class extends BlockIndexer {
         }
         const id = callout.cache.id;
         refName = this.formatMathLink(resolvedSettings, "refFormat");
-        if (id) {
-          this.mathLinkBlocks[id] = refName;
-        }
       }
       if (note.size("theorem") == i) {
         note.add({ type: "theorem", printName: newTitle, refName, cache: callout.cache, file: this.noteIndexer.file, settings: callout.settings });
@@ -8638,14 +8879,14 @@ var MathCalloutIndexer = class extends BlockIndexer {
     if (index >= 0) {
       const resolvedSettings = this.resolveSettings(callouts[index]);
       (_a = this.noteIndexer.plugin.getMathLinksAPI()) == null ? void 0 : _a.update(
-        this.noteIndexer.file.path,
+        this.noteIndexer.file,
         {
           "mathLink": this.formatMathLink(resolvedSettings, "noteMathLinkFormat")
         }
       );
     } else {
       (_b = this.noteIndexer.plugin.getMathLinksAPI()) == null ? void 0 : _b.update(
-        this.noteIndexer.file.path,
+        this.noteIndexer.file,
         {
           "mathLink": void 0
         }
@@ -8655,19 +8896,19 @@ var MathCalloutIndexer = class extends BlockIndexer {
   formatMathLink(resolvedSettings, key) {
     const refFormat = resolvedSettings[key];
     if (refFormat == "[type] [number] ([title])") {
-      return formatTitle(this.noteIndexer.plugin, resolvedSettings, true);
+      return formatTitle(this.noteIndexer.plugin, this.noteIndexer.file, resolvedSettings, true);
     }
     if (refFormat == "[type] [number]") {
-      return formatTitleWithoutSubtitle(this.noteIndexer.plugin, resolvedSettings);
+      return formatTitleWithoutSubtitle(this.noteIndexer.plugin, this.noteIndexer.file, resolvedSettings);
     }
     if (refFormat == "[title] if title exists, [type] [number] otherwise") {
-      return resolvedSettings.title ? resolvedSettings.title : formatTitleWithoutSubtitle(this.noteIndexer.plugin, resolvedSettings);
+      return resolvedSettings.title ? resolvedSettings.title : formatTitleWithoutSubtitle(this.noteIndexer.plugin, this.noteIndexer.file, resolvedSettings);
     }
-    const typePlusNumber = formatTitleWithoutSubtitle(this.noteIndexer.plugin, resolvedSettings);
+    const typePlusNumber = formatTitleWithoutSubtitle(this.noteIndexer.plugin, this.noteIndexer.file, resolvedSettings);
     return resolvedSettings.title ? `${resolvedSettings.title} (${typePlusNumber})` : typePlusNumber;
   }
   async overwriteSettings(lineNumber, settings, title) {
-    const matchResult = matchMathCallout(await this.noteIndexer.io.getLine(lineNumber));
+    const matchResult = matchTheoremCallout(await this.noteIndexer.io.getLine(lineNumber));
     if (!matchResult) {
       throw Error(`Theorem callout not found at line ${lineNumber}, could not overwrite`);
     }
@@ -8695,14 +8936,13 @@ var EquationIndexer = class extends BlockIndexer {
       sections.push({ cache: sectionCache });
     }
   }
-  async setMathLinks(equations) {
-    var _a, _b, _c, _d, _e;
+  async runImpl(equations) {
     const note = this.noteIndexer.plugin.index.getNoteIndex(this.noteIndexer.file).clear("equation");
     const contextSettings = resolveSettings(void 0, this.noteIndexer.plugin, this.noteIndexer.file);
-    const style = (_a = contextSettings == null ? void 0 : contextSettings.eqNumberStyle) != null ? _a : DEFAULT_SETTINGS.eqNumberStyle;
-    let equationNumber = +((_b = contextSettings == null ? void 0 : contextSettings.eqNumberInit) != null ? _b : DEFAULT_SETTINGS.eqNumberInit);
-    const prefix = (_c = contextSettings == null ? void 0 : contextSettings.eqNumberPrefix) != null ? _c : DEFAULT_SETTINGS.eqNumberPrefix;
-    const suffix = (_d = contextSettings == null ? void 0 : contextSettings.eqNumberSuffix) != null ? _d : DEFAULT_SETTINGS.eqNumberSuffix;
+    const style = contextSettings.eqNumberStyle;
+    let equationNumber = +contextSettings.eqNumberInit;
+    const prefix = getEqNumberPrefix(this.noteIndexer.app, this.noteIndexer.file, contextSettings);
+    const suffix = contextSettings.eqNumberSuffix;
     for (let i = 0; i < equations.length; i++) {
       if (note.size("equation") > i) {
         continue;
@@ -8720,9 +8960,8 @@ var EquationIndexer = class extends BlockIndexer {
           equationNumber++;
         }
         refName = eqRefPrefix + printName + eqRefSuffix;
-        this.mathLinkBlocks[id] = refName;
       }
-      const mathText = (_e = (await this.noteIndexer.io.getRange(equation.cache.position)).match(/\$\$([\s\S]*)\$\$/)) == null ? void 0 : _e[1].trim();
+      const mathText = trimMathText(await this.noteIndexer.io.getRange(equation.cache.position));
       if (note.size("equation") == i) {
         note.add({ type: "equation", printName, refName, cache: equation.cache, file: this.noteIndexer.file, mathText });
       }
@@ -8738,12 +8977,12 @@ var NoteIndexer = class {
     if (file.extension != "md") {
       throw Error(`${plugin.manifest.name}: Non-markdown file was passed: "${file.path}"`);
     }
-    this.linkedBlockIds = getBlockIdsWithBacklink(this.file.path, this.plugin);
-    this.calloutIndexer = new MathCalloutIndexer(this);
+    this.linkedBlockIds = getBlockIdsWithBacklink(this.file, this.plugin);
+    this.calloutIndexer = new TheoremCalloutIndexer(this);
     this.equationIndexer = new EquationIndexer(this);
   }
   async run(cache) {
-    var _a, _b;
+    var _a;
     cache = (_a = cache != null ? cache : this.app.metadataCache.getFileCache(this.file)) != null ? _a : void 0;
     if (!cache)
       return;
@@ -8751,15 +8990,7 @@ var NoteIndexer = class {
       this.calloutIndexer.run(cache),
       this.equationIndexer.run(cache)
     ]);
-    this.mathLinkBlocks = Object.assign(
-      {},
-      this.calloutIndexer.mathLinkBlocks,
-      this.equationIndexer.mathLinkBlocks
-    );
-    (_b = this.plugin.getMathLinksAPI()) == null ? void 0 : _b.update(
-      this.file.path,
-      { "mathLink-blocks": this.mathLinkBlocks }
-    );
+    this.plugin.index.getNoteIndex(this.file).setMathLink();
     this.app.metadataCache.trigger(
       "math-booster:index-updated",
       this
@@ -8773,10 +9004,8 @@ var ActiveNoteIndexer = class extends NoteIndexer {
    * @param plugin 
    * @param view 
    */
-  constructor(app2, plugin, view) {
-    super(app2, plugin, view.file, new ActiveNoteIO(plugin, view.file, view.editor));
-    this.app = app2;
-    this.plugin = plugin;
+  constructor(app2, plugin, file, editor) {
+    super(app2, plugin, file, new ActiveNoteIO(plugin, file, editor));
   }
 };
 var NonActiveNoteIndexer = class extends NoteIndexer {
@@ -8809,9 +9038,9 @@ var AutoNoteIndexer = class {
    * @returns 
    */
   getIndexer(activeMarkdownView) {
-    activeMarkdownView = activeMarkdownView != null ? activeMarkdownView : this.app.workspace.getActiveViewOfType(import_obsidian5.MarkdownView);
+    activeMarkdownView = activeMarkdownView != null ? activeMarkdownView : this.app.workspace.getActiveViewOfType(import_obsidian6.MarkdownView);
     if ((activeMarkdownView == null ? void 0 : activeMarkdownView.file) == this.file && isEditingView(activeMarkdownView)) {
-      return new ActiveNoteIndexer(this.app, this.plugin, activeMarkdownView);
+      return new ActiveNoteIndexer(this.app, this.plugin, activeMarkdownView.file, activeMarkdownView.editor);
     } else {
       return new NonActiveNoteIndexer(this.app, this.plugin, this.file);
     }
@@ -8833,7 +9062,7 @@ var LinkedNotesIndexer = class {
     this.changedFile = changedFile;
   }
   async run() {
-    const view = this.app.workspace.getActiveViewOfType(import_obsidian5.MarkdownView);
+    const view = this.app.workspace.getActiveViewOfType(import_obsidian6.MarkdownView);
     await Promise.all([
       new AutoNoteIndexer(this.app, this.plugin, this.changedFile).run(),
       this.runForwardLinks(view),
@@ -8853,11 +9082,12 @@ var LinkedNotesIndexer = class {
     if (links) {
       await Promise.all(
         Array.from(links).map((link) => {
-          if ((activeMarkdownView == null ? void 0 : activeMarkdownView.file.path) == link) {
-            return new ActiveNoteIndexer(this.app, this.plugin, activeMarkdownView).run();
+          var _a2;
+          if (((_a2 = activeMarkdownView == null ? void 0 : activeMarkdownView.file) == null ? void 0 : _a2.path) == link) {
+            return new ActiveNoteIndexer(this.app, this.plugin, activeMarkdownView.file, activeMarkdownView.editor).run();
           } else {
             const file = this.app.vault.getAbstractFileByPath(link);
-            if (file instanceof import_obsidian5.TFile && file.extension == "md") {
+            if (file instanceof import_obsidian6.TFile && file.extension == "md") {
               return new NonActiveNoteIndexer(this.app, this.plugin, file).run();
             }
           }
@@ -8878,50 +9108,171 @@ var VaultIndexer = class {
   }
   async run() {
     const notes = this.app.vault.getMarkdownFiles();
-    const activeMarkdownview = this.app.workspace.getActiveViewOfType(import_obsidian5.MarkdownView);
+    const activeMarkdownview = this.app.workspace.getActiveViewOfType(import_obsidian6.MarkdownView);
     const promises = notes.map(
       (note) => new AutoNoteIndexer(this.app, this.plugin, note).run(activeMarkdownview)
     );
     await Promise.all(promises);
   }
 };
-var NoteIndex = class {
-  constructor(file) {
-    this.file = file;
-    this.theorem = /* @__PURE__ */ new Set();
-    this.equation = /* @__PURE__ */ new Set();
-  }
-  add(newItem) {
-    this[newItem.type].add(newItem);
-    return this;
-  }
-  clear(which) {
-    this[which].clear();
-    return this;
-  }
-  size(which) {
-    return this[which].size;
+
+// src/project.ts
+var import_obsidian7 = require("obsidian");
+var PROJECT_DESCRIPTION = `A project is a group of notes that is treated as if it were a single note when displaying links to theorems in them.`;
+var Project = class {
+  constructor(root, name) {
+    this.root = root;
+    this.name = name != null ? name : root instanceof import_obsidian7.TFile ? root.basename : root.name;
   }
 };
-var VaultIndex = class {
-  constructor(app2, plugin) {
-    this.app = app2;
+var ProjectManager = class {
+  constructor(plugin, dumped) {
     this.plugin = plugin;
-    this.data = /* @__PURE__ */ new Map();
+    this.projects = /* @__PURE__ */ new Map();
+    this.dumped = dumped != null ? dumped : [];
+    this.plugin.registerEvent(
+      this.plugin.app.vault.on("rename", (file, oldPath) => {
+        const project = this.projects.get(file);
+        const basename = pathToBaseName(oldPath);
+        if ((project == null ? void 0 : project.name) == basename) {
+          new ProjectRootRenameModal(this.plugin, project, oldPath).open();
+        }
+      })
+    );
   }
-  getNoteIndex(file) {
-    const note = this.data.get(file);
-    if (note) {
-      return note;
+  add(root, name) {
+    this.projects.set(root, new Project(root, name));
+    const index = root instanceof import_obsidian7.TFile ? this.plugin.index.getNoteIndex(root) : root instanceof import_obsidian7.TFolder ? this.plugin.index.getNoteIndex(root) : void 0;
+    if (index) {
+      index.isProjectRoot = true;
     }
-    const newNote = new NoteIndex(file);
-    this.data.set(file, newNote);
-    return newNote;
+  }
+  delete(root) {
+    const index = root instanceof import_obsidian7.TFile ? this.plugin.index.getNoteIndex(root) : root instanceof import_obsidian7.TFolder ? this.plugin.index.getNoteIndex(root) : void 0;
+    if (index) {
+      index.isProjectRoot = false;
+    }
+    return this.projects.delete(root);
+  }
+  isRoot(file) {
+    if (file instanceof import_obsidian7.TFile) {
+      const index = this.plugin.index.getNoteIndex(file);
+      return index.isProjectRoot;
+    } else if (file instanceof import_obsidian7.TFolder) {
+      const index = this.plugin.index.getFolderIndex(file);
+      return index.isProjectRoot;
+    }
+  }
+  /**
+   * Return the project that `file` belongs to, if exists.
+   * @param file 
+   * @returns 
+   */
+  getProject(file) {
+    var _a;
+    let root = file;
+    while (root) {
+      if (root instanceof import_obsidian7.TFile || root instanceof import_obsidian7.TFolder) {
+        if (this.isRoot(root)) {
+          break;
+        }
+      }
+      root = root.parent;
+    }
+    if (root) {
+      return (_a = this.projects.get(root)) != null ? _a : null;
+    }
+    return null;
+  }
+  /**
+   * Return the project that `file` belongs to, the parent-project that the project belongs to, and so on.
+   * The first element of the returned array is the project that `file` directly belongs to.
+   * @param file 
+   * @returns 
+   */
+  getNestedProjects(file) {
+    const projects = [];
+    let project = this.getProject(file);
+    while (project == null ? void 0 : project.root.parent) {
+      projects.push(project);
+      project = this.getProject(project.root.parent);
+    }
+    return projects;
+  }
+  dump() {
+    const dumped = [];
+    for (const project of this.projects.values()) {
+      dumped.push({ rootPath: project.root.path, name: project.name });
+    }
+    return dumped;
+  }
+  load(dumped) {
+    dumped = dumped != null ? dumped : this.dumped;
+    for (const { rootPath, name } of dumped) {
+      const rootFile = this.plugin.app.vault.getAbstractFileByPath(rootPath);
+      if (rootFile) {
+        this.add(rootFile, name);
+      }
+    }
+  }
+};
+var makePrefixer = (plugin) => (sourceFile, targetFile, subpathResult) => {
+  var _a;
+  if (subpathResult.type == "heading") {
+    return null;
+  }
+  const item = plugin.index.getNoteIndex(targetFile).getItemById(subpathResult.block.id);
+  if ((item == null ? void 0 : item.type) != "theorem") {
+    return null;
+  }
+  const sourceProjects = plugin.projectManager.getNestedProjects(sourceFile);
+  const targetProjects = plugin.projectManager.getNestedProjects(targetFile);
+  if (targetProjects.length) {
+    let prefix = "";
+    for (let i = 0; i < targetProjects.length; i++) {
+      if (((_a = sourceProjects[i]) == null ? void 0 : _a.root) == targetProjects[i].root) {
+        break;
+      }
+      prefix = targetProjects[i].name + (i ? plugin.extraSettings.projectSep : "") + prefix;
+    }
+    if (prefix) {
+      prefix += plugin.extraSettings.projectInfix;
+    }
+    return prefix;
+  }
+  return null;
+};
+var ProjectRootRenameModal = class extends import_obsidian7.Modal {
+  constructor(plugin, project, oldPath) {
+    super(plugin.app);
+    this.plugin = plugin;
+    this.project = project;
+    this.oldPath = oldPath;
+    this.newName = this.project.root instanceof import_obsidian7.TFile ? this.project.root.basename : this.project.root.name;
+  }
+  onOpen() {
+    let { contentEl } = this;
+    contentEl.createEl("h3", { text: "Rename project?" });
+    contentEl.createDiv({
+      text: `The project "${this.project.name}" was named after its root ${this.oldPath}, but the root has been renamed ${this.project.root.path}. Do you want to rename the project "${this.newName}" accordingly?`
+    });
+    const buttonContainerEl = contentEl.createDiv({ cls: "math-booster-button-container" });
+    new import_obsidian7.ButtonComponent(buttonContainerEl).setButtonText("Rename").setCta().onClick(async () => {
+      this.project.name = this.newName;
+      this.close();
+    });
+    new import_obsidian7.ButtonComponent(buttonContainerEl).setButtonText("Keep it").onClick(() => {
+      this.close();
+    });
+  }
+  onClose() {
+    let { contentEl } = this;
+    contentEl.empty();
   }
 };
 
 // src/settings/helper.ts
-var MathCalloutSettingsHelper = class {
+var TheoremCalloutSettingsHelper = class {
   constructor(contentEl, settings, defaultSettings, plugin, file) {
     this.contentEl = contentEl;
     this.settings = settings;
@@ -8931,10 +9282,10 @@ var MathCalloutSettingsHelper = class {
   }
   makeSettingPane() {
     const { contentEl } = this;
-    new import_obsidian6.Setting(contentEl).setName("Type").addDropdown((dropdown) => {
+    new import_obsidian8.Setting(contentEl).setName("Type").addDropdown((dropdown) => {
       var _a;
       for (const id of THEOREM_LIKE_ENV_IDs) {
-        const envName = formatMathCalloutType(this.plugin, { type: id, profile: this.defaultSettings.profile });
+        const envName = formatTheoremCalloutType(this.plugin, { type: id, profile: this.defaultSettings.profile });
         dropdown.addOption(id, envName);
         if (this.defaultSettings.type) {
           dropdown.setValue(String(this.defaultSettings.type));
@@ -8942,7 +9293,7 @@ var MathCalloutSettingsHelper = class {
       }
       const initType = dropdown.getValue();
       this.settings.type = initType;
-      const numberSetting = new import_obsidian6.Setting(contentEl).setName("Number");
+      const numberSetting = new import_obsidian8.Setting(contentEl).setName("Number");
       const numberSettingDescList = numberSetting.descEl.createEl("ul");
       numberSettingDescList.createEl(
         "li",
@@ -8966,8 +9317,8 @@ var MathCalloutSettingsHelper = class {
           this.settings.number = value;
         });
       });
-      const titlePane = new import_obsidian6.Setting(contentEl).setName("Title").setDesc("You can use inline math.");
-      const labelPane = new import_obsidian6.Setting(contentEl).setName("Pandoc label");
+      const titlePane = new import_obsidian8.Setting(contentEl).setName("Title").setDesc("You can include inline math in the title.");
+      const labelPane = new import_obsidian8.Setting(contentEl).setName("Pandoc label");
       const labelPrefixEl = labelPane.controlEl.createDiv({
         text: THEOREM_LIKE_ENVs[this.settings.type].prefix + ":" + ((_a = this.defaultSettings.labelPrefix) != null ? _a : "")
       });
@@ -8987,7 +9338,7 @@ var MathCalloutSettingsHelper = class {
             this.settings.label = value;
           });
         });
-        text.setPlaceholder("ex) $\\sigma$-algebra").onChange((value) => {
+        text.setPlaceholder("Ex) $\\sigma$-algebra").onChange((value) => {
           this.settings.title = value;
           let labelInit = this.settings.title.replaceAll(" ", "-").replaceAll("'s", "").toLowerCase();
           labelInit = labelInit.replaceAll(/[^a-z0-1\-]/g, "");
@@ -9003,7 +9354,7 @@ var MathCalloutSettingsHelper = class {
         }
       });
     });
-    new import_obsidian6.Setting(contentEl).setName("Use this theorem callout to set this note's mathLink").addToggle((toggle) => {
+    new import_obsidian8.Setting(contentEl).setName("Use this theorem callout to set this note's mathLink").addToggle((toggle) => {
       var _a;
       this.settings.setAsNoteMathLink = (_a = this.defaultSettings.setAsNoteMathLink) != null ? _a : false;
       toggle.setValue(this.settings.setAsNoteMathLink);
@@ -9011,12 +9362,12 @@ var MathCalloutSettingsHelper = class {
         const cache = this.plugin.app.metadataCache.getFileCache(this.file);
         if (cache) {
           const indexer = new AutoNoteIndexer(this.plugin.app, this.plugin, this.file).getIndexer().calloutIndexer;
-          await indexer.iter(cache, async (mathCallout) => {
-            mathCallout.settings.setAsNoteMathLink = false;
+          await indexer.iter(cache, async (theoremCallout) => {
+            theoremCallout.settings.setAsNoteMathLink = false;
             await indexer.overwriteSettings(
-              mathCallout.cache.position.start.line,
-              mathCallout.settings,
-              formatTitle(this.plugin, indexer.resolveSettings(mathCallout))
+              theoremCallout.cache.position.start.line,
+              theoremCallout.settings,
+              formatTitle(this.plugin, this.file, indexer.resolveSettings(theoremCallout))
             );
           });
           this.settings.setAsNoteMathLink = value;
@@ -9044,7 +9395,7 @@ var SettingsHelper = class {
     });
   }
   addDropdownSetting(name, options, prettyName, description, defaultValue) {
-    const setting = new import_obsidian6.Setting(this.contentEl).setName(prettyName);
+    const setting = new import_obsidian8.Setting(this.contentEl).setName(prettyName);
     if (description) {
       setting.setDesc(description);
     }
@@ -9070,8 +9421,8 @@ var SettingsHelper = class {
     this.settingRefs[name] = setting;
     return setting;
   }
-  addTextSetting(name, prettyName, description) {
-    const setting = new import_obsidian6.Setting(this.contentEl).setName(prettyName);
+  addTextSetting(name, prettyName, description, number = false) {
+    const setting = new import_obsidian8.Setting(this.contentEl).setName(prettyName);
     if (description) {
       setting.setDesc(description);
     }
@@ -9080,7 +9431,11 @@ var SettingsHelper = class {
       var _a, _b;
       textComponent = text;
       text.setPlaceholder(String((_a = this.defaultSettings[name]) != null ? _a : "")).setValue(String((_b = this.settings[name]) != null ? _b : "")).onChange((value) => {
-        Object.assign(this.settings, { [name]: value });
+        if (number) {
+          Object.assign(this.settings, { [name]: +value });
+        } else {
+          Object.assign(this.settings, { [name]: value });
+        }
       });
     });
     if (this.addClear) {
@@ -9093,7 +9448,7 @@ var SettingsHelper = class {
     return setting;
   }
   addToggleSetting(name, prettyName, description) {
-    const setting = new import_obsidian6.Setting(this.contentEl).setName(prettyName);
+    const setting = new import_obsidian8.Setting(this.contentEl).setName(prettyName);
     if (description) {
       setting.setDesc(description);
     }
@@ -9116,15 +9471,15 @@ var SettingsHelper = class {
     this.settingRefs[name] = setting;
     return setting;
   }
-  addSliderSetting(name, prettyName, description) {
-    const setting = new import_obsidian6.Setting(this.contentEl).setName(prettyName);
+  addSliderSetting(name, limits, prettyName, description) {
+    const setting = new import_obsidian8.Setting(this.contentEl).setName(prettyName);
     if (description) {
       setting.setDesc(description);
     }
     let sliderComponent;
     setting.addSlider((slider) => {
       sliderComponent = slider;
-      slider.setLimits(0, 0.5, 0.01).setDynamicTooltip().setValue(this.defaultSettings[name]);
+      slider.setLimits(limits.min, limits.max, limits.step).setDynamicTooltip().setValue(this.defaultSettings[name]);
       if (typeof this.settings[name] == "number") {
         slider.setValue(this.settings[name]);
       }
@@ -9143,7 +9498,7 @@ var SettingsHelper = class {
 };
 var MathContextSettingsHelper = class extends SettingsHelper {
   constructor(contentEl, settings, defaultSettings, plugin, file) {
-    const isRoot = file instanceof import_obsidian6.TFolder && file.isRoot();
+    const isRoot = file instanceof import_obsidian8.TFolder && file.isRoot();
     super(contentEl, settings, defaultSettings, plugin, !isRoot, !isRoot);
     this.file = file;
   }
@@ -9151,32 +9506,50 @@ var MathContextSettingsHelper = class extends SettingsHelper {
     const { contentEl } = this;
     contentEl.createEl("h4", { text: "Theorem callouts" });
     this.addProfileSetting();
-    const styleSetting = this.addDropdownSetting("mathCalloutStyle", MATH_CALLOUT_STYLES, "Style");
+    const styleSetting = this.addDropdownSetting("theoremCalloutStyle", THEOREM_CALLOUT_STYLES, "Style");
     styleSetting.descEl.replaceChildren(
       "Choose between your custom style and preset styles. You will need to reload the note to see the changes. See the ",
       createEl("a", { text: "documentation", attr: { href: "https://ryotaushio.github.io/obsidian-math-booster/style-your-theorems.html" } }),
-      " for how to customize the appearance of theorem callouts."
+      ' for how to customize the appearance of theorem callouts. "Custom" is recommended, since it will give you the most control. You can view the CSS snippets for all the preset styles in the documentation or README on GitHub. The preset styles are only for a trial purpose, and they might not work well with some non-default themes.'
     );
-    this.addToggleSetting("mathCalloutFontInherit", "Don't override the app's font setting when using preset styles", "You will need to reload the note to see the changes.");
-    this.addTextSetting("titleSuffix", "Title suffix", 'ex) "" > Definition 2 (Group) / "." > Definition 2 (Group).');
+    this.addToggleSetting("theoremCalloutFontInherit", "Don't override the app's font setting when using preset styles", "You will need to reload the note to see the changes.");
+    this.addTextSetting("titleSuffix", "Title suffix", 'Ex) "" > Definition 2 (Group) / "." > Definition 2 (Group).');
     this.addTextSetting("labelPrefix", "Pandoc label prefix", 'Useful for ensuring no label collision. Ex) When "Pandoc label prefix" = "foo:", A theorem with "Pandoc label" = "bar" is assigned "thm:foo:bar."');
     contentEl.createEl("h6", { text: "Numbering" });
-    this.addTextSetting("numberPrefix", "Prefix");
+    this.addToggleSetting(
+      "inferNumberPrefix",
+      "Infer prefix from note title or properties",
+      `Automatically infer a prefix from the note title or properties. If the inference source (title or property) contains whitespaces, the substring before the first whitespace will be parsed for generating a prefix. Ex) To infer a prefix "1.2." from a property "section" with value "1.2-A", set "Use property as source" = "section", "Delimiter for parsing" = "-." (i.e. recognize "-" or "." in the note title as a delimiter), "Delimiter for generating prefix" = ".", and "Use first N" = 2.`
+    );
+    this.addTextSetting("inferNumberPrefixFromProperty", "Use property as source", "If set, use this property as the source of prefix inference. If not set, the note title will be used as the source.");
+    this.addTextSetting("inferNumberPrefixParseSep", "Delimiter for parsing");
+    this.addTextSetting("inferNumberPrefixPrintSep", "Delimiter for generating prefix");
+    this.addTextSetting("inferNumberPrefixUseFirstN", "Use first N", void 0, true);
+    this.addTextSetting("numberPrefix", "Manual prefix", 'Even if "Infer prefix from note title or properties" is turned on, the inferred prefix will be overwritten by the value set here.');
     this.addTextSetting("numberSuffix", "Suffix");
     this.addTextSetting("numberInit", "Initial count");
     this.addDropdownSetting("numberStyle", NUMBER_STYLES, "Style");
     this.addTextSetting("numberDefault", 'Default value for the "Number" field');
     contentEl.createEl("h6", { text: "Referencing" });
-    this.addDropdownSetting("refFormat", MATH_CALLOUT_REF_FORMATS, "Format");
+    this.addDropdownSetting("refFormat", THEOREM_REF_FORMATS, "Format");
     this.addDropdownSetting(
       "noteMathLinkFormat",
-      MATH_CALLOUT_REF_FORMATS,
+      THEOREM_REF_FORMATS,
       "Note mathLink format",
       `When a theorem callout's "Use this theorem callout to set this note's mathLink" setting is turned on, this format will be used for links to the note containing that theorem callout.`
     );
     contentEl.createEl("h4", { text: "Equations" });
     contentEl.createEl("h6", { text: "Numbering" });
-    this.addTextSetting("eqNumberPrefix", "Prefix");
+    this.addToggleSetting(
+      "inferEqNumberPrefix",
+      "Infer prefix from note title",
+      `Automatically infer a prefix from the note title. If the title contains whitespaces, the substring before the first whitespace will be parsed for generating a prefix. Ex) To infer a prefix "1.2." from a note "1.2-A foo.md", set "Delimiter for parsing note title" = "-." (i.e. recognize "-" or "." in the note title as a delimiter), "Delimiter for generating prefix" = ".", and "Use first N" = 2.`
+    );
+    this.addTextSetting("inferEqNumberPrefixFromProperty", "Use property as source", "If set, use this property as the source of prefix inference. If not set, the note title will be used as the source.");
+    this.addTextSetting("inferEqNumberPrefixParseSep", "Delimiter for parsing");
+    this.addTextSetting("inferEqNumberPrefixPrintSep", "Delimiter for generating prefix");
+    this.addTextSetting("inferEqNumberPrefixUseFirstN", "Use first N", void 0, true);
+    this.addTextSetting("eqNumberPrefix", "Manual prefix", 'Even if "Infer prefix from note title" is turned on, the inferred prefix will be overwritten by the value set here.');
     this.addTextSetting("eqNumberSuffix", "Suffix");
     this.addTextSetting("eqNumberInit", "Initial count");
     this.addDropdownSetting("eqNumberStyle", NUMBER_STYLES, "Style");
@@ -9196,7 +9569,7 @@ var MathContextSettingsHelper = class extends SettingsHelper {
   }
   addProfileSetting(defaultValue) {
     const profileSetting = this.addDropdownSetting("profile", Object.keys(this.plugin.extraSettings.profiles), "Profile", "A profile defines the displayed name of each environment.", defaultValue);
-    new import_obsidian6.ButtonComponent(profileSetting.controlEl).setButtonText("Manage profiles").onClick(() => {
+    new import_obsidian8.ButtonComponent(profileSetting.controlEl).setButtonText("Manage profiles").onClick(() => {
       new ManageProfileModal(this.plugin, this, profileSetting).open();
     });
     profileSetting.controlEl.classList.add("math-booster-profile-setting");
@@ -9206,14 +9579,17 @@ var MathContextSettingsHelper = class extends SettingsHelper {
 var ExtraSettingsHelper = class extends SettingsHelper {
   makeSettingPane() {
     this.addToggleSetting("noteTitleInLink", "Show note title at link's head", 'If turned on, a link to "Theorem 1" will look like "Note title > Theorem 1." The same applies to equations.');
-    this.addTextSetting("triggerSuggest", "Trigger suggestion with", "Type this string to trigger suggestion for theorem callouts & equation blocks.");
-    this.addTextSetting("triggerTheoremSuggest", "Trigger theorem suggestion with", "Type this string to trigger suggestion for theorem callouts.");
-    this.addTextSetting("triggerEquationSuggest", "Trigger equation suggestion with", "Type this string to trigger suggestion for equation blocks.");
-    this.addToggleSetting("renderMathInSuggestion", "Render math in equation suggestions", "Turn this off if you have a performance issue.");
+    this.addTextSetting("triggerSuggest", "Trigger suggestion with", `Type this string to trigger suggestion for theorem callouts & equation blocks. Changing this option requires to reloading ${this.plugin.manifest.name} to take effect.`);
+    this.addTextSetting("triggerTheoremSuggest", "Trigger theorem suggestion with", `Type this string to trigger suggestion for theorem callouts. Changing this option requires to reloading ${this.plugin.manifest.name} to take effect.`);
+    this.addTextSetting("triggerEquationSuggest", "Trigger equation suggestion with", `Type this string to trigger suggestion for equation blocks. Changing this option requires to reloading ${this.plugin.manifest.name} to take effect.`);
+    this.addSliderSetting("suggestNumber", { min: 1, max: 50, step: 1 }, "Number of suggestions", "Specify how many items are suggested at one time. Set it to a smaller value if you have a performance issue when equation suggestions with math rendering on.");
+    this.addToggleSetting("renderMathInSuggestion", "Render math in equation suggestions", "Turn this off if you have a performance issue and reducing the number of suggestions doesn't fix it.");
     this.addDropdownSetting("searchMethod", ["Fuzzy", "Simple"], "Search method", "Fuzzy search is more flexible, but simple search is more light-weight.");
-    this.addSliderSetting("upWeightRecent", "Up-weight recently opened notes by", 'It takes effect only if "Search only recently opened notes" is turned off.');
+    this.addSliderSetting("upWeightRecent", { min: 0, max: 0.5, step: 0.01 }, "Up-weight recently opened notes by", 'It takes effect only if "Search only recently opened notes" is turned off.');
     this.addToggleSetting("searchOnlyRecent", "Search only recently opened notes", "Turning this on might speed up suggestions.");
     this.addDropdownSetting("modifierToJump", ["Mod", "Ctrl", "Meta", "Shift", "Alt"], "Modifier key for jumping to suggestion", "Press Enter and this modifier key to jump to the currently selected suggestion. Changing this option requires to reloading " + this.plugin.manifest.name + " to take effect.");
+    this.addDropdownSetting("modifierToNoteLink", ["Mod", "Ctrl", "Meta", "Shift", "Alt"], "Modifier key for insert link to note", "Press Enter and this modifier key to insert a link to the note containing the currently selected item. Changing this option requires to reloading " + this.plugin.manifest.name + " to take effect.");
+    this.addToggleSetting("showModifierInstruction", "Show modifier key instruction", `Show the instruction for the modifier key at the bottom of suggestion box. Changing this option requires to reloading ${this.plugin.manifest.name} to take effect.`);
     const list = this.settingRefs.modifierToJump.descEl.createEl("ul");
     list.createEl("li", { text: "Mod is Cmd on MacOS and Ctrl on other OS." });
     list.createEl("li", { text: "Meta is Cmd on MacOS and Win key on Windows." });
@@ -9224,12 +9600,81 @@ var ExtraSettingsHelper = class extends SettingsHelper {
       cls: ["setting-item-description", "math-booster-setting-item-description"]
     });
     this.addDropdownSetting("backlinkLeafOption", LEAF_OPTIONS, "Opening option", "Specify how to open the selected backlink.");
+    this.addTextSetting("projectInfix", "Link infix", "Specify the infix to connect a project name and a theorem title or an equation number.");
+    this.addTextSetting("projectSep", "Separator for nested projects");
+  }
+};
+var ProjectSettingsHelper = class {
+  constructor(contentEl, parent) {
+    this.contentEl = contentEl;
+    this.parent = parent;
+    this.plugin = parent.plugin;
+    this.file = parent.file;
+  }
+  makeSettingPane() {
+    const project = this.plugin.projectManager.getProject(this.file);
+    const noteOrFolder = this.file instanceof import_obsidian8.TFile ? "note" : "folder";
+    let status = "";
+    if (project) {
+      if (project.root == this.file) {
+        status = `This ${noteOrFolder} is a project's root.`;
+      } else {
+        status = `This ${noteOrFolder} belongs to the project "${project.name}" (root: ${project.root.path}).`;
+      }
+    } else {
+      status = `This ${noteOrFolder} doesn't belong to any project.`;
+    }
+    this.contentEl.createEl("h4", { text: "Project (experimental)" });
+    this.contentEl.createDiv({
+      text: PROJECT_DESCRIPTION + " " + status,
+      cls: ["setting-item-description", "math-booster-setting-item-description"]
+    });
+    this.addRootSetting();
+    if (project) {
+      this.addNameSetting(project);
+    }
+  }
+  addRootSetting() {
+    const prettyName = "Set as project root";
+    const description = this.file instanceof import_obsidian8.TFile ? "If turned on, this file itself will be treated as a project." : "If turned on, all the files under this folder will be treated as a single project.";
+    let index;
+    if (this.file instanceof import_obsidian8.TFile) {
+      index = this.plugin.index.getNoteIndex(this.file);
+    } else if (this.file instanceof import_obsidian8.TFolder) {
+      index = this.plugin.index.getFolderIndex(this.file);
+    }
+    if (index) {
+      const setting = new import_obsidian8.Setting(this.contentEl).setName(prettyName).setDesc(description);
+      setting.addToggle((toggle) => {
+        toggle.setValue(index.isProjectRoot).onChange((value) => {
+          if (value) {
+            this.plugin.projectManager.add(this.file);
+          } else {
+            this.plugin.projectManager.delete(this.file);
+          }
+          this.parent.close();
+          this.parent.open();
+        });
+      });
+      return setting;
+    }
+  }
+  addNameSetting(project) {
+    const prettyName = "Project name";
+    const description = "A project name can contain inline math and doesn't have to be unique.";
+    const setting = new import_obsidian8.Setting(this.contentEl).setName(prettyName).setDesc(description);
+    setting.addText((text) => {
+      text.setValue(project.name).onChange((value) => {
+        project.name = value;
+      });
+    });
+    return setting;
   }
 };
 
 // src/modals.ts
-var import_obsidian7 = require("obsidian");
-var MathSettingModal = class extends import_obsidian7.Modal {
+var import_obsidian9 = require("obsidian");
+var MathSettingModal = class extends import_obsidian9.Modal {
   constructor(app2, plugin, callback) {
     super(app2);
     this.plugin = plugin;
@@ -9240,7 +9685,7 @@ var MathSettingModal = class extends import_obsidian7.Modal {
   }
   addButton(buttonText) {
     const { contentEl } = this;
-    new import_obsidian7.Setting(contentEl).addButton((btn) => {
+    new import_obsidian9.Setting(contentEl).addButton((btn) => {
       btn.setButtonText(buttonText).setCta().onClick(() => {
         this.close();
         if (this.callback) {
@@ -9262,7 +9707,7 @@ var MathSettingModal = class extends import_obsidian7.Modal {
     }
   }
 };
-var MathCalloutModal = class extends MathSettingModal {
+var TheoremCalloutModal = class extends MathSettingModal {
   constructor(app2, plugin, file, callback, buttonText, headerText, currentCalloutSettings) {
     super(app2, plugin, callback);
     this.file = file;
@@ -9286,9 +9731,9 @@ var MathCalloutModal = class extends MathSettingModal {
     if (this.headerText) {
       contentEl.createEl("h4", { text: this.headerText });
     }
-    const helper = new MathCalloutSettingsHelper(contentEl, this.settings, this.defaultSettings, this.plugin, this.file);
+    const helper = new TheoremCalloutSettingsHelper(contentEl, this.settings, this.defaultSettings, this.plugin, this.file);
     helper.makeSettingPane();
-    new import_obsidian7.Setting(contentEl).setName("Open local settings for the current note").addButton((button) => {
+    new import_obsidian9.Setting(contentEl).setName("Open local settings for the current note").addButton((button) => {
       button.setButtonText("Open").onClick(() => {
         const modal = new ContextSettingModal(
           this.app,
@@ -9313,12 +9758,19 @@ var ContextSettingModal = class extends MathSettingModal {
     const { contentEl } = this;
     contentEl.empty();
     contentEl.createEl("h3", { text: "Local settings for " + this.file.path });
+    contentEl.createDiv({
+      text: "If you want the change to apply to the entire vault, go to the plugin settings.",
+      cls: ["setting-item-description", "math-booster-setting-item-description"]
+    });
     if (this.plugin.settings[this.file.path] === void 0) {
       this.plugin.settings[this.file.path] = {};
     }
     const defaultSettings = this.file.parent ? resolveSettings(void 0, this.plugin, this.file.parent) : DEFAULT_SETTINGS;
     const contextSettingsHelper = new MathContextSettingsHelper(contentEl, this.plugin.settings[this.file.path], defaultSettings, this.plugin, this.file);
     contextSettingsHelper.makeSettingPane();
+    if (!(this.file instanceof import_obsidian9.TFolder && this.file.isRoot())) {
+      new ProjectSettingsHelper(contentEl, this).makeSettingPane();
+    }
     this.addButton("Save");
   }
   onClose() {
@@ -9330,7 +9782,7 @@ var ContextSettingModal = class extends MathSettingModal {
     }
   }
 };
-var FileSuggestModal = class extends import_obsidian7.FuzzySuggestModal {
+var FileSuggestModal = class extends import_obsidian9.FuzzySuggestModal {
   constructor(app2, plugin) {
     super(app2);
     this.plugin = plugin;
@@ -9342,10 +9794,10 @@ var FileSuggestModal = class extends import_obsidian7.FuzzySuggestModal {
     return file.path;
   }
   filterCallback(abstractFile) {
-    if (abstractFile instanceof import_obsidian7.TFile && abstractFile.extension != "md") {
+    if (abstractFile instanceof import_obsidian9.TFile && abstractFile.extension != "md") {
       return false;
     }
-    if (abstractFile instanceof import_obsidian7.TFolder && abstractFile.isRoot()) {
+    if (abstractFile instanceof import_obsidian9.TFolder && abstractFile.isRoot()) {
       return false;
     }
     for (const path of this.plugin.excludedFiles) {
@@ -9385,7 +9837,7 @@ var FileExcludeSuggestModal = class extends FileSuggestModal {
     return super.filterCallback(abstractFile);
   }
 };
-var ExcludedFileManageModal = class extends import_obsidian7.Modal {
+var ExcludedFileManageModal = class extends import_obsidian9.Modal {
   constructor(app2, plugin) {
     super(app2);
     this.plugin = plugin;
@@ -9398,7 +9850,7 @@ var ExcludedFileManageModal = class extends import_obsidian7.Modal {
     const { contentEl } = this;
     contentEl.empty();
     contentEl.createEl("h3", { text: "Excluded files/folders" });
-    new import_obsidian7.Setting(contentEl).setName("The files/folders in this list and their descendants will be excluded from suggestion for local settings.").addButton((btn) => {
+    new import_obsidian9.Setting(contentEl).setName("The files/folders in this list and their descendants will be excluded from suggestion for local settings.").addButton((btn) => {
       btn.setIcon("plus").onClick((event) => {
         new FileExcludeSuggestModal(this.app, this.plugin, this).open();
       });
@@ -9407,7 +9859,7 @@ var ExcludedFileManageModal = class extends import_obsidian7.Modal {
       const list = contentEl.createEl("ul");
       for (const path of this.plugin.excludedFiles) {
         const item = list.createEl("li").createDiv();
-        new import_obsidian7.Setting(item).setName(path).addExtraButton((btn) => {
+        new import_obsidian9.Setting(item).setName(path).addExtraButton((btn) => {
           btn.setIcon("x").onClick(async () => {
             this.plugin.excludedFiles.remove(path);
             this.newDisplay();
@@ -9422,15 +9874,56 @@ var ExcludedFileManageModal = class extends import_obsidian7.Modal {
     contentEl.empty();
   }
 };
+var DependencyNotificationModal = class extends import_obsidian9.Modal {
+  constructor(plugin) {
+    super(plugin.app);
+    this.plugin = plugin;
+  }
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.empty();
+    contentEl.createEl("h3", {
+      text: `Welcome to ${this.plugin.manifest.name}`
+    });
+    contentEl.createDiv({
+      text: `${this.plugin.manifest.name} requires the following plugins to work properly. Disable it once, install/update & enable the dependencies and enable it again.`,
+      attr: { style: "margin-bottom: 1em;" }
+    });
+    for (const depenedency of [
+      { id: "mathlinks", name: "MathLinks" },
+      { id: "dataview", name: "Dataview" }
+    ]) {
+      const depPlugin = this.app.plugins.getPlugin(depenedency.id);
+      const requiredVersion = this.plugin.dependencies[depenedency.id];
+      const isValid = depPlugin && !isPluginOlderThan(depPlugin, requiredVersion);
+      const setting = new import_obsidian9.Setting(contentEl).setName(depenedency.name).addExtraButton((button) => {
+        button.setIcon(isValid ? "checkmark" : "cross");
+        const el = button.extraSettingsEl;
+        el.addClass("math-booster-dependency-validation");
+        el.removeClass(isValid ? "invalid" : "valid");
+        el.addClass(isValid ? "valid" : "invalid");
+      });
+      setting.descEl.createDiv(
+        {
+          text: `Required version: ${requiredVersion}+ / ` + (depPlugin ? `Currently installed: ${depPlugin.manifest.version}` : `Not installed or enabled`)
+        }
+      );
+    }
+  }
+  onClose() {
+    const { contentEl } = this;
+    contentEl.empty();
+  }
+};
 
 // src/settings/tab.ts
-var MathSettingTab = class extends import_obsidian8.PluginSettingTab {
+var MathSettingTab = class extends import_obsidian10.PluginSettingTab {
   constructor(app2, plugin) {
     super(app2, plugin);
     this.plugin = plugin;
   }
   addRestoreDefaultsButton() {
-    new import_obsidian8.Setting(this.containerEl).addButton((btn) => {
+    new import_obsidian10.Setting(this.containerEl).addButton((btn) => {
       btn.setButtonText("Restore defaults");
       btn.onClick(async () => {
         Object.assign(this.plugin.settings[VAULT_ROOT], DEFAULT_SETTINGS);
@@ -9469,14 +9962,27 @@ var MathSettingTab = class extends import_obsidian8.PluginSettingTab {
       globalHelper.settingRefs.insertSpace.settingEl,
       extraHelper.settingRefs.searchMethod.settingEl
     );
+    const projectHeading = containerEl.createEl("h3", { text: "Projects (experimental)" });
+    const projectDesc = containerEl.createDiv({
+      text: PROJECT_DESCRIPTION,
+      cls: ["setting-item-description", "math-booster-setting-item-description"]
+    });
+    this.containerEl.insertBefore(
+      projectHeading,
+      extraHelper.settingRefs.projectInfix.settingEl
+    );
+    this.containerEl.insertAfter(
+      projectDesc,
+      projectHeading
+    );
     this.addRestoreDefaultsButton();
     containerEl.createEl("h3", { text: "Local" });
-    new import_obsidian8.Setting(containerEl).setName("Local settings").setDesc("You can set up file-specific or folder-specific configurations, which have more precedence than the global settings.").addButton((btn) => {
+    new import_obsidian10.Setting(containerEl).setName("Local settings").setDesc('You can set up local (i.e. file-specific or folder-specific) settings, which have more precedence than the global settings. Local settings can be configured in various ways; here in the plugin settings, right-clicking in the file explorer, the "Open local settings for the current file" command, and the "Open local settings for the current file" button in the theorem callout settings pop-ups.').addButton((btn) => {
       btn.setButtonText("Search files & folders").onClick(() => {
         new LocalContextSettingsSuggestModal(this.app, this.plugin, this).open();
       });
     });
-    new import_obsidian8.Setting(containerEl).setName("Excluded files").setDesc("You can make your search results more visible by excluding certain files or folders.").addButton((btn) => {
+    new import_obsidian10.Setting(containerEl).setName("Excluded files").setDesc("You can make your search results more visible by excluding certain files or folders.").addButton((btn) => {
       btn.setButtonText("Manage").onClick(() => {
         new ExcludedFileManageModal(this.app, this.plugin).open();
       });
@@ -9489,12 +9995,12 @@ var MathSettingTab = class extends import_obsidian8.PluginSettingTab {
   }
 };
 
-// src/math_callouts.ts
-var import_obsidian10 = require("obsidian");
+// src/theorem_callouts.ts
+var import_obsidian12 = require("obsidian");
 
 // src/backlinks.ts
-var import_obsidian9 = require("obsidian");
-var BacklinkModal = class extends import_obsidian9.Modal {
+var import_obsidian11 = require("obsidian");
+var BacklinkModal = class extends import_obsidian11.Modal {
   constructor(app2, plugin, backlinks, showPrev = 1, showNext = 1) {
     super(app2);
     this.plugin = plugin;
@@ -9530,11 +10036,11 @@ var BacklinkModal = class extends import_obsidian9.Modal {
   async renderBacklink(el, backlink) {
     const file = this.app.vault.getAbstractFileByPath(backlink.sourcePath);
     const cache = this.app.metadataCache.getCache(backlink.sourcePath);
-    if (file instanceof import_obsidian9.TFile && (cache == null ? void 0 : cache.sections)) {
+    if (file instanceof import_obsidian11.TFile && (cache == null ? void 0 : cache.sections)) {
       const io = getIO(this.plugin, file);
       const index = cache.sections.findIndex((secCache) => {
         const { start: secStart, end: secEnd } = secCache.position;
-        const { start: linkStart, end: linkEnd } = backlink.position;
+        const { start: linkStart, end: linkEnd } = backlink.link.position;
         return secStart.offset <= linkStart.offset && linkEnd.offset <= secEnd.offset;
       });
       el.createEl("h6", {
@@ -9546,22 +10052,22 @@ var BacklinkModal = class extends import_obsidian9.Modal {
           end: cache.sections[Math.min(index + this.showNext, cache.sections.length - 1)].position.end
         });
         const previewEl = el.createDiv({ cls: "math-booster-backlink-preview" });
-        import_obsidian9.MarkdownRenderer.renderMarkdown(content, previewEl, backlink.sourcePath, this.plugin);
+        import_obsidian11.MarkdownRenderer.renderMarkdown(content, previewEl, backlink.sourcePath, this.plugin);
       }
       this.plugin.registerDomEvent(
         el,
         "click",
         async () => {
           this.close();
-          await openFileAndSelectPosition(file, backlink.position, ...LEAF_OPTION_TO_ARGS[this.plugin.extraSettings.backlinkLeafOption]);
+          await openFileAndSelectPosition(file, backlink.link.position, ...LEAF_OPTION_TO_ARGS[this.plugin.extraSettings.backlinkLeafOption]);
         }
       );
     }
   }
 };
 
-// src/math_callouts.ts
-var MathCallout = class extends import_obsidian10.MarkdownRenderChild {
+// src/theorem_callouts.ts
+var TheoremCallout = class extends import_obsidian12.MarkdownRenderChild {
   constructor(containerEl, app2, plugin, settings, currentFile, context) {
     super(containerEl);
     this.app = app2;
@@ -9572,7 +10078,7 @@ var MathCallout = class extends import_obsidian10.MarkdownRenderChild {
     this.resolvedSettings = resolveSettings(this.settings, this.plugin, this.currentFile);
   }
   async setRenderedTitleElements() {
-    const titleWithoutSubtitle = await renderTextWithMath(formatTitleWithoutSubtitle(this.plugin, this.resolvedSettings));
+    const titleWithoutSubtitle = await renderTextWithMath(formatTitleWithoutSubtitle(this.plugin, this.currentFile, this.resolvedSettings));
     this.renderedTitleElements = [
       ...titleWithoutSubtitle
     ];
@@ -9595,29 +10101,28 @@ var MathCallout = class extends import_obsidian10.MarkdownRenderChild {
       this.containerEl.classList.add("theorem-callout-" + tag);
     }
     this.containerEl.classList.add("theorem-callout-" + this.resolvedSettings.type);
-    this.containerEl.toggleClass(`theorem-callout-${this.resolvedSettings.mathCalloutStyle.toLowerCase()}`, this.resolvedSettings.mathCalloutStyle != "Custom");
-    this.containerEl.toggleClass("theorem-callout-font-family-inherit", this.resolvedSettings.mathCalloutStyle != "Custom" && this.resolvedSettings.mathCalloutFontInherit);
-    const button = new import_obsidian10.ExtraButtonComponent(this.containerEl).setIcon("settings-2").setTooltip("Edit theorem callout settings");
+    this.containerEl.toggleClass(`theorem-callout-${this.resolvedSettings.theoremCalloutStyle.toLowerCase()}`, this.resolvedSettings.theoremCalloutStyle != "Custom");
+    this.containerEl.toggleClass("theorem-callout-font-family-inherit", this.resolvedSettings.theoremCalloutStyle != "Custom" && this.resolvedSettings.theoremCalloutFontInherit);
+    const button = new import_obsidian12.ExtraButtonComponent(this.containerEl).setIcon("settings-2").setTooltip("Edit theorem callout settings");
     button.extraSettingsEl.addEventListener("click", (ev) => {
       ev.stopPropagation();
       const cache = this.app.metadataCache.getFileCache(this.currentFile);
-      const view = this.app.workspace.getActiveViewOfType(import_obsidian10.MarkdownView);
-      const editor = view == null ? void 0 : view.editor;
-      if (editor) {
+      const view = this.app.workspace.getActiveViewOfType(import_obsidian12.MarkdownView);
+      if (view == null ? void 0 : view.file) {
         const lineNumber = this.getLineNumber(view, cache, ev);
-        new MathCalloutModal(
+        new TheoremCalloutModal(
           this.app,
           this.plugin,
           view.file,
           async (settings) => {
             this.settings = settings;
             this.resolvedSettings = resolveSettings(this.settings, this.plugin, this.currentFile);
-            const title = formatTitle(this.plugin, this.resolvedSettings);
+            const title = formatTitle(this.plugin, this.currentFile, this.resolvedSettings);
             const indexer = new AutoNoteIndexer(this.app, this.plugin, view.file).getIndexer();
             if (lineNumber !== void 0) {
               await indexer.calloutIndexer.overwriteSettings(lineNumber, this.settings, title);
             } else {
-              new import_obsidian10.Notice(
+              new import_obsidian12.Notice(
                 `${this.plugin.manifest.name}: Could not find the line number to overwrite. Retry later.`,
                 5e3
               );
@@ -9634,7 +10139,7 @@ var MathCallout = class extends import_obsidian10.MarkdownRenderChild {
       this.containerEl,
       "contextmenu",
       (event) => {
-        const menu = new import_obsidian10.Menu();
+        const menu = new import_obsidian12.Menu();
         menu.addItem((item) => {
           item.setTitle("Show backlinks");
           item.onClick((clickEvent) => {
@@ -9669,7 +10174,7 @@ var MathCallout = class extends import_obsidian10.MarkdownRenderChild {
     }
   }
   getBacklinks(event) {
-    const view = this.app.workspace.getActiveViewOfType(import_obsidian10.MarkdownView);
+    const view = this.app.workspace.getActiveViewOfType(import_obsidian12.MarkdownView);
     const cache = this.app.metadataCache.getFileCache(this.currentFile);
     if (!view || !cache)
       return null;
@@ -9679,11 +10184,11 @@ var MathCallout = class extends import_obsidian10.MarkdownRenderChild {
     return getBacklinks(this.app, this.plugin, this.currentFile, cache, (block) => block.position.start.line == lineNumber);
   }
 };
-function insertMathCalloutCallback(plugin, editor, config, currentFile) {
+function insertTheoremCalloutCallback(plugin, editor, config, currentFile) {
   const selection = editor.getSelection();
   const cursorPos = editor.getCursor();
   const resolvedSettings = resolveSettings(config, plugin, currentFile);
-  const title = formatTitle(plugin, resolvedSettings);
+  const title = formatTitle(plugin, currentFile, resolvedSettings);
   if (selection) {
     const nLines = splitIntoLines(selection).length;
     editor.replaceSelection(
@@ -9719,30 +10224,31 @@ function insertDisplayMath(editor) {
 }
 
 // src/equation_number.ts
-var import_obsidian11 = require("obsidian");
+var import_obsidian13 = require("obsidian");
 var import_view2 = require("@codemirror/view");
-var DisplayMathRenderChild = class extends import_obsidian11.MarkdownRenderChild {
+var DisplayMathRenderChild = class extends import_obsidian13.MarkdownRenderChild {
   constructor(containerEl, app2, plugin, context) {
     super(containerEl);
     this.app = app2;
     this.plugin = plugin;
     this.context = context;
     const file = this.app.vault.getAbstractFileByPath(context.sourcePath);
-    if (file instanceof import_obsidian11.TFile) {
+    if (file instanceof import_obsidian13.TFile) {
       this.file = file;
     }
   }
-  setId() {
-    if (this.id === void 0) {
-      const info = this.getInfo();
-      const cache = this.getCache();
-      if (cache && info) {
-        const mathCache = getMathCache(cache, info.lineStart);
-        if (mathCache && mathCache.id) {
-          this.id = mathCache.id;
-        }
-      }
+  getItem() {
+    var _a;
+    const info = this.getInfo();
+    const cache = this.getCache();
+    if (!info || !cache)
+      return null;
+    const id = (_a = getMathCache(cache, info.lineStart)) == null ? void 0 : _a.id;
+    if (id) {
+      const item = this.plugin.index.getNoteIndex(this.file).getItemById(id);
+      return item != null ? item : null;
     }
+    return null;
   }
   getCache() {
     return this.app.metadataCache.getCache(this.context.sourcePath);
@@ -9756,42 +10262,43 @@ var DisplayMathRenderChild = class extends import_obsidian11.MarkdownRenderChild
         "math-booster:index-updated",
         (indexer) => {
           if (indexer.file == this.file) {
-            this.impl(indexer);
+            this.impl();
           }
         }
       )
     );
     new AutoNoteIndexer(this.app, this.plugin, this.file).run();
   }
-  async impl(indexer) {
-    this.setId();
-    if (this.id) {
-      const mathLink = indexer.mathLinkBlocks[this.id];
-      const text = await indexer.io.getBlockTextFromID(this.id);
-      if (text) {
-        const settings = resolveSettings(void 0, this.plugin, this.file);
-        if (this.containerEl) {
-          replaceMathTag(this.containerEl, text, mathLink, settings);
-          this.plugin.registerDomEvent(
-            this.containerEl,
-            "contextmenu",
-            (event) => {
-              const menu = new import_obsidian11.Menu();
-              menu.addItem((item) => {
-                item.setTitle("Show backlinks");
-                item.onClick((clickEvent) => {
-                  if (clickEvent instanceof MouseEvent) {
-                    const backlinks = this.getBacklinks(event);
-                    new BacklinkModal(this.app, this.plugin, backlinks).open();
-                  }
-                });
-              });
-              menu.showAtMouseEvent(event);
-            }
-          );
-        }
-      }
+  async impl() {
+    if (this.containerEl.closest(".popover.hover-popover")) {
+      return;
     }
+    if (this.containerEl.closest(".markdown-embed")) {
+      return;
+    }
+    const item = this.getItem();
+    if ((item == null ? void 0 : item.type) != "equation" || !item.mathText) {
+      return;
+    }
+    const settings = resolveSettings(void 0, this.plugin, this.file);
+    replaceMathTag(this.containerEl, item.mathText, item.printName, settings);
+    this.plugin.registerDomEvent(
+      this.containerEl,
+      "contextmenu",
+      (event) => {
+        const menu = new import_obsidian13.Menu();
+        menu.addItem((item2) => {
+          item2.setTitle("Show backlinks");
+          item2.onClick((clickEvent) => {
+            if (clickEvent instanceof MouseEvent) {
+              const backlinks = this.getBacklinks(event);
+              new BacklinkModal(this.app, this.plugin, backlinks).open();
+            }
+          });
+        });
+        menu.showAtMouseEvent(event);
+      }
+    );
   }
   getBacklinks(event) {
     const cache = this.app.metadataCache.getFileCache(this.file);
@@ -9813,50 +10320,41 @@ function buildEquationNumberPlugin(plugin) {
       this.impl(update.view);
     }
     impl(view) {
-      const info = view.state.field(import_obsidian11.editorInfoField);
-      if (info.file && info.editor) {
-        const io = new ActiveNoteIO(plugin, info.file, info.editor);
-        this.callback(view, io);
+      const info = view.state.field(import_obsidian13.editorInfoField);
+      if (info.file) {
+        this.callback(view, info.file);
       }
     }
-    async callback(view, io) {
-      var _a, _b;
-      const mjxElements = view.contentDOM.querySelectorAll('mjx-container.MathJax > mjx-math[display="true"]');
-      const cache = app.metadataCache.getFileCache(io.file);
-      if (mjxElements && cache) {
-        for (let i = 0; i < mjxElements.length; i++) {
-          const mjxContainerEl = mjxElements[i].parentElement;
-          if (mjxContainerEl) {
-            try {
-              const pos = view.posAtDOM(mjxContainerEl);
-              const id = (_a = getMathCacheFromPos(cache, pos)) == null ? void 0 : _a.id;
-              if (id) {
-                const mathLink = (_b = plugin.getMathLinksAPI()) == null ? void 0 : _b.get(io.file.path, id);
-                const text = await io.getBlockTextFromID(id);
-                if (text) {
-                  const settings = resolveSettings(void 0, plugin, io.file);
-                  replaceMathTag(mjxContainerEl, text, mathLink, settings);
-                  plugin.registerDomEvent(
-                    mjxContainerEl,
-                    "contextmenu",
-                    (event) => {
-                      const menu = new import_obsidian11.Menu();
-                      menu.addItem((item) => {
-                        item.setTitle("Show backlinks");
-                        item.onClick((clickEvent) => {
-                          if (clickEvent instanceof MouseEvent) {
-                            const backlinks = this.getBacklinks(mjxContainerEl, event, io.file, view);
-                            new BacklinkModal(plugin.app, plugin, backlinks).open();
-                          }
-                        });
-                      });
-                      menu.showAtMouseEvent(event);
-                    }
-                  );
+    async callback(view, file) {
+      const mjxContainerElements = view.contentDOM.querySelectorAll('mjx-container.MathJax[display="true"]');
+      const cache = app.metadataCache.getFileCache(file);
+      if (cache) {
+        for (const mjxContainerEl of mjxContainerElements) {
+          try {
+            const pos = view.posAtDOM(mjxContainerEl);
+            const item = plugin.index.getNoteIndex(file).getItemByPos(pos, "equation");
+            if (item == null ? void 0 : item.mathText) {
+              const settings = resolveSettings(void 0, plugin, file);
+              replaceMathTag(mjxContainerEl, item.mathText, item.printName, settings);
+              plugin.registerDomEvent(
+                mjxContainerEl,
+                "contextmenu",
+                (event) => {
+                  const menu = new import_obsidian13.Menu();
+                  menu.addItem((item2) => {
+                    item2.setTitle("Show backlinks");
+                    item2.onClick((clickEvent) => {
+                      if (clickEvent instanceof MouseEvent) {
+                        const backlinks = this.getBacklinks(mjxContainerEl, event, file, view);
+                        new BacklinkModal(plugin.app, plugin, backlinks).open();
+                      }
+                    });
+                  });
+                  menu.showAtMouseEvent(event);
                 }
-              }
-            } catch (err) {
+              );
             }
+          } catch (err) {
           }
         }
       }
@@ -9882,67 +10380,60 @@ function buildEquationNumberPlugin(plugin) {
   });
 }
 function getMathTextWithTag(text, tag, lineByLine) {
-  const textResult = text.match(/^\$\$([\s\S]*)\$\$/);
   if (tag) {
     const tagResult = tag.match(/^\((.*)\)$/);
-    if (textResult && tagResult) {
-      const textContent = textResult[1];
+    if (tagResult) {
       const tagContent = tagResult[1];
-      return insertTagInMathText(textContent, tagContent, lineByLine);
+      return insertTagInMathText(text, tagContent, lineByLine);
     }
   }
-  return textResult == null ? void 0 : textResult[1];
+  return text;
 }
-function insertTagInMathText(textContent, tagContent, lineByLine) {
+function insertTagInMathText(text, tagContent, lineByLine) {
   if (lineByLine) {
-    const alignResult = textContent.match(/^\s*\\begin\{align\}([\s\S]*)\\end\{align\}\s*$/);
+    const alignResult = text.match(/^\s*\\begin\{align\}([\s\S]*)\\end\{align\}\s*$/);
     if (alignResult) {
-      let taggedText = "";
+      let alignContent = alignResult[1].split("\n").map((line) => {
+        const commentMatch = line.match(/(?<!\\)\%/);
+        return (commentMatch == null ? void 0 : commentMatch.index) !== void 0 ? line.substring(0, commentMatch.index) : line;
+      }).join("\n");
       let index = 1;
-      for (const line of alignResult[1].split("\\\\")) {
-        if (line.trim()) {
-          taggedText += line.contains("\\nonumber") ? line : line.trim() + `\\tag{${tagContent}-${index++}}`;
-          taggedText += "\\\\";
-        }
-      }
-      return "\\begin{align}" + taggedText + "\\end{align}";
+      alignContent = alignContent.split("\\\\").map(
+        (alignLine) => !alignLine.trim() || alignLine.contains("\\nonumber") ? alignLine : alignLine + `\\tag{${tagContent}-${index++}}`
+      ).join("\\\\");
+      return "\\begin{align}" + alignContent + "\\end{align}";
     }
   }
-  return textContent.replace(/[\n\r]/g, " ") + `\\tag{${tagContent}}`;
+  return text + `\\tag{${tagContent}}`;
 }
-function replaceMathTag(displayMathEl, text, mathLink, settings) {
+function replaceMathTag(displayMathEl, text, tag, settings) {
   const tagMatch = text.match(/\\tag\{.*\}/);
   if (tagMatch) {
     return;
   }
-  let tag = mathLink;
-  if (mathLink) {
-    tag = mathLink.slice(settings.eqRefPrefix.length, mathLink.length - settings.eqRefSuffix.length);
-  }
   const taggedText = getMathTextWithTag(text, tag, settings.lineByLine);
   if (taggedText) {
-    const mjxContainerEl = (0, import_obsidian11.renderMath)(taggedText, true);
+    const mjxContainerEl = (0, import_obsidian13.renderMath)(taggedText, true);
     displayMathEl.replaceChildren(...mjxContainerEl.childNodes);
-    (0, import_obsidian11.finishRenderMath)();
+    (0, import_obsidian13.finishRenderMath)();
   }
 }
 
 // src/math_live_preview_in_callouts.ts
-var import_obsidian12 = require("obsidian");
+var import_obsidian14 = require("obsidian");
 var import_state2 = require("@codemirror/state");
 var import_view4 = require("@codemirror/view");
 var import_language2 = require("@codemirror/language");
 
-// src/math_callout_metadata_hider.ts
+// src/theorem_callout_metadata_hider.ts
 var import_state = require("@codemirror/state");
 var import_language = require("@codemirror/language");
 var import_view3 = require("@codemirror/view");
-var MATH_CALLOUT_PATTERN_GLOBAL = new RegExp(MATH_CALLOUT_PATTERN.source, "g");
 var CALLOUT = /HyperMD-callout_HyperMD-quote_HyperMD-quote-([1-9][0-9]*)/;
 var CALLOUT_PRE_TITLE = (level) => new RegExp(`formatting_formatting-quote_formatting-quote-${level}_hmd-callout_quote_quote-${level}`);
 var DummyRangeValue = class extends import_state.RangeValue {
 };
-var mathCalloutMetadataHiderPlulgin = import_view3.ViewPlugin.fromClass(
+var theoremCalloutMetadataHiderPlulgin = import_view3.ViewPlugin.fromClass(
   class {
     constructor(view) {
       this.impl(view);
@@ -9967,7 +10458,7 @@ var mathCalloutMetadataHiderPlulgin = import_view3.ViewPlugin.fromClass(
               const calloutPreTitleNode = node.node.firstChild;
               if (calloutPreTitleNode == null ? void 0 : calloutPreTitleNode.name.match(CALLOUT_PRE_TITLE(level))) {
                 const text = nodeText(calloutPreTitleNode, view.state);
-                if (matchMathCallout(text)) {
+                if (matchTheoremCallout(text)) {
                   decorationBuilder.add(
                     calloutPreTitleNode.from + 2,
                     calloutPreTitleNode.to,
@@ -10027,7 +10518,7 @@ var MathPreviewWidget = class extends import_view4.WidgetType {
         }
       });
       cmEmbedBlockEl.appendChild(this.info.mathEl);
-      const editButton = new import_obsidian12.ExtraButtonComponent(cmEmbedBlockEl).setIcon("code-2").setTooltip("Edit this block");
+      const editButton = new import_obsidian14.ExtraButtonComponent(cmEmbedBlockEl).setIcon("code-2").setTooltip("Edit this block");
       editButton.extraSettingsEl.addEventListener("click", (ev) => {
         ev.stopPropagation();
         view.dispatch({ selection: { anchor: this.info.from + 2, head: this.info.to - 2 } });
@@ -10055,8 +10546,8 @@ var MathInfo = class extends import_state2.RangeValue {
     this.render();
   }
   async render() {
-    this.mathEl = (0, import_obsidian12.renderMath)(this.mathText, this.display);
-    await (0, import_obsidian12.finishRenderMath)();
+    this.mathEl = (0, import_obsidian14.renderMath)(this.mathText, this.display);
+    await (0, import_obsidian14.finishRenderMath)();
   }
   toWidget() {
     return new MathPreviewWidget(this);
@@ -10064,7 +10555,9 @@ var MathInfo = class extends import_state2.RangeValue {
   toDecoration(which) {
     return import_view4.Decoration[which]({
       widget: this.toWidget(),
-      block: this.display
+      block: this.display,
+      side: which == "widget" ? 1 : void 0
+      // To fix https://github.com/RyotaUshio/obsidian-math-booster/issues/173
     });
   }
 };
@@ -10094,7 +10587,7 @@ function buildMathInfoSet(state) {
           lastCalloutPos = node.to;
         }
       }
-      if (node.from < quoteContentStart) {
+      if (nodeText(node, state).trim() == ">" && node.from < quoteContentStart) {
         return;
       }
       if (insideMath) {
@@ -10266,15 +10759,15 @@ var displayMathPreviewForCallout = import_state2.StateField.define({
     return import_view4.Decoration.none;
   },
   update(value, transaction) {
+    const builder = new import_state2.RangeSetBuilder();
+    const range = transaction.state.selection.main;
+    const field = transaction.state.field(mathPreviewInfoField);
     if (isSourceMode(transaction.state)) {
       return import_view4.Decoration.none;
     }
     if (!transaction.docChanged && !overlapStateChanged(transaction.state)) {
       return value;
     }
-    const builder = new import_state2.RangeSetBuilder();
-    const range = transaction.state.selection.main;
-    const field = transaction.state.field(mathPreviewInfoField);
     field.mathInfoSet.between(
       0,
       transaction.state.doc.length,
@@ -10296,6 +10789,31 @@ var displayMathPreviewForCallout = import_state2.StateField.define({
     return import_view4.EditorView.decorations.from(field);
   }
 });
+var hideDisplayMathPreviewInQuote = import_view4.ViewPlugin.fromClass(
+  class {
+    constructor(view) {
+      this.impl(view);
+    }
+    update(update) {
+      this.impl(update.view);
+    }
+    impl(view) {
+      const field = view.state.field(mathPreviewInfoField);
+      for (const vanillaObsidianMathPreview of view.contentDOM.querySelectorAll(
+        `.cm-line:not(.HyperMD-quote) .math.math-block.cm-embed-block > mjx-container.MathJax[display="true"]:not(.math-booster-preview)`
+      )) {
+        const pos = view.posAtDOM(vanillaObsidianMathPreview);
+        if (rangeSetSome(field.mathInfoSet, (info) => info.from - 1 <= pos && pos <= info.to)) {
+          const cmWidgetBuffer = vanillaObsidianMathPreview.previousSibling;
+          if (cmWidgetBuffer instanceof HTMLElement && cmWidgetBuffer.matches(".cm-widget-buffer")) {
+            cmWidgetBuffer.remove();
+          }
+          vanillaObsidianMathPreview.remove();
+        }
+      }
+    }
+  }
+);
 function isInBlockquoteOrCallout(state) {
   const range = state.selection.main;
   const tree = (0, import_language2.syntaxTree)(state);
@@ -10374,7 +10892,7 @@ var displayMathPreviewForQuote = import_view4.ViewPlugin.fromClass(
 );
 
 // src/proof.ts
-var import_obsidian13 = require("obsidian");
+var import_obsidian15 = require("obsidian");
 var import_state3 = require("@codemirror/state");
 var import_view5 = require("@codemirror/view");
 var import_language3 = require("@codemirror/language");
@@ -10404,7 +10922,7 @@ function parseAtSignLink(codeEl) {
     }
   }
 }
-var ProofRenderChild = class extends import_obsidian13.MarkdownRenderChild {
+var ProofRenderChild = class extends import_obsidian15.MarkdownRenderChild {
   constructor(app2, plugin, containerEl, which, file, display) {
     super(containerEl);
     this.app = app2;
@@ -10463,7 +10981,7 @@ var ProofRenderChild = class extends import_obsidian13.MarkdownRenderChild {
 };
 var ProofProcessor = (app2, plugin, element, context) => {
   const file = plugin.app.vault.getAbstractFileByPath(context.sourcePath);
-  if (!(file instanceof import_obsidian13.TFile))
+  if (!(file instanceof import_obsidian15.TFile))
     return;
   const settings = resolveSettings(void 0, plugin, file);
   const codes = element.querySelectorAll("code");
@@ -10485,7 +11003,7 @@ var ProofProcessor = (app2, plugin, element, context) => {
     }
   }
 };
-var ProofWidget = class extends import_view5.WidgetType {
+var ProofWidget = class _ProofWidget extends import_view5.WidgetType {
   constructor(which, pos, profile, sourcePath, plugin) {
     super();
     this.which = which;
@@ -10499,7 +11017,7 @@ var ProofWidget = class extends import_view5.WidgetType {
       const el = createSpan({ cls: makeProofClasses(this.which, this.profile) });
       const display = this.pos.linktext ? `${this.profile.body.proof.linkedBeginPrefix} [[${this.pos.linktext}]]${this.profile.body.proof.linkedBeginSuffix}` : this.pos.display;
       if (display) {
-        ProofWidget.renderDisplay(el, display, this.sourcePath, this.plugin);
+        _ProofWidget.renderDisplay(el, display, this.sourcePath, this.plugin);
         return el;
       }
     }
@@ -10527,7 +11045,7 @@ var proofPositionFieldFactory = (plugin) => import_state3.StateField.define({
   }
 });
 function makeField(state, plugin) {
-  const file = state.field(import_obsidian13.editorInfoField).file;
+  const file = state.field(import_obsidian15.editorInfoField).file;
   if (!file)
     return [];
   const settings = resolveSettings(void 0, plugin, file);
@@ -10587,7 +11105,7 @@ var proofDecorationFactory = (plugin) => import_view5.ViewPlugin.fromClass(
       this.impl(update.view);
     }
     impl(view) {
-      const file = view.state.field(import_obsidian13.editorInfoField).file;
+      const file = view.state.field(import_obsidian15.editorInfoField).file;
       if (!file) {
         this.decorations = import_view5.Decoration.none;
         return;
@@ -10655,8 +11173,8 @@ function insertProof(plugin, editor, context) {
 }
 
 // src/suggest.ts
-var import_obsidian14 = require("obsidian");
-var Suggest = class extends import_obsidian14.EditorSuggest {
+var import_obsidian16 = require("obsidian");
+var Suggest = class extends import_obsidian16.EditorSuggest {
   constructor(app2, plugin, types) {
     super(app2);
     this.app = app2;
@@ -10671,6 +11189,19 @@ var Suggest = class extends import_obsidian14.EditorSuggest {
       openFileAndSelectPosition(item.file, item.cache.position, ...LEAF_OPTION_TO_ARGS[this.plugin.extraSettings.suggestLeafOption]);
       return false;
     });
+    this.scope.register([this.plugin.extraSettings.modifierToNoteLink], "Enter", () => {
+      const item = this.suggestions.values[this.suggestions.selectedItem];
+      this.selectSuggestionImpl(item, true);
+      return false;
+    });
+    if (this.plugin.extraSettings.showModifierInstruction) {
+      this.setInstructions([
+        { command: "\u2191\u2193", purpose: "to navigate" },
+        { command: "\u21B5", purpose: "to insert link" },
+        { command: `${getModifierNameInPlatform(this.plugin.extraSettings.modifierToNoteLink)} + \u21B5`, purpose: "to insert link to note" },
+        { command: `${getModifierNameInPlatform(this.plugin.extraSettings.modifierToJump)} + \u21B5`, purpose: "to jump" }
+      ]);
+    }
   }
   onTrigger(cursor, editor, file) {
     var _a, _b, _c;
@@ -10678,6 +11209,7 @@ var Suggest = class extends import_obsidian14.EditorSuggest {
     const text = editor.getRange({ line: cursor.line, ch: 0 }, cursor);
     const index = text.lastIndexOf(trigger);
     const query = text.slice(index + trigger.length);
+    this.limit = this.plugin.extraSettings.suggestNumber;
     return index >= 0 && !query.startsWith("[[") ? {
       start: { line: cursor.line, ch: index },
       end: cursor,
@@ -10685,20 +11217,22 @@ var Suggest = class extends import_obsidian14.EditorSuggest {
     } : null;
   }
   getSuggestions(context) {
-    const callback = (this.plugin.extraSettings.searchMethod == "Fuzzy" ? import_obsidian14.prepareFuzzySearch : import_obsidian14.prepareSimpleSearch)(context.query);
+    const callback = (this.plugin.extraSettings.searchMethod == "Fuzzy" ? import_obsidian16.prepareFuzzySearch : import_obsidian16.prepareSimpleSearch)(context.query);
     const results = [];
     const recentFilePaths = this.app.workspace.getLastOpenFiles();
     if (this.plugin.extraSettings.searchOnlyRecent) {
       const recentFiles = recentFilePaths.map((path) => this.app.vault.getAbstractFileByPath(path));
       for (const file of recentFiles) {
-        if (file instanceof import_obsidian14.TFile) {
+        if (file instanceof import_obsidian16.TFile) {
           const noteIndex = this.plugin.index.getNoteIndex(file);
           this.getSuggestionsImpl(noteIndex, results, callback);
         }
       }
     } else {
       for (const noteIndex of this.plugin.index.data.values()) {
-        this.getSuggestionsImpl(noteIndex, results, callback);
+        if (noteIndex instanceof NoteIndex) {
+          this.getSuggestionsImpl(noteIndex, results, callback);
+        }
       }
     }
     if (!this.plugin.extraSettings.searchOnlyRecent) {
@@ -10708,7 +11242,7 @@ var Suggest = class extends import_obsidian14.EditorSuggest {
         }
       });
     }
-    (0, import_obsidian14.sortSearchResults)(results);
+    (0, import_obsidian16.sortSearchResults)(results);
     return results.map((result) => result.item);
   }
   getSuggestionsImpl(noteIndex, results, callback) {
@@ -10716,7 +11250,7 @@ var Suggest = class extends import_obsidian14.EditorSuggest {
     for (const which of this.types) {
       for (const item of noteIndex[which]) {
         const cache = this.app.metadataCache.getFileCache(item.file);
-        const tags = cache ? (_a = (0, import_obsidian14.getAllTags)(cache)) != null ? _a : [] : [];
+        const tags = cache ? (_a = (0, import_obsidian16.getAllTags)(cache)) != null ? _a : [] : [];
         let text = `${item.printName} ${item.file.path} ${tags.join(" ")}`;
         if (item.type == "theorem" && item.settings) {
           const settings = resolveSettings(item.settings, this.plugin, item.file);
@@ -10745,9 +11279,9 @@ var Suggest = class extends import_obsidian14.EditorSuggest {
     );
     if (item.type == "equation" && item.mathText) {
       if (this.plugin.extraSettings.renderMathInSuggestion) {
-        const mjxContainerEl = (0, import_obsidian14.renderMath)(item.mathText, true);
+        const mjxContainerEl = (0, import_obsidian16.renderMath)(item.mathText, true);
         baseEl.insertBefore(mjxContainerEl, smallEl);
-        (0, import_obsidian14.finishRenderMath)();
+        (0, import_obsidian16.finishRenderMath)();
       } else {
         const mathTextEl = createDiv({ text: item.mathText });
         baseEl.insertBefore(mathTextEl, smallEl);
@@ -10755,9 +11289,9 @@ var Suggest = class extends import_obsidian14.EditorSuggest {
     }
   }
   selectSuggestion(item, evt) {
-    this.selectSuggestionImpl(item);
+    this.selectSuggestionImpl(item, false);
   }
-  async selectSuggestionImpl(item) {
+  async selectSuggestionImpl(item, insertNoteLink) {
     const cache = this.app.metadataCache.getFileCache(item.file);
     if (this.context && cache) {
       const { editor, start, end, file } = this.context;
@@ -10772,7 +11306,14 @@ var Suggest = class extends import_obsidian14.EditorSuggest {
         const result = await insertBlockIdIfNotExist(this.plugin, item.file, cache, sec);
         if (result) {
           const { id, lineAdded } = result;
-          const link = this.app.fileManager.generateMarkdownLink(item.file, file.path, `#^${id}`);
+          let linktext = "";
+          if (item.file != file) {
+            linktext += this.app.metadataCache.fileToLinktext(item.file, file.path);
+          }
+          if (!insertNoteLink) {
+            linktext += `#^${id}`;
+          }
+          const link = `[[${linktext}]]`;
           const insertText = link + (settings.insertSpace ? " " : "");
           if (item.file == file) {
             editor.replaceRange(
@@ -10787,7 +11328,7 @@ var Suggest = class extends import_obsidian14.EditorSuggest {
         }
       }
       if (!success) {
-        new import_obsidian14.Notice(`${this.plugin.manifest.name}: Failed to read cache. Retry again later.`, 5e3);
+        new import_obsidian16.Notice(`${this.plugin.manifest.name}: Failed to read cache. Retry again later.`, 5e3);
       }
     }
   }
@@ -10795,32 +11336,44 @@ var Suggest = class extends import_obsidian14.EditorSuggest {
 
 // src/main.ts
 var VAULT_ROOT = "/";
-var MathBooster3 = class extends import_obsidian15.Plugin {
+var MathBooster3 = class extends import_obsidian17.Plugin {
+  constructor() {
+    super(...arguments);
+    this.dependencies = {
+      "mathlinks": "0.4.6",
+      "dataview": "0.5.56"
+    };
+  }
   async onload() {
     await this.loadSettings();
     await this.saveSettings();
     this.addSettingTab(new MathSettingTab(this.app, this));
     this.app.workspace.onLayoutReady(() => {
-      this.assertDataview();
-      this.assertMathLinks();
+      if (!Object.keys(this.dependencies).every((id) => this.checkDependency(id))) {
+        new DependencyNotificationModal(this).open();
+      }
     });
     this.index = new VaultIndex(this.app, this);
-    this.app.workspace.onLayoutReady(() => {
+    this.app.workspace.onLayoutReady(async () => {
       var _a;
       if ((_a = Dataview.getAPI(this.app)) == null ? void 0 : _a.index.initialized) {
-        this.initializeIndex();
+        await this.initializeProjectManager();
+        await this.initializeIndex();
       }
     });
     this.registerEvent(
       this.app.metadataCache.on(
         "dataview:index-ready",
-        this.initializeIndex.bind(this)
+        async () => {
+          await this.initializeProjectManager();
+          await this.initializeIndex();
+        }
       )
     );
     this.registerEvent(
       this.app.metadataCache.on("dataview:metadata-change", async (...args) => {
         const changedFile = args[1];
-        if (changedFile instanceof import_obsidian15.TFile) {
+        if (changedFile instanceof import_obsidian17.TFile) {
           await new LinkedNotesIndexer(this.app, this, changedFile).run();
         }
         this.setOldLinkMap();
@@ -10838,7 +11391,7 @@ var MathBooster3 = class extends import_obsidian15.Plugin {
         );
         await Promise.all(promises);
         this.app.workspace.iterateRootLeaves((leaf) => {
-          if (leaf.view instanceof import_obsidian15.MarkdownView) {
+          if (leaf.view instanceof import_obsidian17.MarkdownView) {
             this.setProfileTagAsCSSClass(leaf.view);
           }
         });
@@ -10848,7 +11401,7 @@ var MathBooster3 = class extends import_obsidian15.Plugin {
       this.app.metadataCache.on("math-booster:global-settings-updated", async () => {
         await new VaultIndexer(this.app, this).run();
         this.app.workspace.iterateRootLeaves((leaf) => {
-          if (leaf.view instanceof import_obsidian15.MarkdownView) {
+          if (leaf.view instanceof import_obsidian17.MarkdownView) {
             this.setProfileTagAsCSSClass(leaf.view);
           }
         });
@@ -10856,14 +11409,14 @@ var MathBooster3 = class extends import_obsidian15.Plugin {
     );
     this.app.workspace.onLayoutReady(() => {
       this.app.workspace.iterateRootLeaves((leaf) => {
-        if (leaf.view instanceof import_obsidian15.MarkdownView) {
+        if (leaf.view instanceof import_obsidian17.MarkdownView) {
           this.setProfileTagAsCSSClass(leaf.view);
         }
       });
     });
     this.registerEvent(
       this.app.workspace.on("active-leaf-change", (leaf) => {
-        if ((leaf == null ? void 0 : leaf.view) instanceof import_obsidian15.MarkdownView) {
+        if ((leaf == null ? void 0 : leaf.view) instanceof import_obsidian17.MarkdownView) {
           this.setProfileTagAsCSSClass(leaf.view);
         }
       })
@@ -10899,14 +11452,14 @@ var MathBooster3 = class extends import_obsidian15.Plugin {
       id: "insert-theorem-callout",
       name: "Insert theorem callout",
       editorCallback: async (editor, context) => {
-        if (context instanceof import_obsidian15.MarkdownView) {
-          new MathCalloutModal(
+        if (context.file) {
+          new TheoremCalloutModal(
             this.app,
             this,
             context.file,
             (config) => {
               if (context.file) {
-                insertMathCalloutCallback(this, editor, config, context.file);
+                insertTheoremCalloutCallback(this, editor, config, context.file);
               }
             },
             "Insert",
@@ -10919,8 +11472,8 @@ var MathBooster3 = class extends import_obsidian15.Plugin {
       id: "open-local-settings-for-current-note",
       name: "Open local settings for the current note",
       callback: () => {
-        const view = this.app.workspace.getActiveViewOfType(import_obsidian15.MarkdownView);
-        if (view) {
+        const view = this.app.workspace.getActiveViewOfType(import_obsidian17.MarkdownView);
+        if (view == null ? void 0 : view.file) {
           new ContextSettingModal(this.app, this, view.file).open();
         }
       }
@@ -10930,12 +11483,23 @@ var MathBooster3 = class extends import_obsidian15.Plugin {
       name: "Insert proof",
       editorCallback: (editor, context) => insertProof(this, editor, context)
     });
-    this.registerEditorExtension(mathCalloutMetadataHiderPlulgin);
+    this.addCommand({
+      id: "convert-equation-number-to-tag",
+      name: "Convert equation numbers in the current note to static \\tag{}",
+      callback: () => {
+        const file = this.app.workspace.getActiveFile();
+        if (file) {
+          staticifyEqNumber(this, file);
+        }
+      }
+    });
+    this.registerEditorExtension(theoremCalloutMetadataHiderPlulgin);
     this.registerEditorExtension(buildEquationNumberPlugin(this));
     this.registerEditorExtension(mathPreviewInfoField);
     this.registerEditorExtension(inlineMathPreview);
     this.registerEditorExtension(displayMathPreviewForCallout);
     this.registerEditorExtension(displayMathPreviewForQuote);
+    this.registerEditorExtension(hideDisplayMathPreviewInQuote);
     this.proofPositionField = proofPositionFieldFactory(this);
     this.registerEditorExtension(this.proofPositionField);
     this.registerEditorExtension(proofDecorationFactory(this));
@@ -10947,30 +11511,25 @@ var MathBooster3 = class extends import_obsidian15.Plugin {
         const type = callout.getAttribute("data-callout");
         const metadata = callout.getAttribute("data-callout-metadata");
         if (metadata) {
-          const isMathCallout = (type == null ? void 0 : type.toLowerCase()) == "math";
-          if (isMathCallout) {
+          const isTheoremCallout = (type == null ? void 0 : type.toLowerCase()) == "math";
+          if (isTheoremCallout) {
             const settings = JSON.parse(metadata);
             const currentFile = this.app.vault.getAbstractFileByPath(context.sourcePath);
-            if (currentFile instanceof import_obsidian15.TFile) {
-              const mathCallout = new MathCallout(callout, this.app, this, settings, currentFile, context);
-              await mathCallout.setRenderedTitleElements();
-              context.addChild(mathCallout);
+            if (currentFile instanceof import_obsidian17.TFile) {
+              const theoremCallout = new TheoremCallout(callout, this.app, this, settings, currentFile, context);
+              await theoremCallout.setRenderedTitleElements();
+              context.addChild(theoremCallout);
             }
           }
         }
       }
     });
     this.registerMarkdownPostProcessor((element, context) => {
-      const mjxElements = element.querySelectorAll('mjx-container.MathJax > mjx-math[display="true"]');
-      if (mjxElements) {
-        for (let i = 0; i < mjxElements.length; i++) {
-          const mjxContainerEl = mjxElements[i].parentElement;
-          if (mjxContainerEl) {
-            context.addChild(
-              new DisplayMathRenderChild(mjxContainerEl, this.app, this, context)
-            );
-          }
-        }
+      const mjxContainerElements = element.querySelectorAll('mjx-container.MathJax[display="true"]');
+      for (const mjxContainerEl of mjxContainerElements) {
+        context.addChild(
+          new DisplayMathRenderChild(mjxContainerEl, this.app, this, context)
+        );
       }
     });
     this.registerMarkdownPostProcessor(
@@ -10985,7 +11544,7 @@ var MathBooster3 = class extends import_obsidian15.Plugin {
           item.setTitle(`${this.manifest.name}: Open local settings`).onClick(() => {
             new ContextSettingModal(this.app, this, file).open();
           });
-        });
+        }).addSeparator();
       })
     );
   }
@@ -10996,9 +11555,10 @@ var MathBooster3 = class extends import_obsidian15.Plugin {
     this.settings = { [VAULT_ROOT]: JSON.parse(JSON.stringify(DEFAULT_SETTINGS)) };
     this.extraSettings = JSON.parse(JSON.stringify(DEFAULT_EXTRA_SETTINGS));
     this.excludedFiles = [];
+    this.projectManager = new ProjectManager(this);
     const loadedData = await this.loadData();
     if (loadedData) {
-      const { settings, extraSettings, excludedFiles } = loadedData;
+      const { settings, extraSettings, excludedFiles, dumpedProjects } = loadedData;
       for (const path in settings) {
         if (path != VAULT_ROOT) {
           this.settings[path] = {};
@@ -11035,6 +11595,7 @@ var MathBooster3 = class extends import_obsidian15.Plugin {
         }
       }
       this.excludedFiles = excludedFiles;
+      this.projectManager = new ProjectManager(this, dumpedProjects);
     }
   }
   async saveSettings() {
@@ -11042,43 +11603,43 @@ var MathBooster3 = class extends import_obsidian15.Plugin {
       version: this.manifest.version,
       settings: this.settings,
       extraSettings: this.extraSettings,
-      excludedFiles: this.excludedFiles
+      excludedFiles: this.excludedFiles,
+      dumpedProjects: this.projectManager.dump()
     });
   }
-  assertDataview() {
-    if (!Dataview.isPluginEnabled(this.app)) {
-      new import_obsidian15.Notice(
-        `${this.manifest.name}: Make sure Dataview is installed & enabled.`,
-        1e4
-      );
+  /**
+   * Return true if the required plugin with the specified id is enabled and its version matches the requriement.
+   * @param id 
+   * @returns 
+   */
+  checkDependency(id) {
+    if (!this.app.plugins.enabledPlugins.has(id)) {
       return false;
     }
-    return true;
-  }
-  assertMathLinks() {
-    if (!isPluginEnabled(this.app)) {
-      new import_obsidian15.Notice(
-        `${this.manifest.name}: Make sure MathLinks is installed & enabled.`,
-        1e4
-      );
-      return false;
+    const depPlugin = this.app.plugins.getPlugin(id);
+    if (depPlugin) {
+      return !isPluginOlderThan(depPlugin, this.dependencies[id]);
     }
-    return true;
+    return false;
   }
   getMathLinksAPI() {
     const account = getAPIAccount(this);
     if (account) {
       account.blockPrefix = "";
-      account.enableFileNameBlockLinks = this.extraSettings.noteTitleInLink;
+      account.prefixer = makePrefixer(this);
       return account;
     }
   }
-  initializeIndex() {
+  async initializeIndex() {
     const indexStart = Date.now();
     this.setOldLinkMap();
-    new VaultIndexer(this.app, this).run();
+    await new VaultIndexer(this.app, this).run();
     const indexEnd = Date.now();
     console.log(`${this.manifest.name}: All theorem callouts and equations in the vault have been indexed in ${(indexEnd - indexStart) / 1e3}s.`);
+  }
+  async initializeProjectManager() {
+    this.projectManager.load();
+    await this.saveSettings();
   }
   getNewLinkMap() {
     var _a;
@@ -11091,6 +11652,8 @@ var MathBooster3 = class extends import_obsidian15.Plugin {
     }
   }
   setProfileTagAsCSSClass(view) {
+    if (!view.file)
+      return;
     const profile = getProfile(this, view.file);
     const classes = profile.meta.tags.map((tag) => `math-booster-${tag}`);
     for (const el of [getMarkdownSourceViewEl(view), getMarkdownPreviewViewEl(view)]) {
