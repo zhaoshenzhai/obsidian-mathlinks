@@ -34,7 +34,7 @@ export default class MathLinks extends Plugin {
 
         this.registerEditorExtension(createEditorExtensions(this));
 
-        this.registerEvent(this.app.metadataCache.on('changed', file => this.update(file)));
+        this.registerEvent(this.app.metadataCache.on('resolve', file => this.update(file)));
         // Force-update when switching between Reading & Editing views
         this.registerEvent(this.app.workspace.on('layout-change', () => this.update()));
 
@@ -122,7 +122,7 @@ export default class MathLinks extends Plugin {
                 let shouldDispatch = !file;
                 // Should dispatch if Obsidian is still yet to resolve links
                 shouldDispatch ||= !this.app.metadataCache.resolvedLinks;
-                if (file && leaf.view.file) {
+                if (file && leaf.view.file && this.app.metadataCache.resolvedLinks) {
                     // Should dispatch if the opened file (leaf.view.file) links to the changed file (file)
                     shouldDispatch ||= file.path in this.app.metadataCache.resolvedLinks[leaf.view.file.path];
                 }
