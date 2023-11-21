@@ -71,7 +71,7 @@ If you would like to point out a bug, add support, or have a feature request, do
 
 ## Changelog
 ### 0.5.x: _Source Mode and Outline support._
-* 0.5.2: Fixed an unhandled error that arose when Obsidian's link resolution was incomplete; updated the API functions to handle situations where MathLinks is not fully loaded when called.
+* 0.5.2: Fixed an unhandled error that arose when Obsidian's link resolution was incomplete ([#63](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/63)); updated the API functions to handle situations where MathLinks is not fully loaded when called ([#60](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/60)).
 * 0.5.1: Fixed a bug where enabling MathLinks while the cursor was over a link caused the link not to render properly until the next document change ([#58](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/58)); fixed an issue where the `update()` API function had no effect in Editing view ([#59](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/59)).
 * 0.5.0: Render MathJax in [outline](https://help.obsidian.md/Plugins/Outline) ([#55](https://github.com/zhaoshenzhai/obsidian-mathlinks/issues/55), [#57](https://github.com/zhaoshenzhai/obsidian-mathlinks/pull/57)).
 ### 0.4.x: _Heading/Block Links and API Integration._
