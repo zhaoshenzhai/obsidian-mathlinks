@@ -34,7 +34,7 @@ export default class MathLinks extends Plugin {
 
         this.registerEditorExtension(createEditorExtensions(this));
 
-        this.registerEvent(this.app.metadataCache.on('resolve', file => this.update(file)));
+        this.registerEvent(this.app.metadataCache.on('changed', file => this.update(file)));
         // Force-update when switching between Reading & Editing views
         this.registerEvent(this.app.workspace.on('layout-change', () => this.update()));
 
