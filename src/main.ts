@@ -122,7 +122,7 @@ export default class MathLinks extends Plugin {
                 let shouldDispatch = !file;
                 // Should dispatch if Obsidian is still yet to resolve links
                 shouldDispatch ||= !this.app.metadataCache.resolvedLinks;
-                if (file && leaf.view.file && this.app.metadataCache.resolvedLinks) {
+                if (file && leaf.view.file && this.app.metadataCache.resolvedLinks[leaf.view.file.path]) {
                     // Should dispatch if the opened file (leaf.view.file) links to the changed file (file)
                     shouldDispatch ||= file.path in this.app.metadataCache.resolvedLinks[leaf.view.file.path];
                 }
