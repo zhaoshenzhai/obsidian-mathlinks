@@ -1,4 +1,4 @@
-import { TFile, getLinkpath, MarkdownRenderChild, MarkdownPostProcessorContext } from "obsidian";
+import { TFile, getLinkpath, MarkdownRenderChild, MarkdownPostProcessorContext, finishRenderMath } from "obsidian";
 import { setMathLink, getMathLink } from "./helper"
 import { translateLink } from "../utils";
 import MathLinks from "../main"
@@ -59,6 +59,7 @@ export class MathLinksRenderChild extends MarkdownRenderChild {
         } else {
             setMathLink(this.displayText, this.mathLinkEl);
         }
+        finishRenderMath();
     }
 }
 

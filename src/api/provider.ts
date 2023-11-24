@@ -22,6 +22,12 @@ export abstract class Provider extends Component {
         this.mathLinks.update();
     }
 
+    /**
+     * Provide a displayed text for the given information about a link by returning `string`.
+     * You should return `null` as soon as possible if you don't want to handle the given link.
+     * 
+     * @param sourceFile Can be `null` for a canvas card that is not associated with any existing note in the vault.
+     */
     public abstract provide(
         parsedLinktext: { path: string, subpath: string },
         targetFile: TFile | null,
@@ -69,7 +75,7 @@ export class NativeProvider extends Provider {
                 mathLinks.settings.enableFileNameBlockLinks ? null : ""
             );
         } else if (parsedLinktext.path) {
-            mathLink = cache.frontmatter?.mathLink;
+            mathLink = cache.frontmatter?.mathLink ?? null;
             if (mathLink == "auto") {
                 mathLink = getMathLinkFromTemplates(mathLinks, targetFile);
             }
