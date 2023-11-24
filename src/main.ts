@@ -27,7 +27,12 @@ export default class MathLinks extends Plugin {
         // Markdown Post Processor for reading view
         this.registerMarkdownPostProcessor((element, context) => {
             let file = this.app.vault.getAbstractFileByPath(context.sourcePath);
-            if (file && isExcluded(this, file)) {
+            if (!file || !isExcluded(this, file)) {
+                // - !file: true if this is a canvas card that is not an embed of an existing note
+                // - !isExcluded: true if 
+                //     1. this is a canvas "add note from vault" card, or
+                //     2. this is a normal (non-canvas) markdown view
+                //   and the associated file is not excluded by the setting
                 generateMathLinks(this, element, context);
             }
         });

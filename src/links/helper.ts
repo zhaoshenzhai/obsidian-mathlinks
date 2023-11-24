@@ -1,5 +1,5 @@
 import { NativeProvider } from './../api/provider';
-import { TFile, renderMath, finishRenderMath, parseLinktext, resolveSubpath, BlockSubpathResult, HeadingSubpathResult } from "obsidian";
+import { TFile, renderMath, parseLinktext, resolveSubpath, BlockSubpathResult, HeadingSubpathResult } from "obsidian";
 import { MathLinksMetadata } from "../api/deprecated";
 import MathLinks from "../main";
 
@@ -15,7 +15,6 @@ export function setMathLink(source: string, mathLinkEl: HTMLElement) {
 
         const mathEl = renderMath(mathString, false);
         mathLinkEl.createSpan({ cls: ["math", "math-inline", "is-loaded"] }).replaceWith(mathEl);
-        finishRenderMath();
 
         textFrom = mathPattern.lastIndex;
     }
@@ -34,8 +33,10 @@ export function getMathLink(plugin: MathLinks, targetLink: string, sourcePath: s
 
     let subpathResult = resolveSubpath(cache, subpath);
 
+    
+
     const sourceFile = plugin.app.vault.getAbstractFileByPath(sourcePath);
-    if (!(sourceFile instanceof TFile)) {
+    if (!(sourceFile === null || sourceFile instanceof TFile)) {
         return "";
     }
 

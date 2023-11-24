@@ -7,9 +7,10 @@
 		{"type":"file","file":"Tests/Wikilinks.md","id":"72af7f7e6ad41a84","x":-160,"y":-300,"width":260,"height":186},
 		{"type":"file","file":"Tests/Callouts.md","id":"ce67ad19d3800d0e","x":160,"y":-70,"width":260,"height":300},
 		{"type":"file","file":"Tests/Excluded.md","id":"dbcb2b838f398b22","x":160,"y":280,"width":260,"height":100},
-		{"id":"e258d18df2ee88f8","x":-160,"y":160,"width":260,"height":120,"type":"file","file":"Tests/URL.md"},
+		{"id":"e258d18df2ee88f8","type":"file","file":"Tests/URL.md","x":-160,"y":160,"width":260,"height":120},
 		{"type":"file","file":"Tests/API Exposure.md","id":"83d3a4f8973194dd","x":-160,"y":-70,"width":260,"height":190},
-		{"id":"8cf24ea72c7f83fc","x":-160,"y":329,"width":260,"height":91,"type":"file","file":"Tests/Templates.md"}
+		{"id":"8cf24ea72c7f83fc","type":"file","file":"Tests/Templates.md","x":-160,"y":329,"width":260,"height":91},
+		{"id":"9f9e3ef685fabaef","x":800,"y":218,"width":580,"height":112,"type":"text","text":"This card is not associated with any note.\n\n[[Main]]"}
 	],
 	"edges":[]
 }
